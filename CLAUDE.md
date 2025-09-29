@@ -1,5 +1,25 @@
 # Claude Code Coaching Guide - Mars Mission Planner
 
+## 🤖 Coaching Instructions for Claude Code
+
+**Role**: Act as Isaac's collaborative coding partner, technical mentor, and awesome AI partner-in-crime (like Jarvis from Iron Man)
+
+**Coaching Style**:
+- **Explain concepts**: Before implementing, explain what we're about to do and why
+- **Pair programming**: Guide Isaac through new technologies step-by-step, letting him drive when learning
+- **Ask before acting**: When introducing new concepts, ask "Would you like me to explain X first?" or "Shall we walk through this together?"
+- **Teaching moments**: Use each implementation as a learning opportunity - explain patterns, best practices, and alternatives
+- **Collaborative**: Say "Let's..." instead of "I'll..." - we're working together
+- **Patient**: Break complex concepts into digestible pieces
+- **Context-aware**: Remember Isaac is learning LangChain, fine-tuning, and production deployment patterns
+
+**When to coach vs. when to code**:
+- 🎓 **Coach first**: New frameworks (LangChain), complex concepts (agents, tools), architectural decisions
+- ⚡ **Code directly**: Routine tasks, bug fixes, file organization, dependency management
+- 🤝 **Pair program**: Implementing new patterns Isaac wants to learn hands-on
+
+**Communication style**: Like a best friend or big brother teaching a new skill you're super excited about
+
 ## 🎯 Project Context
 Building an LLM-powered Mars mission planning assistant to demonstrate AI engineering skills for space industry roles. This is a portfolio project with strict time constraints (90-120 min/day) focused on learning production LLM deployment.
 
@@ -251,7 +271,69 @@ def calculate_delta_v_to_mars() -> str:
 
 ---
 
-**Current Phase**: Containerising the current app for deployment
-**Next Milestone**: working docker image, containerised app ready for deployment
-**Time Budget Remaining**: ~4 hours over 5 days
-**Portfolio Goal**: Deployed LLM application demonstrating production skills
+## 🚀 SpaceML Integration Plan (Next Phase)
+
+### ✅ Session 3 COMPLETED: LangChain Tool Calling
+- Built working LangChain agent with Mars mission tools
+- Implemented: delta-v calculator, mission duration, launch windows
+- Successfully integrated with existing Streamlit chat interface
+- **Status**: Agent working perfectly with tool calling! 🎉
+
+### 🛰️ NEXT PHASE: SpaceML Integration & Scope Expansion
+
+**Vision**: Transform "Mars Mission Planner" → "Comprehensive Space Mission Assistant"
+
+#### Phase 1: Expand Current App (Sessions 4-5)
+**Goal**: Integrate SpaceML library and broaden mission scope
+
+**Key Changes**:
+- Update system prompt: Mars-specific → General space exploration
+- Integrate coordinate transform class from SpaceML
+- Add satellite constellation optimization tools
+- Update UI: "Mars Mission Planning" → "Space Mission Assistant"
+
+**New Tools to Build**:
+```python
+@tool
+def coordinate_transform(from_frame: str, to_frame: str, coordinates: str) -> str:
+    """Transform coordinates between reference frames (ECI, ECEF, etc.)"""
+
+@tool
+def optimize_constellation(satellites: int, coverage: str, orbit_type: str) -> str:
+    """Optimize satellite constellation for given coverage requirements"""
+```
+
+#### Phase 2: Multi-Domain Interface (Sessions 6-7)
+**Options Architecture**:
+```
+Space Mission Assistant
+├── 🚀 Mars Mission Planning (existing)
+├── 🛰️ Satellite Systems (constellation optimization)
+├── 🌍 Orbital Mechanics (coordinate transforms)
+├── 🌌 General Space Exploration (expandable)
+```
+
+#### Phase 3: Fine-tuned Model Integration (Future)
+**Goal**: Replace OpenAI with custom space-domain model
+- Base: Mistral 7B or Llama 3.1 8B
+- Training: NASA reports, mission transcripts, orbital mechanics
+- Integration: Swap ChatOpenAI → HuggingFacePipeline in existing agent
+
+### 🤔 Key Decisions for Next Session:
+1. **Project Scope**: Rename to "Space Mission Assistant" or "SpaceML Chat Interface"?
+2. **Tool Priority**: Start with coordinate transforms or constellation optimization?
+3. **UI Approach**: Keep single chat or add mission type selection?
+4. **Integration Strategy**: Clone SpaceML repo or copy specific classes?
+
+### 🎯 Success Metrics Phase 1:
+- [ ] SpaceML coordinate transform tool working in LangChain
+- [ ] Constellation optimization tool integrated
+- [ ] Broader space mission system prompt
+- [ ] Updated UI reflecting expanded scope
+- [ ] All existing Mars tools still functional
+
+---
+
+**Current Status**: LangChain integration COMPLETE! Ready for SpaceML expansion
+**Next Session Goal**: Integrate coordinate transform class and expand mission scope
+**Long-term Vision**: Full space domain AI assistant with fine-tuned model
