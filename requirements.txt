@@ -1,0 +1,23 @@
+# Voyager - Chart your course through the cosmos
+# Production dependencies with pinned versions
+
+# Web framework
+streamlit==1.50.0
+
+# LLM providers
+openai==1.109.1
+anthropic==0.39.0
+
+# LangChain framework
+langchain==0.3.27
+langchain-core==0.3.76
+langchain-openai==0.3.33
+langchain-text-splitters==0.3.11
+
+# Utilities
+python-dotenv==1.0.0
+numpy==1.24.0
+
+# Testing (dev dependencies)
+pytest==7.4.3
+pytest-cov==4.1.0

@@ -5,7 +5,7 @@ import numpy as np
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain.prompts import ChatPromptTemplate
-from tools import calculate_delta_v_to_mars, calculate_mission_duration, find_launch_window
+from tools.mars_mission import calculate_delta_v_to_mars, calculate_mission_duration, find_launch_window
 
 load_dotenv()
 llm = ChatOpenAI(model ="gpt-3.5-turbo", api_key = os.getenv("OPENAI_API_KEY"), temperature =0)
