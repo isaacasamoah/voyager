@@ -4,8 +4,11 @@ Allows swapping between different LLM providers (Claude, GPT-4, local models)
 without changing application code.
 """
 
+import os
 from abc import ABC, abstractmethod
 from typing import Optional
+
+import anthropic
 
 
 class LLMProvider(ABC):
