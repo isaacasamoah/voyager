@@ -6,8 +6,9 @@ from langchain_anthropic import ChatAnthropic
 from langchain.agents import AgentExecutor, create_tool_calling_agent
 from langchain.prompts import ChatPromptTemplate
 from tools.mars_mission import calculate_delta_v_to_mars, calculate_mission_duration, find_launch_window
-from voyager_brain import VoyagerBrain 
-from llm.providers import ClaudeProvider 
+from voyager_brain import VoyagerBrain
+from llm.providers import ClaudeProvider
+from agents.iss_agent import ISSAgent 
 
 load_dotenv()
 llm = ChatAnthropic(
@@ -17,6 +18,7 @@ llm = ChatAnthropic(
 )
 
 brain = VoyagerBrain(ClaudeProvider())
+iss_agent = ISSAgent(brain)
 
 tools = [calculate_delta_v_to_mars, calculate_mission_duration, find_launch_window]
 
@@ -75,18 +77,37 @@ for message in st.session_state.messages:
 user_input = st.chat_input("Chart your course through the cosmos")
 
 if user_input:
-    st.session_state.messages.append({"role": "user", "content": user_input})   
+    st.session_state.messages.append({"role": "user", "content": user_input})
+
+    with st.chat_message("user"):
+        st.write(user_input)
+
     try:
+        # Parse query to determine task type
         parsed_params = brain.parse_query(user_input)
         with st.expander("🧠 Query Analysis", expanded=False):
             st.json(parsed_params)
+
+        task = parsed_params.get("task")
+
+        # Route to appropriate agent based on task
+        with st.chat_message("assistant"):
+            if task in ["iss_location", "people_in_space"]:
+                # Use ISSAgent for ISS queries
+                ai_response = iss_agent.query(user_input)
+                st.write(ai_response)
+            else:
+                # Use LangChain agent for Mars missions
+                response = agent_executor.invoke({"input": user_input})
+                ai_response = response["output"][0]["text"]
+                st.write(ai_response)
+
+        st.session_state.messages.append({"role": "assistant", "content": ai_response})
+
     except Exception as e:
-        parsed_params = None
-        st.warning(f"Query parsing failed: {e}")
-    
-    response = agent_executor.invoke({"input": user_input})
-    ai_response = response["output"][0]["text"]
-    st.session_state.messages.append({"role": "assistant", "content": ai_response})
-    st.rerun()
+        with st.chat_message("assistant"):
+            error_msg = f"Sorry, I encountered an error: {str(e)}"
+            st.error(error_msg)
+            st.session_state.messages.append({"role": "assistant", "content": error_msg})
   
   
