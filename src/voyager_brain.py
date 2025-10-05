@@ -66,20 +66,32 @@ class VoyagerBrain:
         #       - Return ONLY valid JSON (no extra text)
         #       - Extract mission-related parameters
 
-        system_prompt = """you are a space mission parameter parser.
-                            Extract parameters from user queries, with particular emphasis on space missions
-                            return ONLY valid JSON with no explanations or extra text
-                            
-                            Examples: 
-                            User: "I would like to rotate my satellite 40 degrees on the y-axis"
-                            Output: {"task" : "coordinate transform", "axis": "y", "rotation": "40"}
+        system_prompt = """You are a space mission parameter parser.
+Extract parameters from user queries about space missions and ISS tracking.
+Return ONLY valid JSON with no explanations or extra text.
 
-                            User:  "I would like to optimse my constellation of 7 satellites for efficiency only"
-                            Output: {"task": "optimisation", "satellites": 7, "weights" : {"efficiency" : 1,
-                                                                                         "redundancy" : 0, 
-                                                                                         "communication": 0}}
+Available tasks:
+- "iss_location" - Get current ISS position
+- "people_in_space" - List astronauts currently in space
+- "coordinate_transform" - Satellite rotation/transformation
+- "optimization" - Constellation optimization
 
-                            """
+Examples:
+User: "Where is the ISS right now?"
+Output: {"task": "iss_location"}
+
+User: "Who is in space?"
+Output: {"task": "people_in_space"}
+
+User: "Show me ISS location"
+Output: {"task": "iss_location"}
+
+User: "I would like to rotate my satellite 40 degrees on the y-axis"
+Output: {"task": "coordinate_transform", "axis": "y", "rotation": 40}
+
+User: "Optimize my constellation of 7 satellites for efficiency only"
+Output: {"task": "optimization", "satellites": 7, "weights": {"efficiency": 1, "redundancy": 0, "communication": 0}}
+"""
         
         response = self.llm.complete(prompt = user_input,
                                     system_prompt = system_prompt,
