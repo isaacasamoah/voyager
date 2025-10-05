@@ -3,6 +3,10 @@
 Uses VoyagerBrain to parse queries and routes to ISS tracker functions.
 """
 
+import sys
+import os
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
+
 from voyager_brain import VoyagerBrain
 from data.sources.iss_tracker import (
     get_iss_location,
@@ -43,39 +47,46 @@ class ISSAgent:
             "Who is in space?" -> "12 people in space: Oleg Kononenko (ISS)..."
         """
         # TODO: Use brain to parse the query
-        # parsed = self.brain.parse_query(user_input)
+        parsed = self.brain.parse_query(user_input)
 
         # TODO: Route based on task
-        # task = parsed.get("task")
+        task = parsed.get("task")
 
         # TODO: Call appropriate ISS tracker function
-        # if task == "iss_location":
-        #     return self._handle_iss_location()
-        # elif task == "people_in_space":
-        #     return self._handle_people_in_space()
+        if task == "iss_location":
+             return self._handle_iss_location()
+        elif task == "people_in_space":
+             return self._handle_people_in_space()
 
         pass
 
     def _handle_iss_location(self) -> str:
         """Handle ISS location query."""
-        # TODO: Call get_iss_location()
-        # TODO: Call get_nearest_city() with lat/lon
-        # TODO: Call format_timestamp()
-        # TODO: Return formatted string like:
-        #       "ISS is over Paris, France at 2025-10-05 12:30:00 UTC"
-        pass
+        iss_pos = get_iss_location()
+        nearest_city = get_nearest_city(iss_pos["latitude"], iss_pos["longitude"])
+        timestamp = format_timestamp(iss_pos["timestamp"])
+        return (f"ISS is over {nearest_city}, at {timestamp}")
+       
 
     def _handle_people_in_space(self) -> str:
         """Handle people in space query."""
-        # TODO: Call get_people_in_space()
-        # TODO: Format into readable string
-        # TODO: Return something like:
-        #       "12 people in space:\n  - Oleg Kononenko on ISS\n  - ..."
-        pass
+        people_in_space = get_people_in_space()
+        result = f"{people_in_space['number']} people in space: \n"
+        for person in people_in_space["people"]:
+            result +=f" - {person['name']} on {person['craft']}\n"
+            
+            
+        return result
+       
+      
 
 
 if __name__ == "__main__":
+    import sys
+    sys.path.insert(0, '/home/isaac/voyager/src')
+
     from llm.providers import ClaudeProvider
+    from voyager_brain import VoyagerBrain
     from dotenv import load_dotenv
 
     load_dotenv()
@@ -85,4 +96,5 @@ if __name__ == "__main__":
     agent = ISSAgent(brain)
 
     print(agent.query("Where is the ISS right now?"))
-    print("\n" + agent.query("Who is in space?"))
+    print()
+    print(agent.query("Who is in space?"))

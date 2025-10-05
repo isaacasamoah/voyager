@@ -27,7 +27,7 @@ class VoyagerBrain:
             llm_provider: Any LLM provider implementing LLMProvider interface
                          (ClaudeProvider, OpenAIProvider, etc.)
         """
-        # TODO: Store the llm_provider as self.llm (or self.provider)
+      
         self.llm = llm_provider 
        
 

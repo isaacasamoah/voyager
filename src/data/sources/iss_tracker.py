@@ -35,7 +35,7 @@ def get_nearest_city(lat: float, lon: float) -> str:
     """
     try:
         geolocator = Nominatim(user_agent="voyager_iss_tracker")
-        location = geolocator.reverse(f"{lat}, {lon}", timeout=10)
+        location = geolocator.reverse(f"{lat}, {lon}", language='en', timeout=10)
 
         if location and location.raw.get('address'):
             address = location.raw['address']
