@@ -1,116 +1,267 @@
-# Voyager
-**Chart your course through the cosmos**
+# Voyager 🌌
+**Chart your course through the cosmos with AI-powered space intelligence**
 
-AI-powered space mission planning assistant that combines conversational interfaces with specialized orbital mechanics tools.
+> A revolutionary platform combining real-time satellite tracking, advanced constellation optimization, and natural language interfaces to democratize access to space data and mission planning.
 
-## 🚀 Features
+## ✨ Vision
 
-- **Mars Mission Planning**: Calculate delta-v requirements, mission durations, and launch windows
-- **LangChain Tool Calling**: Specialized orbital mechanics calculations powered by LLM agents
-- **LLM Provider Abstraction**: Swap between OpenAI and Claude (Anthropic) seamlessly
-- **Beautiful UI**: Clean Streamlit interface for natural language mission planning
+Voyager is more than a tool—it's a **movement to make space accessible to everyone**. Whether you're a researcher analyzing satellite constellations, an engineer planning missions, or an enthusiast exploring the cosmos, Voyager bridges the gap between complex space systems and human curiosity.
 
-## 📦 Installation
+We believe that:
+- 🌍 **Space data should be open and understandable** to researchers, students, and enthusiasts worldwide
+- 🤝 **Community-driven innovation** accelerates discovery and learning
+- 🧠 **AI should augment human intelligence**, not replace it
+- 🚀 **The future of space exploration** belongs to those who collaborate
+
+## 🛰️ Features
+
+### Real-Time Space Intelligence
+- **ISS Tracking**: Live position tracking of the International Space Station with astronaut roster
+- **Starlink Constellation Monitoring**: Track 6000+ Starlink satellites in real-time using TLE data from Celestrak
+- **Human-Readable Locations**: Every position geocoded to nearest city or geographic region
+
+### Advanced Constellation Optimization
+- **SpaceML Integration**: Eigenvalue-based multi-constraint optimization
+- **Customizable Weights**: Balance efficiency, redundancy, and communication priorities
+- **Before/After Analysis**: Visualize optimization impact with side-by-side comparisons
+- **Real Satellite Data**: Optimize actual Starlink constellations, not simulations
+
+### Intelligent Agent System
+- **VoyagerBrain**: Natural language query parser powered by Claude
+- **Specialized Agents**:
+  - `ISSAgent` - ISS tracking and astronaut data
+  - `ConstellationAgent` - Starlink tracking and optimization
+  - `MarsAgent` - Mission planning with LangChain tools
+- **Multi-Agent Routing**: Intelligent task dispatch based on query intent
+
+### Natural Language Interface
+Ask questions naturally:
+- *"Where is the ISS right now?"*
+- *"Show me 10 Starlink satellites"*
+- *"Optimize 5 satellites for communication efficiency"*
+- *"Calculate delta-v for a Mars transfer"*
+- *"Who is currently in space?"*
+
+## 🚀 Quick Start
 
 ### Prerequisites
 - Python 3.11+
-- Conda (recommended) or pip
+- Anthropic API key (for Claude)
+- Git
 
-### Setup
+### Installation
 
-1. **Clone the repository**
 ```bash
+# Clone the repository
 git clone https://github.com/isaacasamoah/voyager.git
 cd voyager
-```
 
-2. **Create conda environment**
-```bash
+# Create environment
 conda env create -f environment.yml
 conda activate voyager
-```
 
-Or with pip:
-```bash
+# Or use pip
 pip install -r requirements.txt
-```
 
-3. **Configure API keys**
-```bash
+# Configure API keys
 cp .env.example .env
-# Edit .env and add your API keys
+# Edit .env and add your ANTHROPIC_API_KEY
 ```
 
-## 🎯 Quick Start
+### Launch
 
 ```bash
-# Activate environment
-conda activate voyager
-
-# Run the app
 streamlit run src/app.py
 ```
 
-Navigate to `http://localhost:8501` and start planning your Mars mission!
+Navigate to `http://localhost:8501` and start exploring! 🌌
 
-## 🏗️ Project Structure
+### Example Queries
+
+Try these in the chat interface:
+
+```
+"Where is the ISS?"
+"Track 5 Starlink satellites"
+"Optimize 10 Starlink satellites prioritizing efficiency"
+"Who is in space right now?"
+"Calculate mission duration to Mars"
+```
+
+## 🏗️ Architecture
 
 ```
 voyager/
-├── src/                           # Source code
-│   ├── app.py                     # Main Streamlit application
-│   ├── llm/                       # LLM provider abstraction
-│   │   └── providers.py           # Abstract LLM interface
-│   └── tools/                     # LangChain tools
-│       └── mars_mission.py        # Mars mission calculations
-├── tests/                         # Test suite
-├── docs/                          # Documentation
-├── requirements.txt               # Python dependencies
-├── environment.yml                # Conda environment
-└── .env.example                   # Environment variables template
+├── src/
+│   ├── app.py                          # Streamlit UI with multi-agent routing
+│   ├── voyager_brain.py                # Natural language query parser
+│   ├── agents/                         # Specialized agent implementations
+│   │   ├── iss_agent.py               # ISS tracking agent
+│   │   └── constellation_agent.py      # Starlink tracking & optimization
+│   ├── data/sources/                   # Real-time data sources
+│   │   ├── iss_tracker.py             # ISS position & astronaut data
+│   │   └── starlink_tracker.py        # TLE fetching & orbit propagation
+│   ├── spaceml/                        # Constellation optimization
+│   │   └── constellation_optimizer.py  # Eigenvalue-based optimizer
+│   ├── llm/                            # LLM provider abstraction
+│   │   └── providers.py               # Claude & OpenAI providers
+│   └── tools/                          # LangChain mission planning tools
+│       └── mars_mission.py            # Delta-v, duration, launch windows
+├── tests/                              # Test suite
+└── docs/                               # Documentation
 ```
-
-## 🛠️ Development
-
-### Run Tests
-```bash
-pytest tests/
-```
-
-### Code Style
-This project follows PEP 8 conventions with type hints and comprehensive docstrings.
 
 ## 📚 Tech Stack
 
-- **UI Framework**: Streamlit
-- **LLM Providers**: OpenAI (GPT-3.5-turbo), Anthropic (Claude)
-- **Agent Framework**: LangChain
-- **Calculations**: NumPy, custom orbital mechanics
+**AI & ML**
+- Claude (Anthropic) - Query understanding & response generation
+- LangChain - Agent framework for Mars mission planning
+- Custom SpaceML - Eigenvalue-based constellation optimization
 
-## 🎓 Learning Resources
+**Space Systems**
+- Skyfield - Satellite orbit propagation (SGP4)
+- Celestrak - TLE data source for satellite tracking
+- Open Notify API - ISS real-time data
 
-See `docs/VOYAGER.md` for comprehensive project documentation including:
-- Technical implementation guide
-- Architecture decisions
-- Future roadmap (SpaceML integration, fine-tuning)
+**Data & Computation**
+- NumPy - Numerical computing
+- SciPy - Optimization algorithms (L-BFGS-B)
+- Geopy - Geocoding (Nominatim)
 
-## 🤝 Contributing
+**Interface**
+- Streamlit - Interactive web UI
+- Python 3.11+ - Core implementation
 
-This is a portfolio/learning project. Feedback and suggestions welcome!
+## 🎯 Use Cases
+
+### For Researchers
+- Analyze real-time constellation configurations
+- Test optimization algorithms on live satellite data
+- Study orbital mechanics with interactive tools
+
+### For Engineers
+- Plan mission parameters (delta-v, launch windows)
+- Optimize satellite deployments
+- Visualize constellation coverage
+
+### For Students
+- Learn orbital mechanics interactively
+- Explore agentic AI architectures
+- Understand space systems through natural language
+
+### For Space Enthusiasts
+- Track the ISS in real-time
+- Follow Starlink satellite positions
+- Discover who's currently in space
+
+## 🤝 Join the Community
+
+Voyager is built on the belief that **space exploration advances through collaboration**. We're building a global community of researchers, engineers, students, and enthusiasts working together to democratize space intelligence.
+
+### Ways to Contribute
+
+🌟 **Share Your Ideas**
+- Open issues for features you'd love to see
+- Suggest improvements to existing functionality
+- Share your use cases and learnings
+
+🔧 **Improve the Code**
+- Submit pull requests for bug fixes
+- Add new data sources (GPS, weather satellites, etc.)
+- Enhance optimization algorithms
+- Improve documentation
+
+📚 **Expand Knowledge**
+- Write tutorials and guides
+- Share research findings using Voyager
+- Create educational content
+- Translate documentation
+
+🎨 **Enhance Experience**
+- Design better visualizations
+- Improve UI/UX
+- Add accessibility features
+
+### Community Guidelines
+
+We're committed to maintaining a welcoming, inclusive environment where:
+- Questions are encouraged, not judged
+- Diverse perspectives drive innovation
+- Collaboration trumps competition
+- Learning together is the goal
+
+**Code of Conduct**: Be respectful, constructive, and curious.
+
+## 🛣️ Roadmap
+
+### Near Term (Q1 2026)
+- [ ] GPS constellation tracking
+- [ ] 3D satellite visualization
+- [ ] Coverage map generation
+- [ ] Historical position playback
+- [ ] Export optimization results
+
+### Mid Term (Q2-Q3 2026)
+- [ ] Multi-constellation comparison
+- [ ] Launch schedule integration
+- [ ] Space weather data
+- [ ] Orbital debris tracking
+- [ ] Fine-tuned space-domain LLM
+
+### Long Term (2026+)
+- [ ] Real-time collision avoidance
+- [ ] Mission planning automation
+- [ ] Community dataset sharing
+- [ ] API for external integrations
+- [ ] Mobile app
+
+## 📖 Documentation
+
+- **[Getting Started Guide](docs/VOYAGER.md)** - Comprehensive setup and usage
+- **[Architecture Overview](docs/ARCHITECTURE.md)** - System design and agent patterns
+- **[API Reference](docs/API.md)** - Function and agent documentation
+- **[Contributing Guide](CONTRIBUTING.md)** - How to get involved
+
+## 🙏 Acknowledgments
+
+Built with inspiration from:
+- The global space community making data accessible
+- Open source projects advancing AI and orbital mechanics
+- Researchers sharing knowledge and tools freely
+
+Special thanks to:
+- **Celestrak** for TLE data
+- **Open Notify** for ISS tracking APIs
+- **Anthropic** for Claude's natural language understanding
+- **The Skyfield Team** for orbit propagation tools
 
 ## 📄 License
 
-MIT License - see LICENSE file for details
+MIT License - see [LICENSE](LICENSE) file for details
 
-## 🌌 Future Vision
+Free for academic, commercial, and personal use. We only ask that you:
+- Credit Voyager in your work
+- Share improvements back with the community
+- Help make space accessible to all
 
-- **SpaceML Integration**: Coordinate transformations, constellation optimization
-- **Fine-tuned Models**: Custom space-domain LLM (Mistral 7B / Llama 3.1 8B)
-- **Multi-mode Interface**: Expand beyond Mars to general space mission planning
+## 🌠 Get Started Today
+
+```bash
+git clone https://github.com/isaacasamoah/voyager.git
+cd voyager
+conda env create -f environment.yml
+conda activate voyager
+streamlit run src/app.py
+```
+
+**Let's explore the cosmos together.** 🚀
 
 ---
 
-**Current Status**: LLM provider abstraction layer (Step 1 complete)
-**Next Milestone**: Claude provider implementation (Step 2)
+*Built with curiosity, powered by community, designed for the future of space exploration.*
 
-*Built with ❤️ for the space industry*
+**Questions?** Open an issue or start a discussion!
+**Want to contribute?** We'd love to have you—check out our [Contributing Guide](CONTRIBUTING.md)!
+
+[![Twitter Follow](https://img.shields.io/twitter/follow/voyagerspace?style=social)](https://twitter.com/voyagerspace)
+[![GitHub Stars](https://img.shields.io/github/stars/isaacasamoah/voyager?style=social)](https://github.com/isaacasamoah/voyager)
