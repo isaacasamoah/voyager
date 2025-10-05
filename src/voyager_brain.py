@@ -73,8 +73,9 @@ Return ONLY valid JSON with no explanations or extra text.
 Available tasks:
 - "iss_location" - Get current ISS position
 - "people_in_space" - List astronauts currently in space
+- "track_starlink" - Track current Starlink satellite positions
+- "optimize_constellation" - Optimize Starlink constellation positions
 - "coordinate_transform" - Satellite rotation/transformation
-- "optimization" - Constellation optimization
 
 Examples:
 User: "Where is the ISS right now?"
@@ -83,14 +84,17 @@ Output: {"task": "iss_location"}
 User: "Who is in space?"
 Output: {"task": "people_in_space"}
 
-User: "Show me ISS location"
-Output: {"task": "iss_location"}
+User: "Show me 5 Starlink satellites"
+Output: {"task": "track_starlink", "satellites": 5}
 
-User: "I would like to rotate my satellite 40 degrees on the y-axis"
-Output: {"task": "coordinate_transform", "axis": "y", "rotation": 40}
+User: "Where are 10 Starlink satellites right now?"
+Output: {"task": "track_starlink", "satellites": 10}
 
-User: "Optimize my constellation of 7 satellites for efficiency only"
-Output: {"task": "optimization", "satellites": 7, "weights": {"efficiency": 1, "redundancy": 0, "communication": 0}}
+User: "Optimize 5 Starlink satellites for efficiency"
+Output: {"task": "optimize_constellation", "satellites": 5, "weights": {"efficiency": 0.7, "redundancy": 0.2, "communication": 0.1}}
+
+User: "Optimize 10 Starlink satellites balancing all constraints"
+Output: {"task": "optimize_constellation", "satellites": 10, "weights": {"efficiency": 0.33, "redundancy": 0.33, "communication": 0.34}}
 """
         
         response = self.llm.complete(prompt = user_input,

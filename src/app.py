@@ -8,7 +8,8 @@ from langchain.prompts import ChatPromptTemplate
 from tools.mars_mission import calculate_delta_v_to_mars, calculate_mission_duration, find_launch_window
 from voyager_brain import VoyagerBrain
 from llm.providers import ClaudeProvider
-from agents.iss_agent import ISSAgent 
+from agents.iss_agent import ISSAgent
+from agents.constellation_agent import ConstellationAgent 
 
 load_dotenv()
 llm = ChatAnthropic(
@@ -19,6 +20,7 @@ llm = ChatAnthropic(
 
 brain = VoyagerBrain(ClaudeProvider())
 iss_agent = ISSAgent(brain)
+constellation_agent = ConstellationAgent(brain)
 
 tools = [calculate_delta_v_to_mars, calculate_mission_duration, find_launch_window]
 
@@ -95,6 +97,10 @@ if user_input:
             if task in ["iss_location", "people_in_space"]:
                 # Use ISSAgent for ISS queries
                 ai_response = iss_agent.query(user_input)
+                st.write(ai_response)
+            elif task in ["optimize_constellation", "track_starlink"]:
+                # Use ConstellationAgent for Starlink queries
+                ai_response = constellation_agent.query(user_input)
                 st.write(ai_response)
             else:
                 # Use LangChain agent for Mars missions

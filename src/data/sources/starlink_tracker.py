@@ -4,7 +4,10 @@ import requests
 import numpy as np
 from skyfield.api import load, wgs84, EarthSatellite
 from typing import List, Dict, Tuple
-from iss_tracker import get_nearest_city
+try:
+    from iss_tracker import get_nearest_city
+except ModuleNotFoundError:
+    from data.sources.iss_tracker import get_nearest_city
 
 def fetch_starlink_tles(max_satellites=None):
     """Fetch Startlink TLE data from CElestrak
