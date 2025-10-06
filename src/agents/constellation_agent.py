@@ -82,6 +82,7 @@ class ConstellationAgent:
         result += f"- Communication: {weights['communication']:.0%}\n\n"
 
         try:
+            result += f"*Fetching satellite data (first request may take 30s, then cached for 1 hour)...*\n\n"
             constellation = get_starlink_constellation(num_satellites)
 
             result += f"## 📍 Current Constellation Positions\n\n"
@@ -121,6 +122,7 @@ class ConstellationAgent:
         result += f"**Tracking {num_satellites} Starlink satellites**\n\n"
 
         try:
+            result += f"*Fetching satellite data (first request may take 30s, then cached for 1 hour)...*\n\n"
             constellation = get_starlink_constellation(num_satellites)
 
             result += f"## 📍 Current Positions\n\n"
