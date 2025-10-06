@@ -7,37 +7,32 @@ dependencies:
   - python=3.11
 
   # Web framework
-  - streamlit=1.50.0
+  - streamlit
 
   # LLM providers
-  - anthropic=0.69.0
+  - anthropic
 
   # LangChain ecosystem
-  - langchain=0.3.27
-  - langchain-core=0.3.76
-  - langchain-anthropic=0.3.21
-  - langchain-openai=0.3.33
-  - langchain-text-splitters=0.3.11
+  - langchain
+  - langchain-core
+  - langchain-anthropic
+  - langchain-openai
+  - langchain-text-splitters
 
   # Scientific computing
-  - numpy=2.3.3
-  - scipy=1.16.2
+  - numpy
+  - scipy
 
   # Space science
-  - skyfield=1.53
-  - geopy=2.4.1
+  - skyfield
+  - geopy
 
   # Utilities
-  - requests=2.32.5
-  - python-dotenv=1.0.0
+  - requests
+  - python-dotenv
   - pydantic
 
-  # Testing
-  - pytest=8.4.2
-  - black
-  - flake8
-
-  # Pip-only (openai SDK not on conda-forge)
+  # Pip-only
   - pip
   - pip:
-    - openai==1.109.1
+    - openai>=1.0
