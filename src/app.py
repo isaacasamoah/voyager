@@ -140,8 +140,24 @@ The cosmos awaits your questions."""
                 st.write(ai_response)
             elif task in ["optimize_constellation", "track_starlink"]:
                 # Use ConstellationAgent for Starlink queries
-                ai_response = constellation_agent.query(user_input)
-                st.write(ai_response)
+                response = constellation_agent.query(user_input)
+
+                # Handle visualization separately if optimization was run
+                if isinstance(response, tuple):
+                    ai_response, constellation, optimized, num_satellites = response
+                    st.write(ai_response)
+
+                    # Show visualization after text
+                    from visualization.satellite_viz import visualize_satellites
+                    fig = visualize_satellites(
+                        constellation,
+                        optimized,
+                        title=f"Starlink Optimization ({num_satellites} satellites)"
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    ai_response = response
+                    st.write(ai_response)
             else:
                 # Use LangChain agent for Mars missions
                 response = agent_executor.invoke({"input": user_input})

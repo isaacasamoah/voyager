@@ -57,15 +57,18 @@ def visualize_satellites(positions, optimized_positions=None, title="Satellite C
     # Add current satellite positions
     fig.add_trace(go.Scatter3d(
         x=x, y=y, z=z,
-        mode='markers',
+        mode='markers+text',
         marker=dict(
             size=8,
             color='#FF6B6B',  # Coral red for current
             symbol='diamond',
             line=dict(color='white', width=1)
         ),
+        text=[f'{i+1}' for i in range(len(lats))],  # Satellite numbers
+        textposition='top center',
+        textfont=dict(size=10, color='#FF6B6B', family='Arial Black'),
         name='Current Position',
-        text=[f'Sat {i+1}: ({lats[i]:.1f}°, {lons[i]:.1f}°)' for i in range(len(lats))],
+        hovertext=[f'Satellite {i+1}<br>({lats[i]:.1f}°, {lons[i]:.1f}°)' for i in range(len(lats))],
         hoverinfo='text'
     ))
 
@@ -76,15 +79,18 @@ def visualize_satellites(positions, optimized_positions=None, title="Satellite C
 
         fig.add_trace(go.Scatter3d(
             x=opt_x, y=opt_y, z=opt_z,
-            mode='markers',
+            mode='markers+text',
             marker=dict(
                 size=8,
                 color='#4ECDC4',  # Teal for optimized
                 symbol='circle',
                 line=dict(color='white', width=1)
             ),
+            text=[f'{i+1}' for i in range(len(opt_lats))],  # Satellite numbers
+            textposition='bottom center',
+            textfont=dict(size=10, color='#4ECDC4', family='Arial Black'),
             name='Optimized Position',
-            text=[f'Sat {i+1}: ({opt_lats[i]:.1f}°, {opt_lons[i]:.1f}°)' for i in range(len(opt_lats))],
+            hovertext=[f'Satellite {i+1}<br>({opt_lats[i]:.1f}°, {opt_lons[i]:.1f}°)' for i in range(len(opt_lats))],
             hoverinfo='text'
         ))
 

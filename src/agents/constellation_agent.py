@@ -101,23 +101,20 @@ class ConstellationAgent:
             result += f"\n## ⚙️ Running SpaceML Eigenvalue Optimizer...\n\n"
             optimized = optimize_satellite_positions(constellation, weights)
 
-            # Show 3D visualization
-            if HAS_STREAMLIT:
-                result += f"## 🌍 3D Constellation Visualization\n\n"
-                fig = visualize_satellites(
-                    constellation,
-                    optimized,
-                    title=f"Starlink Optimization ({num_satellites} satellites)"
-                )
-                st.plotly_chart(fig, use_container_width=True)
-
-            result += f"\n## ✅ Optimized Constellation\n\n"
+            result += f"## ✅ Optimized Constellation\n\n"
             for i, pos in enumerate(optimized, 1):
                 new_city = get_nearest_city(pos[0], pos[1])
                 orig = constellation[i-1]
                 orig_city = get_nearest_city(orig[0], orig[1])
                 result += f"**Satellite {i}:** `{pos[0]:6.2f}°, {pos[1]:7.2f}°` → {new_city}  \n"
                 result += f"  *Moved from: `{orig[0]:6.2f}°, {orig[1]:7.2f}°` ({orig_city})*  \n\n"
+
+            # Show 3D visualization at the bottom
+            if HAS_STREAMLIT:
+                result += f"\n## 🌍 3D Constellation Visualization\n\n"
+                # Return result text first, then show visualization separately
+                # This way text is visible before the chart
+                return result, constellation, optimized, num_satellites
 
             return result
 
