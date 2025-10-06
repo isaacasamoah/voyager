@@ -15,9 +15,14 @@ def fetch_starlink_tles(max_satellites=None):
     """
     url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
 
-    response = requests.get(url)
-    if response.status_code != 200:
-        raise RuntimeError(f"Failed to fetch TLES: {response.status_code}")
+    try:
+        response = requests.get(url, timeout=10)  # 10 second timeout
+        if response.status_code != 200:
+            raise RuntimeError(f"Failed to fetch TLES: {response.status_code}")
+    except requests.exceptions.Timeout:
+        raise RuntimeError("Celestrak API timed out. Please try again in a moment.")
+    except requests.exceptions.RequestException as e:
+        raise RuntimeError(f"Failed to connect to Celestrak: {str(e)}")
     
     lines = response.text.strip().split('\n')
 
