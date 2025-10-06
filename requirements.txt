@@ -1,0 +1,25 @@
+# Voyager - Minimal requirements for Streamlit Cloud
+# Install base dependencies first, then LangChain ecosystem
+
+# Core dependencies
+streamlit==1.50.0
+numpy
+scipy
+requests
+python-dotenv
+geopy
+skyfield
+
+# LLM providers - install before LangChain
+anthropic>=0.69.0
+pydantic>=2.0
+
+# LangChain - install core first
+langchain-core>=0.3.0
+langchain-anthropic>=0.3.0
+langchain-openai>=0.3.0
+langchain-text-splitters>=0.3.0
+langchain>=0.3.0
+
+# OpenAI
+openai>=1.0
