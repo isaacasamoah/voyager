@@ -17,8 +17,9 @@ We believe that:
 
 ### Real-Time Space Intelligence
 - **ISS Tracking**: Live position tracking of the International Space Station with astronaut roster
-- **Starlink Constellation Monitoring**: Track 6000+ Starlink satellites in real-time using TLE data from Celestrak
+- **Starlink Constellation Monitoring**: Track 8000+ Starlink satellites instantly using cached TLE data
 - **Human-Readable Locations**: Every position geocoded to nearest city or geographic region
+- **Optimized Performance**: Static TLE cache enables instant queries without API timeouts
 
 ### Advanced Constellation Optimization
 - **SpaceML Integration**: Eigenvalue-based multi-constraint optimization
@@ -56,11 +57,7 @@ Ask questions naturally:
 git clone https://github.com/isaacasamoah/voyager.git
 cd voyager
 
-# Create environment
-conda env create -f environment.yml
-conda activate voyager
-
-# Or use pip
+# Install dependencies
 pip install -r requirements.txt
 
 # Configure API keys
