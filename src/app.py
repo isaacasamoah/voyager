@@ -10,23 +10,8 @@ from voyager_brain import VoyagerBrain
 from llm.providers import ClaudeProvider
 from agents.iss_agent import ISSAgent
 from agents.constellation_agent import ConstellationAgent
-from data.sources.starlink_tracker import get_starlink_constellation
 
 load_dotenv()
-
-# Warm up Starlink TLE cache on app startup (runs once)
-@st.cache_resource
-def warmup_starlink_cache():
-    """Pre-fetch and cache Starlink TLE data to avoid first-user delay."""
-    try:
-        get_starlink_constellation(1)  # Fetch minimal data to populate cache
-        return True
-    except Exception as e:
-        st.warning(f"Could not pre-load Starlink data: {e}")
-        return False
-
-warmup_starlink_cache()
-
 
 llm = ChatAnthropic(
     model="claude-sonnet-4-20250514",

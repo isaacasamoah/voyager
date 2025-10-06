@@ -2,6 +2,7 @@
 
 import requests
 import numpy as np
+import os
 from skyfield.api import load, wgs84, EarthSatellite
 from typing import List, Dict, Tuple
 try:
@@ -15,23 +16,36 @@ try:
 except ModuleNotFoundError:
     from data.sources.iss_tracker import get_nearest_city
 
+# Path to static TLE cache
+TLE_CACHE_FILE = os.path.join(os.path.dirname(__file__), "..", "tle_cache", "starlink_tle.txt")
+
 @st.cache_data(ttl=3600) if HAS_STREAMLIT else lambda f: f
 def fetch_starlink_tles(max_satellites=None):
-    """Fetch Startlink TLE data from Celestrak (cached for 1 hour)
+    """Fetch Starlink TLE data from static cache (instant) with API fallback.
     Returns: List of dicts with 'name, 'line1', 'line2'
     """
-    url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
-
-    try:
-        response = requests.get(url, timeout=30)  # Increased to 30 seconds for large file
-        if response.status_code != 200:
-            raise RuntimeError(f"Failed to fetch TLES: {response.status_code}")
-    except requests.exceptions.Timeout:
-        raise RuntimeError("Celestrak API timed out (1.4MB file takes time). Please try again.")
-    except requests.exceptions.RequestException as e:
-        raise RuntimeError(f"Failed to connect to Celestrak: {str(e)}")
-    
-    lines = response.text.strip().split('\n')
+    # Try static cache first (instant, no network required)
+    if os.path.exists(TLE_CACHE_FILE):
+        try:
+            with open(TLE_CACHE_FILE, 'r') as f:
+                tle_text = f.read()
+        except Exception as e:
+            # Fall through to API if file read fails
+            pass
+        else:
+            lines = tle_text.strip().split('\n')
+    else:
+        # Fallback to API if no cache file
+        url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
+        try:
+            response = requests.get(url, timeout=30)
+            if response.status_code != 200:
+                raise RuntimeError(f"Failed to fetch TLES: {response.status_code}")
+            lines = response.text.strip().split('\n')
+        except requests.exceptions.Timeout:
+            raise RuntimeError("Celestrak API timed out. Please try again.")
+        except requests.exceptions.RequestException as e:
+            raise RuntimeError(f"Failed to connect to Celestrak: {str(e)}")
 
     satellites = []
     for i in range(0, len(lines),3): # setp by 3
