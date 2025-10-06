@@ -7,10 +7,17 @@ import sys
 import os
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..'))
 
+try:
+    import streamlit as st
+    HAS_STREAMLIT = True
+except ImportError:
+    HAS_STREAMLIT = False
+
 from voyager_brain import VoyagerBrain
 from data.sources.starlink_tracker import get_starlink_constellation
 from data.sources.iss_tracker import get_nearest_city
 from spaceml.constellation_optimizer import optimize_satellite_positions
+from visualization.satellite_viz import visualize_satellites
 
 
 class ConstellationAgent:
@@ -94,7 +101,17 @@ class ConstellationAgent:
             result += f"\n## ⚙️ Running SpaceML Eigenvalue Optimizer...\n\n"
             optimized = optimize_satellite_positions(constellation, weights)
 
-            result += f"## ✅ Optimized Constellation\n\n"
+            # Show 3D visualization
+            if HAS_STREAMLIT:
+                result += f"## 🌍 3D Constellation Visualization\n\n"
+                fig = visualize_satellites(
+                    constellation,
+                    optimized,
+                    title=f"Starlink Optimization ({num_satellites} satellites)"
+                )
+                st.plotly_chart(fig, use_container_width=True)
+
+            result += f"\n## ✅ Optimized Constellation\n\n"
             for i, pos in enumerate(optimized, 1):
                 new_city = get_nearest_city(pos[0], pos[1])
                 orig = constellation[i-1]

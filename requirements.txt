@@ -9,6 +9,7 @@ requests
 python-dotenv
 geopy
 skyfield
+plotly
 
 # LLM providers - install before LangChain
 anthropic>=0.69.0
