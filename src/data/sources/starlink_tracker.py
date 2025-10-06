@@ -5,22 +5,29 @@ import numpy as np
 from skyfield.api import load, wgs84, EarthSatellite
 from typing import List, Dict, Tuple
 try:
+    import streamlit as st
+    HAS_STREAMLIT = True
+except ImportError:
+    HAS_STREAMLIT = False
+
+try:
     from iss_tracker import get_nearest_city
 except ModuleNotFoundError:
     from data.sources.iss_tracker import get_nearest_city
 
+@st.cache_data(ttl=3600) if HAS_STREAMLIT else lambda f: f
 def fetch_starlink_tles(max_satellites=None):
-    """Fetch Startlink TLE data from CElestrak
+    """Fetch Startlink TLE data from Celestrak (cached for 1 hour)
     Returns: List of dicts with 'name, 'line1', 'line2'
     """
     url = "https://celestrak.org/NORAD/elements/gp.php?GROUP=starlink&FORMAT=tle"
 
     try:
-        response = requests.get(url, timeout=10)  # 10 second timeout
+        response = requests.get(url, timeout=30)  # Increased to 30 seconds for large file
         if response.status_code != 200:
             raise RuntimeError(f"Failed to fetch TLES: {response.status_code}")
     except requests.exceptions.Timeout:
-        raise RuntimeError("Celestrak API timed out. Please try again in a moment.")
+        raise RuntimeError("Celestrak API timed out (1.4MB file takes time). Please try again.")
     except requests.exceptions.RequestException as e:
         raise RuntimeError(f"Failed to connect to Celestrak: {str(e)}")
     
