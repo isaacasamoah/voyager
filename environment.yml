@@ -3,32 +3,41 @@ channels:
   - conda-forge
   - defaults
 dependencies:
+  # Core Python
   - python=3.11
-  - streamlit=1.50.0
-  - numpy=2.3.3
-  - scipy=1.16.2
-  - requests=2.32.5
-  - python-dotenv=1.0.0
 
-  # LangChain ecosystem (conda-forge has these!)
+  # Web framework
+  - streamlit=1.50.0
+
+  # LLM providers
+  - anthropic=0.69.0
+
+  # LangChain ecosystem
   - langchain=0.3.27
   - langchain-core=0.3.76
+  - langchain-anthropic=0.3.21
+  - langchain-openai=0.3.33
+  - langchain-text-splitters=0.3.11
 
-  # Space science libraries
+  # Scientific computing
+  - numpy=2.3.3
+  - scipy=1.16.2
+
+  # Space science
   - skyfield=1.53
   - geopy=2.4.1
+
+  # Utilities
+  - requests=2.32.5
+  - python-dotenv=1.0.0
+  - pydantic
 
   # Testing
   - pytest=8.4.2
   - black
   - flake8
 
-  # Pip-only packages (not available in conda-forge)
+  # Pip-only (openai SDK not on conda-forge)
   - pip
   - pip:
-    - anthropic==0.69.0
-    - langchain-anthropic==0.3.21
-    - langchain-openai==0.3.33
-    - langchain-text-splitters==0.3.11
     - openai==1.109.1
-    - pydantic==2.11.9
