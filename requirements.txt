@@ -5,15 +5,15 @@
 streamlit==1.50.0
 
 # LLM providers
-openai==1.109.1
 anthropic==0.69.0
 
-# LangChain framework
-langchain==0.3.27
+# LangChain framework - order matters for dependencies
 langchain-core==0.3.76
-langchain-openai==0.3.33
 langchain-anthropic==0.3.21
+langchain-openai==0.3.33
 langchain-text-splitters==0.3.11
+langchain==0.3.27
+openai==1.109.1
 
 # Space & Science libraries
 skyfield==1.53
