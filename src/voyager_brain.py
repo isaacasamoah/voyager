@@ -71,6 +71,7 @@ Extract parameters from user queries about space missions and ISS tracking.
 Return ONLY valid JSON with no explanations or extra text.
 
 Available tasks:
+- "help" - Show capabilities and example queries
 - "iss_location" - Get current ISS position
 - "people_in_space" - List astronauts currently in space
 - "track_starlink" - Track current Starlink satellite positions
@@ -78,6 +79,12 @@ Available tasks:
 - "coordinate_transform" - Satellite rotation/transformation
 
 Examples:
+User: "What can you do?"
+Output: {"task": "help"}
+
+User: "What can I ask you?"
+Output: {"task": "help"}
+
 User: "Where is the ISS right now?"
 Output: {"task": "iss_location"}
 

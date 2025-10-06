@@ -61,14 +61,31 @@ if "messages" not in st.session_state:
     st.session_state.messages = []
 agent = create_tool_calling_agent(llm, tools, prompt)
 agent_executor = AgentExecutor(agent=agent, tools=tools,
-  verbose=True)  
+  verbose=True)
 
-st.markdown("<h1 style='text-align: center;'>🪐 Voyager 🚀</h1>", unsafe_allow_html=True)
+# Subtle, professional header inspired by NASA
+st.markdown("""
+<style>
+    .voyager-header {
+        padding: 1.5rem 0 1rem 0;
+        border-bottom: 1px solid #e0e0e0;
+        margin-bottom: 2rem;
+    }
 
-st.markdown("<p style='text-align: center;'>A natural language interface for space exploration</p>", unsafe_allow_html=True)
+    .voyager-title {
+        font-size: 2.5rem;
+        font-weight: 400;
+        color: #0b3d91;
+        margin: 0;
+        padding-bottom: 0.5rem;
+        letter-spacing: 0.3rem;
+    }
+</style>
 
-# Add some spacing
-st.markdown("<br>", unsafe_allow_html=True)
+<div class="voyager-header">
+    <h1 class="voyager-title">VOYAGER</h1>
+</div>
+""", unsafe_allow_html=True)
 
 for message in st.session_state.messages:
     if message["role"] != "system": # Don't show system message
@@ -76,7 +93,7 @@ for message in st.session_state.messages:
             st.write(message["content"])
 
 # Handle new input
-user_input = st.chat_input("Chart your course through the cosmos")
+user_input = st.chat_input("Ask me what I can do 🌌")
 
 if user_input:
     st.session_state.messages.append({"role": "user", "content": user_input})
@@ -94,7 +111,29 @@ if user_input:
 
         # Route to appropriate agent based on task
         with st.chat_message("assistant"):
-            if task in ["iss_location", "people_in_space"]:
+            if task == "help":
+                # Show capabilities with mystery and intrigue
+                ai_response = """## 🌌 Voyager Capabilities
+
+I can help you explore the cosmos through data and intelligence. Try asking me:
+
+**Real-Time Tracking**
+- *"Where is the ISS right now?"*
+- *"Who is in space?"*
+- *"Show me 10 Starlink satellites"*
+
+**Constellation Intelligence**
+- *"Optimize 5 satellites for efficiency"*
+- *"Balance 10 satellites across all constraints"*
+
+**Mission Planning**
+- *"Calculate delta-v to Mars"*
+- *"Find the next launch window to Mars"*
+- *"What's the mission duration to Mars?"*
+
+The cosmos awaits your questions."""
+                st.write(ai_response)
+            elif task in ["iss_location", "people_in_space"]:
                 # Use ISSAgent for ISS queries
                 ai_response = iss_agent.query(user_input)
                 st.write(ai_response)
