@@ -12,7 +12,7 @@ anthropic==0.39.0
 langchain==0.3.27
 langchain-core==0.3.76
 langchain-openai==0.3.33
-langchain-anthropic==0.3.5
+langchain-anthropic==0.3.21
 langchain-text-splitters==0.3.11
 
 # Space & Science libraries
