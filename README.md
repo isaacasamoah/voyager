@@ -43,6 +43,13 @@ Ask questions naturally:
 - *"Calculate delta-v for a Mars transfer"*
 - *"Who is currently in space?"*
 
+### 🧠 Custom Space Reasoning LLM (In Development)
+- **Fine-tuned Llama 3 8B** for orbital mechanics reasoning
+- **Step-by-step solutions** to orbital transfer calculations
+- **Physical intuition** behind space physics equations
+- **Training approach**: Synthetic reasoning traces, not document memorization
+- **Deploy stack**: Kaggle (train) → HuggingFace (serve) → Voyager (integrate)
+
 ## 🚀 Quick Start
 
 ### Prerequisites
@@ -104,8 +111,15 @@ voyager/
 │   │   └── providers.py               # Claude & OpenAI providers
 │   └── tools/                          # LangChain mission planning tools
 │       └── mars_mission.py            # Delta-v, duration, launch windows
+├── training/                           # 🆕 Custom LLM training pipeline
+│   ├── train_space_llm.py             # Llama 3 fine-tuning with LoRA
+│   ├── requirements.txt               # Training dependencies
+│   └── README.md                      # Kaggle training guide
+├── generate_space_reasoning_examples.py # Training data generator
+├── space_reasoning.jsonl              # 945 orbital mechanics examples
 ├── tests/                              # Test suite
 └── docs/                               # Documentation
+    └── SPACE_REASONING_LLM_TRAINING.md # Full training guide
 ```
 
 ## 📚 Tech Stack
@@ -114,6 +128,10 @@ voyager/
 - Claude (Anthropic) - Query understanding & response generation
 - LangChain - Agent framework for Mars mission planning
 - Custom SpaceML - Eigenvalue-based constellation optimization
+- **Llama 3 8B Fine-Tuning** - Custom space reasoning LLM (in development)
+  - LoRA adapter training on Kaggle (free GPU)
+  - 945 synthetic orbital mechanics examples
+  - Deployment via HuggingFace Inference API
 
 **Space Systems**
 - Skyfield - Satellite orbit propagation (SGP4)

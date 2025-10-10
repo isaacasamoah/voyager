@@ -1,0 +1,14 @@
+# ⚠️  ARCHIVED: GCP Cloud Build configuration for Vertex AI deployment
+# Current approach: Train on Kaggle (free GPU) instead of GCP
+# Kept for reference or future enterprise deployment
+
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: [
+      'build',
+      '-t',
+      'us-central1-docker.pkg.dev/voyager-ai-1759900320/ml-images/llama3-space-trainer:v1',
+      '.'
+    ]
+images:
+  - 'us-central1-docker.pkg.dev/voyager-ai-1759900320/ml-images/llama3-space-trainer:v1'

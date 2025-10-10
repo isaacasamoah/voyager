@@ -91,10 +91,17 @@ TrainingArguments(
 )
 ```
 
-### **Platform**: Kaggle (30 hours/week free GPU)
-- T4 or P100 GPU
-- 8-12 hour sessions
-- No disconnects
+### **Platform**: Kaggle (Free GPU Training)
+- **Why Kaggle**: 30 hours/week free T4/P100 GPUs, no cost
+- **Session length**: Up to 12 hours per run
+- **Persistent storage**: Upload data as Kaggle dataset
+- **Monitoring**: Weights & Biases integration
+
+### **Deployment**: Hugging Face Inference API
+- **Upload**: Push LoRA adapters to Hugging Face Hub (~80MB)
+- **Free tier**: 30K tokens/month (perfect for MVP)
+- **Integration**: Simple API calls from Voyager
+- **Scale path**: Move to FastAPI when needed
 
 ---
 
@@ -340,3 +347,121 @@ This creates true understanding, not pattern matching.
 ---
 
 **Ready to build in Claude Code!** 🚀
+
+---
+
+## 🚢 Deployment Workflow (Kaggle → HuggingFace → Voyager)
+
+### **Step 1: Train on Kaggle**
+
+1. **Upload training data**:
+   - Create Kaggle dataset from `space_reasoning.jsonl`
+   - Or generate directly in notebook
+
+2. **Create Kaggle notebook**:
+   - Copy `training/train_space_llm.py`
+   - Set secrets: `HUGGING_FACE_TOKEN`, `WANDB_API_KEY`
+   - Enable GPU (T4 or P100)
+
+3. **Run training** (~2-3 hours):
+   ```python
+   # Full pipeline runs automatically
+   # Output: LoRA adapters in /kaggle/working/
+   ```
+
+4. **Download adapters**:
+   - `adapter_config.json`
+   - `adapter_model.safetensors`
+
+---
+
+### **Step 2: Deploy to Hugging Face**
+
+1. **Create HF model repository**:
+   ```bash
+   huggingface-cli login
+   huggingface-cli repo create llama3-space-reasoning
+   ```
+
+2. **Upload adapters**:
+   ```python
+   from huggingface_hub import HfApi
+
+   api = HfApi()
+   api.upload_folder(
+       folder_path="./llama3-space-reasoning-final",
+       repo_id="YOUR_USERNAME/llama3-space-reasoning",
+       repo_type="model"
+   )
+   ```
+
+3. **Model is now live** at:
+   `https://huggingface.co/YOUR_USERNAME/llama3-space-reasoning`
+
+---
+
+### **Step 3: Integrate into Voyager**
+
+**Option A: HuggingFace Inference API (MVP)**
+```python
+from huggingface_hub import InferenceClient
+
+client = InferenceClient(
+    model="YOUR_USERNAME/llama3-space-reasoning",
+    token=os.getenv("HF_TOKEN")
+)
+
+def solve_orbital_problem(prompt: str) -> str:
+    response = client.text_generation(
+        prompt=prompt,
+        max_new_tokens=512,
+        temperature=0.7
+    )
+    return response
+```
+
+**Option B: FastAPI (When scaling)**
+```python
+# Deploy on Railway/Render with vLLM backend
+# 10x faster inference, unlimited requests
+# ~$10/month vs free HF tier
+```
+
+---
+
+### **Step 4: Add to Voyager Agent**
+
+```python
+# src/agents/physics_agent.py
+
+class PhysicsAgent:
+    def __init__(self):
+        self.llm = InferenceClient(
+            model="isaacasamoah/llama3-space-reasoning"
+        )
+
+    def query(self, user_input: str) -> str:
+        """Solve orbital mechanics problems"""
+        return self.llm.text_generation(
+            f"Solve this space physics problem:\n{user_input}",
+            max_new_tokens=512
+        )
+```
+
+**Integration time**: <30 minutes 🚀
+
+---
+
+## 💰 Cost Comparison
+
+| Platform | Training | Deployment | Monthly | Best For |
+|----------|----------|------------|---------|----------|
+| **Kaggle + HF** | $0 | $0* | $0 | MVP, learning |
+| **GCP Vertex AI** | $1-2 | $50+ | $100+ | Enterprise |
+| **FastAPI** | $0 | $10 | $10 | Scale |
+
+*Free tier: 30K tokens/month, then $0.001/1K tokens
+
+**Winner for MVP**: Kaggle + HuggingFace = $0, deploy today 🎯
+
+---
