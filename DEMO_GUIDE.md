@@ -5,12 +5,19 @@
 ### 1. Start with the Problem (15 sec)
 "Tech professionals in Australia need personalized career guidance, but it's expensive and hard to access. That's why we built Careersy Wingman..."
 
-### 2. Show the Login (10 sec)
+### 2. Show the Login & Subscription (30 sec)
 - Navigate to `http://localhost:3000`
 - Clean, professional landing page
 - Click "Get Started"
 - Sign in with Google OAuth
 - "Sign in with Google in seconds - secure and familiar"
+- **NEW: Subscription page appears**
+  - "We've integrated Stripe for subscriptions"
+  - "$0/month free tier for demo purposes"
+  - Click "Start Free Subscription"
+  - Use test card: `4242 4242 4242 4242`, any future date, any CVC
+  - "In production, we can easily add paid tiers"
+  - After subscription → instant access to chat!
 
 ### 3. Highlight Key Features (2-3 min)
 
@@ -60,6 +67,7 @@ Pick one or more of these example questions:
 "Under the hood, this is production-ready:"
 - Built on **Next.js 14** - modern, scalable, fast
 - **Secure Google OAuth** authentication
+- **Stripe subscriptions** - monetization ready
 - **PostgreSQL database** for conversation persistence
 - **GPT-4o** for fast, accurate, and cost-effective AI responses
 - Fully responsive design
@@ -70,6 +78,7 @@ Pick one or more of these example questions:
 "This is our MVP - ready for initial users to start getting value today."
 
 **Potential Future Features:**
+- **Paid tiers** - Pro ($29/mo), Enterprise ($99/mo)
 - Resume upload and feedback
 - Salary benchmarking with real market data
 - Company culture insights
@@ -99,9 +108,12 @@ Pick one or more of these example questions:
 
 ## Pre-Demo Checklist
 
+- [ ] **Stripe is configured** (see `STRIPE_SETUP.md` for 5-min setup)
+- [ ] **Environment variables** set in `.env.local` (including Stripe keys)
 - [ ] Server is running (`npm run dev`)
 - [ ] Browser is on `http://localhost:3000`
 - [ ] Logged out (to show the full login flow)
+- [ ] **Test card ready**: `4242 4242 4242 4242`
 - [ ] No other tabs/distractions visible
 - [ ] Loom is ready to record
 - [ ] Camera and mic tested
