@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, Lexend_Deca } from 'next/font/google'
 import './globals.css'
 import { SessionProvider } from '@/components/SessionProvider'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const lexend = Lexend_Deca({ subsets: ['latin'], variable: '--font-lexend' })
 
 export const metadata: Metadata = {
   title: 'Careersy Wingman - Australian Tech Career Coach',
@@ -17,7 +18,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body className={`${inter.variable} ${lexend.variable} font-sans`}>
         <SessionProvider>
           {children}
         </SessionProvider>

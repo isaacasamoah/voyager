@@ -11,6 +11,14 @@ const config: Config = {
       colors: {
         background: 'var(--background)',
         foreground: 'var(--foreground)',
+        careersy: {
+          cream: '#fff9f2',
+          yellow: '#fad02c',
+          black: '#000000',
+        },
+      },
+      fontFamily: {
+        'lexend': ['Lexend Deca', 'sans-serif'],
       },
     },
   },

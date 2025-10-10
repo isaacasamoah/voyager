@@ -11,13 +11,17 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center p-4">
-      <div className="text-center text-white max-w-2xl">
-        <h1 className="text-5xl font-bold mb-4">Careersy Wingman</h1>
-        <p className="text-xl mb-8">Your AI-powered career wingman for the Australian tech market</p>
+    <div className="min-h-screen bg-careersy-cream flex items-center justify-center p-4">
+      <div className="text-center max-w-2xl">
+        <h1 className="text-6xl font-lexend font-bold mb-6 text-careersy-black tracking-tight">
+          Careersy Wingman
+        </h1>
+        <p className="text-xl mb-10 text-gray-700">
+          Your AI-powered career wingman for the Australian tech market
+        </p>
         <Link
           href="/login"
-          className="inline-block bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-gray-100 transition-colors"
+          className="inline-block bg-careersy-yellow text-careersy-black px-10 py-4 rounded-[30px] font-semibold hover:scale-105 transition-transform shadow-lg"
         >
           Get Started
         </Link>
