@@ -11,8 +11,8 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-500 to-purple-600">
       <div className="bg-white p-8 rounded-xl shadow-2xl max-w-md w-full">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">AI Career Coach</h1>
-          <p className="text-gray-600">Australian Tech Market Specialist</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Careersy Wingman</h1>
+          <p className="text-gray-600">Your AI Career Partner for Australian Tech</p>
         </div>
 
         <div className="space-y-4">
