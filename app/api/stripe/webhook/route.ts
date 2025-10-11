@@ -38,6 +38,7 @@ export async function POST(req: NextRequest) {
 
         // Get subscription details
         const subscription = await stripe.subscriptions.retrieve(subscriptionId)
+        const periodEnd = (subscription as any).current_period_end
 
         // Update user with subscription info
         await prisma.user.update({
@@ -46,9 +47,7 @@ export async function POST(req: NextRequest) {
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
             stripePriceId: subscription.items.data[0]?.price.id,
-            stripeCurrentPeriodEnd: subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000)
-              : null,
+            stripeCurrentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : null,
           },
         })
 
@@ -60,6 +59,7 @@ export async function POST(req: NextRequest) {
     case 'customer.subscription.updated': {
       const subscription = event.data.object as Stripe.Subscription
       const customerId = subscription.customer as string
+      const periodEnd = (subscription as any).current_period_end
 
       // Find user by Stripe customer ID
       const user = await prisma.user.findUnique({
@@ -71,9 +71,7 @@ export async function POST(req: NextRequest) {
           where: { id: user.id },
           data: {
             stripePriceId: subscription.items.data[0]?.price.id,
-            stripeCurrentPeriodEnd: subscription.current_period_end
-              ? new Date(subscription.current_period_end * 1000)
-              : null,
+            stripeCurrentPeriodEnd: periodEnd ? new Date(periodEnd * 1000) : null,
           },
         })
         console.log(`Subscription updated for user ${user.id}`)
