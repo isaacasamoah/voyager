@@ -2,6 +2,7 @@ import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
 import Link from 'next/link'
+import Image from 'next/image'
 
 export default async function HomePage() {
   const session = await getServerSession(authOptions)
@@ -13,6 +14,15 @@ export default async function HomePage() {
   return (
     <div className="min-h-screen bg-careersy-cream flex items-center justify-center p-4">
       <div className="text-center max-w-2xl">
+        <div className="mb-8 flex justify-center">
+          <Image
+            src="/careersy-logo.webp"
+            alt="Careersy Wingman Logo"
+            width={200}
+            height={200}
+            className="object-contain"
+          />
+        </div>
         <h1 className="text-6xl font-lexend font-bold mb-6 text-careersy-black tracking-tight">
           Careersy Wingman
         </h1>

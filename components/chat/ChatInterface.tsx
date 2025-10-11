@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
+import Image from 'next/image'
 import ChatMessage from './ChatMessage'
 
 interface Message {
@@ -194,6 +195,13 @@ export default function ChatInterface() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
+            <Image
+              src="/careersy-logo.webp"
+              alt="Careersy Logo"
+              width={40}
+              height={40}
+              className="object-contain"
+            />
             <div>
               <h1 className="text-xl font-lexend font-bold text-careersy-black tracking-tight">Careersy Wingman</h1>
               <p className="text-sm text-gray-700">Your AI Career Partner for Australian Tech</p>

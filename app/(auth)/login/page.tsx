@@ -3,6 +3,7 @@
 import { Suspense } from 'react'
 import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
+import Image from 'next/image'
 
 function LoginForm() {
   const searchParams = useSearchParams()
@@ -12,6 +13,15 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-careersy-cream">
       <div className="bg-white p-8 rounded-xl shadow-xl max-w-md w-full">
         <div className="text-center mb-8">
+          <div className="mb-4 flex justify-center">
+            <Image
+              src="/careersy-logo.webp"
+              alt="Careersy Wingman Logo"
+              width={120}
+              height={120}
+              className="object-contain"
+            />
+          </div>
           <h1 className="text-4xl font-lexend font-bold text-careersy-black mb-2 tracking-tight">Careersy Wingman</h1>
           <p className="text-gray-700">Your AI Career Partner for Australian Tech</p>
         </div>
