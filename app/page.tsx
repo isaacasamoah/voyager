@@ -12,17 +12,8 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-careersy-cream flex items-center justify-center p-4">
-      <div className="text-center max-w-2xl">
-        <div className="mb-8 flex justify-center">
-          <Image
-            src="/careersy-logo.webp"
-            alt="Careersy Wingman Logo"
-            width={200}
-            height={200}
-            className="object-contain"
-          />
-        </div>
+    <div className="min-h-screen bg-careersy-cream flex flex-col items-center justify-center p-4">
+      <div className="text-center max-w-2xl flex-1 flex flex-col justify-center">
         <h1 className="text-6xl font-lexend font-bold mb-6 text-careersy-black tracking-tight">
           Careersy Wingman
         </h1>
@@ -35,6 +26,17 @@ export default async function HomePage() {
         >
           Get Started
         </Link>
+      </div>
+
+      {/* Logo at bottom */}
+      <div className="pb-8 flex justify-center opacity-60">
+        <Image
+          src="/careersy-logo.webp"
+          alt="Careersy Wingman Logo"
+          width={80}
+          height={80}
+          className="object-contain"
+        />
       </div>
     </div>
   )
