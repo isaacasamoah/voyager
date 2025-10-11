@@ -23,7 +23,7 @@ export default function ChatInterface() {
   const [loading, setLoading] = useState(false)
   const [conversationId, setConversationId] = useState<string | null>(null)
   const [conversations, setConversations] = useState<Conversation[]>([])
-  const [showSidebar, setShowSidebar] = useState(true)
+  const [showSidebar, setShowSidebar] = useState(false)
   const [loadingConversations, setLoadingConversations] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
