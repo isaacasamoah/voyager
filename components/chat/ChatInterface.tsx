@@ -239,12 +239,12 @@ export default function ChatInterface() {
           </div>
 
           {/* Right: Logo (balancing hamburger) */}
-          <div className="flex-shrink-0 p-2">
+          <div className="flex-shrink-0">
             <Image
               src="/careersy-logo.webp"
               alt="Careersy Logo"
-              width={50}
-              height={50}
+              width={80}
+              height={80}
               className="object-contain"
             />
           </div>
