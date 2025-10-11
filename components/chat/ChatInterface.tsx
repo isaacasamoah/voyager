@@ -231,17 +231,19 @@ export default function ChatInterface() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <Image
-              src="/careersy-logo.webp"
-              alt="Careersy Logo"
-              width={40}
-              height={40}
-              className="object-contain"
-            />
             <div>
               <h1 className="text-xl font-lexend font-bold text-careersy-black tracking-tight">Careersy Wingman</h1>
               <p className="text-sm text-gray-700">Your AI Career Partner for Australian Tech</p>
             </div>
+          </div>
+          <div className="flex-shrink-0">
+            <Image
+              src="/careersy-logo.webp"
+              alt="Careersy Logo"
+              width={60}
+              height={60}
+              className="object-contain"
+            />
           </div>
         </div>
 
