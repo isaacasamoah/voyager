@@ -15,7 +15,9 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.LINKEDIN_CLIENT_ID!,
       clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
       authorization: {
-        params: { scope: 'openid profile email' }
+        params: {
+          scope: 'openid profile email'
+        }
       },
       issuer: 'https://www.linkedin.com',
       jwks_endpoint: 'https://www.linkedin.com/oauth/openid/jwks',
@@ -27,6 +29,7 @@ export const authOptions: NextAuthOptions = {
           image: profile.picture,
         }
       },
+      allowDangerousEmailAccountLinking: true,
     }),
   ],
   callbacks: {
