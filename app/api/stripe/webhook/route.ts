@@ -4,6 +4,7 @@ import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/db'
 import Stripe from 'stripe'
 
+// Stripe webhook handler for subscription events
 export async function POST(req: NextRequest) {
   const body = await req.text()
   const signature = headers().get('stripe-signature')!
