@@ -45,8 +45,10 @@ export async function POST(req: NextRequest) {
           data: {
             stripeCustomerId: customerId,
             stripeSubscriptionId: subscriptionId,
-            stripePriceId: subscription.items.data[0].price.id,
-            stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            stripePriceId: subscription.items.data[0]?.price.id,
+            stripeCurrentPeriodEnd: subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000)
+              : null,
           },
         })
 
@@ -68,8 +70,10 @@ export async function POST(req: NextRequest) {
         await prisma.user.update({
           where: { id: user.id },
           data: {
-            stripePriceId: subscription.items.data[0].price.id,
-            stripeCurrentPeriodEnd: new Date(subscription.current_period_end * 1000),
+            stripePriceId: subscription.items.data[0]?.price.id,
+            stripeCurrentPeriodEnd: subscription.current_period_end
+              ? new Date(subscription.current_period_end * 1000)
+              : null,
           },
         })
         console.log(`Subscription updated for user ${user.id}`)
