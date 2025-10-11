@@ -11,22 +11,21 @@ export default async function ChatPage() {
     redirect('/login')
   }
 
-  // Check if user has an active subscription
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      stripeSubscriptionId: true,
-      stripeCurrentPeriodEnd: true,
-    },
-  })
+  // Subscription check temporarily disabled for demo
+  // TODO: Re-enable after fixing webhook integration
+  // const user = await prisma.user.findUnique({
+  //   where: { id: session.user.id },
+  //   select: {
+  //     stripeSubscriptionId: true,
+  //     stripeCurrentPeriodEnd: true,
+  //   },
+  // })
 
-  // For demo purposes with $0 subscription, just check if they have a subscription ID
-  // In production, you'd also check stripeCurrentPeriodEnd > new Date()
-  const hasActiveSubscription = !!user?.stripeSubscriptionId
+  // const hasActiveSubscription = !!user?.stripeSubscriptionId
 
-  if (!hasActiveSubscription) {
-    redirect('/subscribe')
-  }
+  // if (!hasActiveSubscription) {
+  //   redirect('/subscribe')
+  // }
 
   return <ChatInterface />
 }

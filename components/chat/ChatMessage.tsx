@@ -9,10 +9,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
   return (
     <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
-        className={`max-w-[80%] rounded-lg p-4 shadow ${
+        className={`max-w-[80%] rounded-xl p-4 shadow-lg ${
           message.role === 'user'
-            ? 'bg-blue-600 text-white'
-            : 'bg-white text-gray-900'
+            ? 'bg-careersy-yellow text-careersy-black border-2 border-careersy-yellow'
+            : 'bg-white text-gray-900 border-2 border-careersy-yellow/20'
         }`}
       >
         <p className="whitespace-pre-wrap">{message.content}</p>
