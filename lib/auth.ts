@@ -19,7 +19,7 @@ export const authOptions: NextAuthOptions = {
           scope: 'openid profile email'
         }
       },
-      issuer: 'https://www.linkedin.com',
+      issuer: 'https://www.linkedin.com/oauth',
       jwks_endpoint: 'https://www.linkedin.com/oauth/openid/jwks',
       profile(profile) {
         return {
