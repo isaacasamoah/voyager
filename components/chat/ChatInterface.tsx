@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
 import Image from 'next/image'
 import ChatMessage from './ChatMessage'
+import ResumeModal from './ResumeModal'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -26,6 +27,8 @@ export default function ChatInterface() {
   const [conversations, setConversations] = useState<Conversation[]>([])
   const [showSidebar, setShowSidebar] = useState(false)
   const [loadingConversations, setLoadingConversations] = useState(false)
+  const [showResumeModal, setShowResumeModal] = useState(false)
+  const [hasResume, setHasResume] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -36,10 +39,37 @@ export default function ChatInterface() {
     scrollToBottom()
   }, [messages])
 
-  // Load conversations on mount
+  // Load conversations and check resume on mount
   useEffect(() => {
     loadConversations()
+    checkResume()
   }, [])
+
+  const checkResume = async () => {
+    try {
+      const response = await fetch('/api/resume')
+      if (response.ok) {
+        const data = await response.json()
+        setHasResume(!!data.resumeText)
+      }
+    } catch (error) {
+      console.error('Error checking resume:', error)
+    }
+  }
+
+  const saveResume = async (resumeText: string) => {
+    const response = await fetch('/api/resume', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ resumeText }),
+    })
+
+    if (!response.ok) {
+      throw new Error('Failed to save resume')
+    }
+
+    setHasResume(true)
+  }
 
   const loadConversations = async () => {
     setLoadingConversations(true)
@@ -126,12 +156,18 @@ export default function ChatInterface() {
       {showSidebar && (
         <div className="w-64 bg-careersy-black text-white flex flex-col">
           {/* Sidebar Header */}
-          <div className="p-4 border-b border-gray-800">
+          <div className="p-4 border-b border-gray-800 space-y-2">
             <button
               onClick={startNewChat}
               className="w-full py-2 px-4 bg-careersy-yellow text-careersy-black hover:scale-105 rounded-[30px] font-semibold transition-transform"
             >
               + New Chat
+            </button>
+            <button
+              onClick={() => setShowResumeModal(true)}
+              className="w-full py-2 px-4 bg-gray-800 text-white hover:bg-gray-700 rounded-[30px] font-semibold transition-colors flex items-center justify-center gap-2"
+            >
+              {hasResume ? '✓ Update Resume' : '+ Add Resume'}
             </button>
           </div>
 
@@ -281,6 +317,13 @@ export default function ChatInterface() {
           </div>
         </form>
       </div>
+
+      {/* Resume Modal */}
+      <ResumeModal
+        isOpen={showResumeModal}
+        onClose={() => setShowResumeModal(false)}
+        onSave={saveResume}
+      />
     </div>
   )
 }

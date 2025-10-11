@@ -22,6 +22,9 @@ model User {
   stripePriceId          String?
   stripeCurrentPeriodEnd DateTime?
 
+  // Resume
+  resumeText             String?   @db.Text
+
   accounts      Account[]
   sessions      Session[]
   conversations Conversation[]

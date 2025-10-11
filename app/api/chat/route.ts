@@ -50,8 +50,20 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    // Get user's resume if available
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { resumeText: true },
+    })
+
+    // Build system prompt with resume context
+    let systemPrompt = SYSTEM_PROMPT
+    if (user?.resumeText) {
+      systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
+    }
+
     const messages = [
-      { role: 'system' as const, content: SYSTEM_PROMPT },
+      { role: 'system' as const, content: systemPrompt },
       ...conversation.messages.map(m => ({
         role: m.role as 'user' | 'assistant',
         content: m.content
