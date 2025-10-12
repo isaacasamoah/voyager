@@ -222,34 +222,33 @@ export default function ChatInterface() {
       <div className="flex-1 flex flex-col">
         {/* Header */}
         <div className="flex-shrink-0 p-4 border-b border-careersy-yellow/30 bg-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            {/* Hamburger */}
+          {/* Left: Hamburger + Logo */}
+          <div className="flex items-center gap-3 flex-shrink-0">
             <button
               onClick={() => setShowSidebar(!showSidebar)}
-              className="p-2 hover:bg-careersy-cream rounded-[30px] transition-colors flex-shrink-0"
+              className="p-2 hover:bg-careersy-cream rounded-[30px] transition-colors"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-
-            {/* Logo */}
-            <div className="flex-shrink-0">
-              <Image
-                src="/careersy-logo.webp"
-                alt="Careersy Logo"
-                width={80}
-                height={80}
-                className="object-contain"
-              />
-            </div>
-
-            {/* Title */}
-            <div>
-              <h1 className="text-xl font-lexend font-bold text-careersy-black tracking-tight">Careersy Wingman</h1>
-              <p className="text-sm text-gray-700">Your AI Career Partner for Australian Tech</p>
-            </div>
+            <Image
+              src="/careersy-logo.webp"
+              alt="Careersy Logo"
+              width={80}
+              height={80}
+              className="object-contain"
+            />
           </div>
+
+          {/* Center: Title */}
+          <div className="absolute left-1/2 transform -translate-x-1/2 text-center">
+            <h1 className="text-xl font-lexend font-bold text-careersy-black tracking-tight">Careersy Wingman</h1>
+            <p className="text-sm text-gray-700">Your AI Career Partner for Australian Tech</p>
+          </div>
+
+          {/* Right: Spacer for balance */}
+          <div className="w-[140px] flex-shrink-0"></div>
         </div>
 
         {/* Messages Container */}
