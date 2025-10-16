@@ -12,6 +12,9 @@ export default async function ChatPage() {
   }
 
   // Check if user has an active subscription
+  // TEMP: Disabled for development/testing
+  // TODO: Re-enable before production deployment
+  /*
   const user = await prisma.user.findUnique({
     where: { id: session.user.id },
     select: {
@@ -25,6 +28,7 @@ export default async function ChatPage() {
   if (!hasActiveSubscription) {
     redirect('/subscribe')
   }
+  */
 
   return <ChatInterface />
 }
