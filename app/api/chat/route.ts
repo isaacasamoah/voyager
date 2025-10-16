@@ -11,11 +11,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { message, conversationId } = await req.json()
+    const { message, conversationId, mode = 'private', title } = await req.json()
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Invalid message' }, { status: 400 })
     }
+
+    // Get the Careersy community ID
+    const community = await prisma.community.findUnique({
+      where: { slug: 'careersy-career-coaching' }
+    })
 
     let conversation
     if (conversationId) {
@@ -32,11 +37,13 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
       }
     } else {
-      const title = message.length > 50 ? message.substring(0, 50) + '...' : message
+      const conversationTitle = title || (message.length > 50 ? message.substring(0, 50) + '...' : message)
       conversation = await prisma.conversation.create({
         data: {
           userId: session.user.id,
-          title,
+          title: conversationTitle,
+          isPublic: mode === 'public',
+          communityId: mode === 'public' && community ? community.id : null,
         },
         include: { messages: true }
       })
@@ -45,8 +52,10 @@ export async function POST(req: NextRequest) {
     await prisma.message.create({
       data: {
         conversationId: conversation.id,
+        userId: session.user.id,
         role: 'user',
         content: message,
+        isAiGenerated: false,
       },
     })
 
@@ -85,6 +94,7 @@ export async function POST(req: NextRequest) {
         conversationId: conversation.id,
         role: 'assistant',
         content: assistantMessage,
+        isAiGenerated: true,
       },
     })
 

@@ -18,6 +18,8 @@ interface Conversation {
   updatedAt: string
 }
 
+type ConversationMode = 'private' | 'public'
+
 export default function ChatInterface() {
   const { data: session } = useSession()
   const [messages, setMessages] = useState<Message[]>([])
@@ -29,6 +31,8 @@ export default function ChatInterface() {
   const [loadingConversations, setLoadingConversations] = useState(false)
   const [showResumeModal, setShowResumeModal] = useState(false)
   const [hasResume, setHasResume] = useState(false)
+  const [mode, setMode] = useState<ConversationMode>('private')
+  const [publicTitle, setPublicTitle] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -121,6 +125,8 @@ export default function ChatInterface() {
         body: JSON.stringify({
           message: userMessage,
           conversationId,
+          mode: mode,
+          title: mode === 'public' && publicTitle ? publicTitle : undefined,
         }),
       })
 
@@ -132,6 +138,11 @@ export default function ChatInterface() {
 
       setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
       setConversationId(data.conversationId)
+
+      // Clear public title after sending
+      if (mode === 'public') {
+        setPublicTitle('')
+      }
 
       // Reload conversations to show the new one
       loadConversations()
@@ -304,22 +315,66 @@ export default function ChatInterface() {
 
         {/* Input Form */}
         <form onSubmit={sendMessage} className="flex-shrink-0 p-4 border-t border-careersy-yellow/30 bg-white">
-          <div className="flex space-x-2 max-w-4xl mx-auto">
-            <input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask about careers, interviews, salaries..."
-              className="flex-1 p-3 border-2 border-gray-200 rounded-[30px] focus:outline-none focus:ring-2 focus:ring-careersy-yellow focus:border-transparent"
-              disabled={loading}
-            />
-            <button
-              type="submit"
-              disabled={loading || !input.trim()}
-              className="px-8 py-3 bg-careersy-yellow text-careersy-black font-semibold rounded-[30px] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-transform shadow-lg"
-            >
-              {loading ? 'Sending...' : 'Send'}
-            </button>
+          <div className="max-w-4xl mx-auto space-y-3">
+            {/* Mode Toggle */}
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => setMode('private')}
+                className={`px-6 py-2 rounded-[30px] font-semibold transition-all ${
+                  mode === 'private'
+                    ? 'bg-careersy-black text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                🔒 Private Chat
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('public')}
+                className={`px-6 py-2 rounded-[30px] font-semibold transition-all ${
+                  mode === 'public'
+                    ? 'bg-careersy-yellow text-careersy-black'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+              >
+                🌍 Ask Community
+              </button>
+            </div>
+
+            {/* Optional Title for Public Posts */}
+            {mode === 'public' && (
+              <input
+                type="text"
+                value={publicTitle}
+                onChange={(e) => setPublicTitle(e.target.value)}
+                placeholder="Give your question a title (optional)..."
+                className="w-full p-3 border-2 border-careersy-yellow/30 rounded-[30px] focus:outline-none focus:ring-2 focus:ring-careersy-yellow focus:border-transparent"
+              />
+            )}
+
+            {/* Message Input */}
+            <div className="flex space-x-2">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder={
+                  mode === 'private'
+                    ? 'Ask about careers, interviews, salaries...'
+                    : 'Share your question with the community...'
+                }
+                className="flex-1 p-3 border-2 border-gray-200 rounded-[30px] focus:outline-none focus:ring-2 focus:ring-careersy-yellow focus:border-transparent"
+                disabled={loading}
+              />
+              <button
+                type="submit"
+                disabled={loading || !input.trim()}
+                className="px-8 py-3 bg-careersy-yellow text-careersy-black font-semibold rounded-[30px] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-transform shadow-lg"
+              >
+                {loading ? 'Sending...' : 'Send'}
+              </button>
+            </div>
           </div>
         </form>
       </div>
