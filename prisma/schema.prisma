@@ -25,9 +25,13 @@ model User {
   // Resume
   resumeText             String?   @db.Text
 
-  accounts      Account[]
-  sessions      Session[]
-  conversations Conversation[]
+  accounts          Account[]
+  sessions          Session[]
+  conversations     Conversation[]
+  communityMembers  CommunityMember[]
+  votes             Vote[]
+  validations       Validation[]
+  messages          Message[]
 }
 
 model Account {
@@ -58,28 +62,48 @@ model Session {
 }
 
 model Conversation {
-  id        String    @id @default(cuid())
-  userId    String
-  title     String    @default("New Conversation")
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id          String    @id @default(cuid())
+  userId      String
+  title       String    @default("New Conversation")
+  isPublic    Boolean   @default(false)
+  communityId String?
+  viewCount   Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  community Community? @relation(fields: [communityId], references: [id], onDelete: SetNull)
   messages  Message[]
 
   @@index([userId])
+  @@index([communityId])
+  @@index([isPublic])
 }
 
 model Message {
   id             String       @id @default(cuid())
   conversationId String
+  userId         String?
   role           String       // "user" or "assistant"
   content        String       @db.Text
+  messageType    String?      @default("comment") // "question" | "answer" | "comment"
+  parentId       String?      // For threading
+  isAiGenerated  Boolean      @default(false)
   createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @default(now()) @updatedAt
 
-  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  conversation      Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  user              User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  parent            Message?       @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies           Message[]      @relation("MessageReplies")
+  votes             Vote[]
+  validations       Validation[]
+  trainingQuestions TrainingData[] @relation("QuestionTraining")
+  trainingAnswers   TrainingData[] @relation("AnswerTraining")
 
   @@index([conversationId])
+  @@index([userId])
+  @@index([parentId])
 }
 
 model VerificationToken {
@@ -88,4 +112,78 @@ model VerificationToken {
   expires    DateTime
 
   @@unique([identifier, token])
+}
+
+model Community {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  description String?
+  createdAt   DateTime @default(now())
+
+  members       CommunityMember[]
+  conversations Conversation[]
+}
+
+model CommunityMember {
+  id          String   @id @default(cuid())
+  communityId String
+  userId      String
+  role        String   @default("member") // "member" | "expert" | "admin"
+  joinedAt    DateTime @default(now())
+
+  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([communityId, userId])
+  @@index([userId])
+  @@index([communityId])
+}
+
+model Vote {
+  id        String   @id @default(cuid())
+  messageId String
+  userId    String
+  value     Int      // -1 or 1
+  createdAt DateTime @default(now())
+
+  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, userId])
+  @@index([messageId])
+  @@index([userId])
+}
+
+model Validation {
+  id                String   @id @default(cuid())
+  messageId         String
+  validatedBy       String
+  validationType    String   // "affirm" | "contest" | "affirm_and_add"
+  additionalContext String?  @db.Text
+  createdAt         DateTime @default(now())
+
+  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  validator User    @relation(fields: [validatedBy], references: [id], onDelete: Cascade)
+
+  @@unique([messageId, validatedBy])
+  @@index([messageId])
+  @@index([validatedBy])
+}
+
+model TrainingData {
+  id                String   @id @default(cuid())
+  questionMessageId String
+  answerMessageId   String
+  validationScore   Int      @default(0)
+  isValidated       Boolean  @default(false)
+  createdAt         DateTime @default(now())
+
+  question Message @relation("QuestionTraining", fields: [questionMessageId], references: [id], onDelete: Cascade)
+  answer   Message @relation("AnswerTraining", fields: [answerMessageId], references: [id], onDelete: Cascade)
+
+  @@unique([questionMessageId, answerMessageId])
+  @@index([isValidated])
+  @@index([questionMessageId])
+  @@index([answerMessageId])
 }
