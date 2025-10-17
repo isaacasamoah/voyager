@@ -229,10 +229,10 @@ export default function ChatInterface() {
           </button>
 
           {/* Right: Collaborate Tools + Toggle */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {/* Collaborate Mode Tools */}
             {mode === 'public' && (
-              <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-5 duration-300">
+              <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-5 duration-300">
                 {/* New Conversation */}
                 <div className="relative group">
                   <button
@@ -247,10 +247,10 @@ export default function ChatInterface() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                     </svg>
                   </button>
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
+                  {/* Tooltip - Below Icon */}
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
                     Start new conversation
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-careersy-black"></div>
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-careersy-black"></div>
                   </div>
                 </div>
 
@@ -279,10 +279,10 @@ export default function ChatInterface() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </button>
-                  {/* Tooltip */}
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
+                  {/* Tooltip - Below Icon */}
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
                     Search conversations
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-careersy-black"></div>
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-careersy-black"></div>
                   </div>
                 </div>
 
