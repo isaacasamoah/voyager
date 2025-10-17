@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
+import { logAuth } from '@/lib/logger'
 
 export default async function DashboardLayout({
   children,
@@ -9,7 +10,15 @@ export default async function DashboardLayout({
 }) {
   const session = await getServerSession(authOptions)
 
+  logAuth('DashboardLayout check', {
+    hasSession: !!session,
+    userId: session?.user?.id,
+    email: session?.user?.email,
+    path: 'dashboard'
+  })
+
   if (!session) {
+    logAuth('DashboardLayout redirect - no session')
     redirect('/login')
   }
 

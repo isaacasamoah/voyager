@@ -3,6 +3,7 @@ import GoogleProvider from "next-auth/providers/google"
 import LinkedInProvider from "next-auth/providers/linkedin"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./db"
+import { logAuth, logError } from "./logger"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -33,11 +34,44 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
+    signIn: async ({ user, account, profile }) => {
+      logAuth('signIn callback', {
+        userId: user.id,
+        email: user.email,
+        provider: account?.provider
+      })
+      return true
+    },
     session: async ({ session, user }) => {
+      logAuth('session callback', {
+        sessionUserId: session?.user?.email,
+        dbUserId: user.id,
+        hasSession: !!session
+      })
       if (session?.user) {
         session.user.id = user.id
       }
       return session
+    },
+  },
+  events: {
+    signIn: async ({ user, account }) => {
+      logAuth('signIn event', {
+        userId: user.id,
+        email: user.email,
+        provider: account?.provider
+      })
+    },
+    signOut: async ({ session }) => {
+      logAuth('signOut event', {
+        email: session?.user?.email
+      })
+    },
+    createUser: async ({ user }) => {
+      logAuth('createUser event', {
+        userId: user.id,
+        email: user.email
+      })
     },
   },
   pages: {

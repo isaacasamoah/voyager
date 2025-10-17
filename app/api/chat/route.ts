@@ -3,15 +3,31 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { openai, SYSTEM_PROMPT } from '@/lib/openai'
+import { logApi, logError } from '@/lib/logger'
 
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)
+
+    logApi('POST /api/chat', {
+      hasSession: !!session,
+      userId: session?.user?.id,
+      email: session?.user?.email
+    })
+
     if (!session?.user) {
+      logApi('POST /api/chat - Unauthorized')
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const { message, conversationId, mode = 'private', title } = await req.json()
+
+    logApi('POST /api/chat - params', {
+      hasMessage: !!message,
+      hasConversationId: !!conversationId,
+      mode,
+      hasTitle: !!title
+    })
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Invalid message' }, { status: 400 })
@@ -20,6 +36,11 @@ export async function POST(req: NextRequest) {
     // Get the Careersy community ID
     const community = await prisma.community.findUnique({
       where: { slug: 'careersy-career-coaching' }
+    })
+
+    logApi('POST /api/chat - community lookup', {
+      foundCommunity: !!community,
+      communityId: community?.id
     })
 
     let conversation
@@ -104,7 +125,9 @@ export async function POST(req: NextRequest) {
     })
 
   } catch (error) {
-    console.error('Chat API error:', error)
+    logError('POST /api/chat', error, {
+      hasSession: !!await getServerSession(authOptions)
+    })
     return NextResponse.json(
       { error: 'Failed to process message' },
       { status: 500 }
