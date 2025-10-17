@@ -24,6 +24,7 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.67.0",
     "@auth/prisma-adapter": "^2.4.0",
     "@prisma/client": "^5.16.1",
     "@stripe/stripe-js": "^8.0.0",

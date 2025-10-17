@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { openai, SYSTEM_PROMPT } from '@/lib/openai'
 import { logApi, logError } from '@/lib/logger'
+import { getModelConfig } from '@/lib/ai-models'
+import { callAIModel, ChatMessage } from '@/lib/ai-providers'
 
 export async function POST(req: NextRequest) {
   try {
@@ -86,29 +87,27 @@ export async function POST(req: NextRequest) {
       select: { resumeText: true },
     })
 
+    // Get model configuration (defaults to Claude via env or hardcoded)
+    const modelConfig = getModelConfig()
+
     // Build system prompt with resume context
-    let systemPrompt = SYSTEM_PROMPT
+    let systemPrompt = modelConfig.systemPrompt
     if (user?.resumeText) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
     }
 
-    const messages = [
-      { role: 'system' as const, content: systemPrompt },
+    const messages: ChatMessage[] = [
+      { role: 'system', content: systemPrompt },
       ...conversation.messages.map(m => ({
         role: m.role as 'user' | 'assistant',
         content: m.content
       })),
-      { role: 'user' as const, content: message }
+      { role: 'user', content: message }
     ]
 
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: messages,
-      temperature: 0.7,
-      max_tokens: 1000,
-    })
-
-    const assistantMessage = completion.choices[0].message.content || 'I apologize, I could not generate a response.'
+    // Call AI model through unified interface
+    const response = await callAIModel(modelConfig, messages)
+    const assistantMessage = response.content
 
     await prisma.message.create({
       data: {
