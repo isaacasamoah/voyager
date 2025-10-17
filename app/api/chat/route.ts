@@ -6,6 +6,9 @@ import { logApi, logError } from '@/lib/logger'
 import { getModelConfig } from '@/lib/ai-models'
 import { callAIModel, ChatMessage } from '@/lib/ai-providers'
 
+// Force dynamic rendering for auth routes
+export const dynamic = 'force-dynamic'
+
 export async function POST(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)

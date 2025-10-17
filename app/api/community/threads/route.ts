@@ -4,6 +4,9 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { logApi } from '@/lib/logger'
 
+// Force dynamic rendering for auth routes
+export const dynamic = 'force-dynamic'
+
 export async function GET(req: NextRequest) {
   try {
     const session = await getServerSession(authOptions)

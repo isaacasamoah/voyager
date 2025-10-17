@@ -3,6 +3,9 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { logs } from '@/lib/logger'
 
+// Force dynamic rendering for auth routes
+export const dynamic = 'force-dynamic'
+
 // POST endpoint removed - logs are now stored automatically by logger helpers
 
 export async function GET(req: Request) {
