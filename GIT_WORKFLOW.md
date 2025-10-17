@@ -143,13 +143,18 @@ npm run precommit && git commit -m "your message"
 
 ## Branch Strategy
 
-### Main Branch
-- `main` - Always production-ready (or demo-ready)
-- Every commit on main should be functional
-- Every commit on main should be tagged
+### Branches
+- **main** - Production (always working, demo-ready)
+- **develop** - Integration (test features here first)
+- **feature/** - Feature branches
 
-### Feature Branches (Optional)
-For complex features that take multiple commits:
+### Rules
+1. Never commit directly to main
+2. Always branch from develop
+3. Merge to develop first, test, then main
+4. Only tag main
+
+### Workflow
 
 ```bash
 # Create feature branch
