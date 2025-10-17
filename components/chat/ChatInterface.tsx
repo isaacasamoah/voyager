@@ -37,13 +37,26 @@ export default function ChatInterface() {
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const isLoadingConversation = useRef(false)
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }
 
+  const scrollToTop = () => {
+    messagesContainerRef.current?.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
   useEffect(() => {
-    scrollToBottom()
+    // If we just loaded a conversation, scroll to top
+    if (isLoadingConversation.current) {
+      scrollToTop()
+      isLoadingConversation.current = false
+    } else {
+      // Otherwise scroll to bottom for new messages
+      scrollToBottom()
+    }
   }, [messages])
 
   // Load conversations and check resume on mount
@@ -103,6 +116,7 @@ export default function ChatInterface() {
 
   const loadConversation = async (id: string) => {
     try {
+      isLoadingConversation.current = true
       const response = await fetch(`/api/conversations/${id}`)
       if (response.ok) {
         const data = await response.json()
@@ -111,6 +125,7 @@ export default function ChatInterface() {
       }
     } catch (error) {
       console.error('Error loading conversation:', error)
+      isLoadingConversation.current = false
     }
   }
 
@@ -342,7 +357,7 @@ export default function ChatInterface() {
         </div>
 
         {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto p-8 space-y-6">
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
