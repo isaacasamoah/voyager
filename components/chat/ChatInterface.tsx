@@ -187,6 +187,13 @@ export default function ChatInterface() {
     signOut({ callbackUrl: '/login' })
   }
 
+  // Filter conversations based on search query (only in collaborate mode)
+  const filteredConversations = mode === 'public' && searchQuery.trim()
+    ? conversations.filter(conv =>
+        conv.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
+    : conversations
+
   return (
     <div className="flex h-screen bg-careersy-cream">
       {/* Sidebar - Minimal Space Style */}
@@ -195,16 +202,23 @@ export default function ChatInterface() {
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
-              {mode === 'public' ? 'Community' : 'History'}
+              {mode === 'public' ? (
+                searchQuery ? `Results (${filteredConversations.length})` : 'Community'
+              ) : (
+                'History'
+              )}
             </div>
             {loadingConversations ? (
               <div className="text-center text-gray-400 py-4 text-sm">...</div>
-            ) : conversations.length === 0 ? (
+            ) : filteredConversations.length === 0 ? (
               <div className="text-center text-gray-400 py-4 text-xs">
-                {mode === 'public' ? 'No threads yet' : 'No history yet'}
+                {searchQuery
+                  ? 'No matches found'
+                  : mode === 'public' ? 'No threads yet' : 'No history yet'
+                }
               </div>
             ) : (
-              conversations.map((conv) => (
+              filteredConversations.map((conv) => (
                 <button
                   key={conv.id}
                   onClick={() => loadConversation(conv.id)}
