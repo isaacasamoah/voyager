@@ -229,10 +229,10 @@ export default function ChatInterface() {
           </button>
 
           {/* Right: Collaborate Tools + Toggle */}
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-0.5">
             {/* Collaborate Mode Tools */}
             {mode === 'public' && (
-              <div className="flex items-center gap-1.5 animate-in fade-in slide-in-from-right-5 duration-300">
+              <div className="flex items-center gap-0.5 animate-in fade-in slide-in-from-right-5 duration-300">
                 {/* New Conversation */}
                 <div className="relative group">
                   <button
