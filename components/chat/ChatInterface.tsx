@@ -231,65 +231,52 @@ export default function ChatInterface() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header */}
-        <div className="flex-shrink-0 p-4 border-b border-careersy-yellow/30 bg-white flex items-center justify-between">
-          {/* Left: Hamburger + Logo */}
-          <div className="flex items-center gap-3 flex-shrink-0">
+        {/* Header - Voyager Style */}
+        <div className="flex-shrink-0 px-6 py-4 bg-white flex items-center justify-between border-b border-gray-100">
+          {/* Left: Hamburger */}
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className="p-2 hover:bg-gray-50 rounded transition-colors"
+          >
+            <svg className="w-4 h-4 text-careersy-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+          </button>
+
+          {/* Right: Public Toggle */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-careersy-black font-medium">Public</span>
             <button
-              onClick={() => setShowSidebar(!showSidebar)}
-              className="p-2 hover:bg-careersy-cream rounded-[30px] transition-colors"
+              onClick={() => setMode(mode === 'private' ? 'public' : 'private')}
+              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                mode === 'public' ? 'bg-careersy-yellow' : 'bg-gray-300'
+              }`}
             >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
+              <span
+                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                  mode === 'public' ? 'translate-x-5' : 'translate-x-1'
+                }`}
+              />
             </button>
-            <Image
-              src="/careersy-logo.webp"
-              alt="Careersy Logo"
-              width={80}
-              height={80}
-              className="object-contain"
-            />
           </div>
-
-          {/* Center: Title */}
-          <div className="absolute left-1/2 transform -translate-x-1/2 text-center">
-            <h1 className="text-xl font-lexend font-bold text-careersy-black tracking-tight">Careersy Wingman</h1>
-            <p className="text-sm text-gray-700">Your AI Career Partner for Australian Tech</p>
-          </div>
-
-          {/* Right: Spacer for balance */}
-          <div className="w-[140px] flex-shrink-0"></div>
         </div>
 
         {/* Messages Container */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        <div className="flex-1 overflow-y-auto p-8 space-y-6">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full">
-              <div className="text-center text-gray-700">
-                <h2 className="text-3xl font-lexend font-bold mb-3 text-careersy-black tracking-tight">👋 Welcome, {session?.user?.name?.split(' ')[0]}!</h2>
-                <p className="mb-6 text-lg">Ask me anything about your tech career in Australia</p>
-                <div className="text-left max-w-md mx-auto space-y-3 bg-white p-6 rounded-xl shadow-lg border-2 border-careersy-yellow/20">
-                  <p className="text-sm font-semibold text-careersy-black">Try asking about:</p>
-                  <ul className="text-sm space-y-2">
-                    <li className="flex items-start gap-2">
-                      <span className="text-careersy-yellow">●</span>
-                      <span>Interview preparation tips</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-careersy-yellow">●</span>
-                      <span>Salary expectations for your role</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-careersy-yellow">●</span>
-                      <span>Career progression advice</span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="text-careersy-yellow">●</span>
-                      <span>Resume feedback</span>
-                    </li>
-                  </ul>
-                </div>
+              <div className="text-center">
+                <Image
+                  src="/careersy-logo.webp"
+                  alt="Careersy"
+                  width={120}
+                  height={120}
+                  className="object-contain mx-auto mb-6 opacity-90"
+                />
+                <h1 className="text-4xl font-lexend font-bold text-careersy-black tracking-wide mb-2">
+                  CAREERSY WINGMAN
+                </h1>
+                <div className="w-48 h-[1px] bg-gray-200 mx-auto mt-6"></div>
               </div>
             </div>
           )}
@@ -313,35 +300,9 @@ export default function ChatInterface() {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Form */}
-        <form onSubmit={sendMessage} className="flex-shrink-0 p-4 border-t border-careersy-yellow/30 bg-white">
-          <div className="max-w-4xl mx-auto space-y-3">
-            {/* Mode Toggle */}
-            <div className="flex items-center justify-center gap-2">
-              <button
-                type="button"
-                onClick={() => setMode('private')}
-                className={`px-6 py-2 rounded-[30px] font-semibold transition-all ${
-                  mode === 'private'
-                    ? 'bg-careersy-black text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                🔒 Private Chat
-              </button>
-              <button
-                type="button"
-                onClick={() => setMode('public')}
-                className={`px-6 py-2 rounded-[30px] font-semibold transition-all ${
-                  mode === 'public'
-                    ? 'bg-careersy-yellow text-careersy-black'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-              >
-                🌍 Ask Community
-              </button>
-            </div>
-
+        {/* Input Form - Voyager Style */}
+        <form onSubmit={sendMessage} className="flex-shrink-0 p-8 bg-white">
+          <div className="w-[60%] mx-auto space-y-3">
             {/* Optional Title for Public Posts */}
             {mode === 'public' && (
               <input
@@ -349,30 +310,28 @@ export default function ChatInterface() {
                 value={publicTitle}
                 onChange={(e) => setPublicTitle(e.target.value)}
                 placeholder="Give your question a title (optional)..."
-                className="w-full p-3 border-2 border-careersy-yellow/30 rounded-[30px] focus:outline-none focus:ring-2 focus:ring-careersy-yellow focus:border-transparent"
+                className="w-full px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-colors text-sm"
               />
             )}
 
-            {/* Message Input */}
-            <div className="flex space-x-2">
+            {/* Message Input with Integrated Submit */}
+            <div className="relative">
               <input
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder={
-                  mode === 'private'
-                    ? 'Ask about careers, interviews, salaries...'
-                    : 'Share your question with the community...'
-                }
-                className="flex-1 p-3 border-2 border-gray-200 rounded-[30px] focus:outline-none focus:ring-2 focus:ring-careersy-yellow focus:border-transparent"
+                placeholder="|"
+                className="w-full px-6 py-4 pr-14 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-colors text-base"
                 disabled={loading}
               />
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
-                className="px-8 py-3 bg-careersy-yellow text-careersy-black font-semibold rounded-[30px] hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 transition-transform shadow-lg"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-careersy-yellow hover:bg-careersy-yellow/90 rounded-full flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all"
               >
-                {loading ? 'Sending...' : 'Send'}
+                <svg className="w-5 h-5 text-careersy-black" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M8 5v14l11-7z" />
+                </svg>
               </button>
             </div>
           </div>
