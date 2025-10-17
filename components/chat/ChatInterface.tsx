@@ -33,6 +33,9 @@ export default function ChatInterface() {
   const [hasResume, setHasResume] = useState(false)
   const [mode, setMode] = useState<ConversationMode>('private')
   const [publicTitle, setPublicTitle] = useState('')
+  const [showNewConversation, setShowNewConversation] = useState(false)
+  const [showSearch, setShowSearch] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
 
   const scrollToBottom = () => {
@@ -213,7 +216,7 @@ export default function ChatInterface() {
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header - Voyager Style */}
+        {/* Header - Voyager Style with Collaborate Mode */}
         <div className="flex-shrink-0 px-6 py-4 bg-white flex items-center justify-between border-b border-gray-100">
           {/* Left: Hamburger */}
           <button
@@ -225,21 +228,97 @@ export default function ChatInterface() {
             </svg>
           </button>
 
-          {/* Right: Public Toggle */}
-          <div className="flex items-center gap-2">
-            <span className="text-sm text-careersy-black font-medium">Public</span>
-            <button
-              onClick={() => setMode(mode === 'private' ? 'public' : 'private')}
-              className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                mode === 'public' ? 'bg-careersy-yellow' : 'bg-gray-300'
-              }`}
-            >
-              <span
-                className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                  mode === 'public' ? 'translate-x-5' : 'translate-x-1'
+          {/* Right: Collaborate Tools + Toggle */}
+          <div className="flex items-center gap-3">
+            {/* Collaborate Mode Tools */}
+            {mode === 'public' && (
+              <div className="flex items-center gap-2 animate-in fade-in slide-in-from-right-5 duration-300">
+                {/* New Conversation */}
+                <div className="relative group">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowNewConversation(!showNewConversation)
+                      setShowSearch(false)
+                    }}
+                    className="w-5 h-5 border border-gray-300 hover:border-careersy-yellow rounded-full flex items-center justify-center transition-colors"
+                  >
+                    <svg className="w-3 h-3 text-gray-500 group-hover:text-careersy-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+                    </svg>
+                  </button>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
+                    Start new conversation
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-careersy-black"></div>
+                  </div>
+                </div>
+
+                {/* New Conversation Title Field */}
+                <input
+                  type="text"
+                  value={publicTitle}
+                  onChange={(e) => setPublicTitle(e.target.value)}
+                  placeholder="Conversation title..."
+                  className={`px-3 py-1 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-all text-xs ${
+                    showNewConversation ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'
+                  }`}
+                />
+
+                {/* Search */}
+                <div className="relative group">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowSearch(!showSearch)
+                      setShowNewConversation(false)
+                    }}
+                    className="w-5 h-5 flex items-center justify-center hover:text-careersy-yellow transition-colors"
+                  >
+                    <svg className="w-4 h-4 text-gray-500 group-hover:text-careersy-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                  </button>
+                  {/* Tooltip */}
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
+                    Search conversations
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-careersy-black"></div>
+                  </div>
+                </div>
+
+                {/* Search Field */}
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search..."
+                  className={`px-3 py-1 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-all text-xs ${
+                    showSearch ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'
+                  }`}
+                />
+              </div>
+            )}
+
+            {/* Collaborate Toggle */}
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-careersy-black font-medium">Collaborate</span>
+              <button
+                onClick={() => {
+                  setMode(mode === 'private' ? 'public' : 'private')
+                  setShowNewConversation(false)
+                  setShowSearch(false)
+                }}
+                className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                  mode === 'public' ? 'bg-careersy-yellow' : 'bg-gray-300'
                 }`}
-              />
-            </button>
+              >
+                <span
+                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                    mode === 'public' ? 'translate-x-5' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -284,18 +363,7 @@ export default function ChatInterface() {
 
         {/* Input Form - Voyager Style */}
         <form onSubmit={sendMessage} className="flex-shrink-0 p-8 bg-white">
-          <div className="w-[60%] mx-auto space-y-3">
-            {/* Optional Title for Public Posts */}
-            {mode === 'public' && (
-              <input
-                type="text"
-                value={publicTitle}
-                onChange={(e) => setPublicTitle(e.target.value)}
-                placeholder="Give your question a title (optional)..."
-                className="w-full px-4 py-3 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-colors text-sm"
-              />
-            )}
-
+          <div className="w-[60%] mx-auto">
             {/* Message Input with Add Context + Submit */}
             <div className="relative flex items-center gap-2">
               {/* Add Files Button */}
