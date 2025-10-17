@@ -1,7 +1,6 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
-import { prisma } from '@/lib/db'
 import ChatInterface from '@/components/chat/ChatInterface'
 
 export default async function ChatPage() {
@@ -10,25 +9,6 @@ export default async function ChatPage() {
   if (!session) {
     redirect('/login')
   }
-
-  // Check if user has an active subscription
-  // TEMP: Disabled for development/testing
-  // TODO: Re-enable before production deployment
-  /*
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: {
-      stripeSubscriptionId: true,
-      stripeCurrentPeriodEnd: true,
-    },
-  })
-
-  const hasActiveSubscription = !!user?.stripeSubscriptionId
-
-  if (!hasActiveSubscription) {
-    redirect('/subscribe')
-  }
-  */
 
   return <ChatInterface />
 }
