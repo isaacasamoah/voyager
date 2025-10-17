@@ -189,10 +189,14 @@ export default function ChatInterface() {
 
   // Filter conversations based on search query (only in collaborate mode)
   const filteredConversations = mode === 'public' && searchQuery.trim()
-    ? conversations.filter(conv =>
-        conv.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+    ? conversations.filter(conv => {
+        const match = conv.title.toLowerCase().includes(searchQuery.toLowerCase())
+        console.log('Search:', { query: searchQuery, title: conv.title, match })
+        return match
+      })
     : conversations
+
+  console.log('Search state:', { mode, searchQuery, totalConversations: conversations.length, filtered: filteredConversations.length })
 
   return (
     <div className="flex h-screen bg-careersy-cream">
