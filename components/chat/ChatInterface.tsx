@@ -267,15 +267,22 @@ export default function ChatInterface() {
                 </div>
 
                 {/* New Conversation Title Field */}
-                <input
-                  type="text"
-                  value={publicTitle}
-                  onChange={(e) => setPublicTitle(e.target.value)}
-                  placeholder="Conversation title..."
-                  className={`px-3 py-1 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-all text-xs ${
-                    showNewConversation ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'
-                  }`}
-                />
+                <div className={`relative transition-all ${showNewConversation ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'}`}>
+                  <input
+                    type="text"
+                    value={publicTitle}
+                    onChange={(e) => setPublicTitle(e.target.value)}
+                    placeholder="Conversation title..."
+                    className="w-full px-3 py-1 pr-8 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-colors text-xs"
+                  />
+                  {publicTitle && (
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2 text-careersy-yellow">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                  )}
+                </div>
 
                 {/* Search */}
                 <div className="relative group">

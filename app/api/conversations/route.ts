@@ -13,6 +13,7 @@ export async function GET(req: NextRequest) {
     const conversations = await prisma.conversation.findMany({
       where: {
         userId: session.user.id,
+        isPublic: false, // Only show private conversations
       },
       orderBy: {
         updatedAt: 'desc',
