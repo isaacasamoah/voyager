@@ -52,6 +52,11 @@ export default function ChatInterface() {
     checkResume()
   }, [])
 
+  // Reload conversations when mode changes
+  useEffect(() => {
+    loadConversations()
+  }, [mode])
+
   const checkResume = async () => {
     try {
       const response = await fetch('/api/resume')
@@ -81,10 +86,13 @@ export default function ChatInterface() {
   const loadConversations = async () => {
     setLoadingConversations(true)
     try {
-      const response = await fetch('/api/conversations')
+      // Fetch different data based on mode
+      const endpoint = mode === 'public' ? '/api/community/threads' : '/api/conversations'
+      const response = await fetch(endpoint)
       if (response.ok) {
         const data = await response.json()
-        setConversations(data.conversations || [])
+        // Threads endpoint returns { threads }, conversations returns { conversations }
+        setConversations(data.threads || data.conversations || [])
       }
     } catch (error) {
       console.error('Error loading conversations:', error)
@@ -171,11 +179,15 @@ export default function ChatInterface() {
         <div className="w-64 bg-white border-r border-gray-100 flex flex-col">
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto px-3 py-4">
-            <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">History</div>
+            <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
+              {mode === 'public' ? 'Community' : 'History'}
+            </div>
             {loadingConversations ? (
               <div className="text-center text-gray-400 py-4 text-sm">...</div>
             ) : conversations.length === 0 ? (
-              <div className="text-center text-gray-400 py-4 text-xs">No history yet</div>
+              <div className="text-center text-gray-400 py-4 text-xs">
+                {mode === 'public' ? 'No threads yet' : 'No history yet'}
+              </div>
             ) : (
               conversations.map((conv) => (
                 <button
