@@ -189,14 +189,10 @@ export default function ChatInterface() {
 
   // Filter conversations based on search query (only in collaborate mode)
   const filteredConversations = mode === 'public' && searchQuery.trim()
-    ? conversations.filter(conv => {
-        const match = conv.title.toLowerCase().includes(searchQuery.toLowerCase())
-        console.log('Search:', { query: searchQuery, title: conv.title, match })
-        return match
-      })
+    ? conversations.filter(conv =>
+        conv.title.toLowerCase().includes(searchQuery.toLowerCase())
+      )
     : conversations
-
-  console.log('Search state:', { mode, searchQuery, totalConversations: conversations.length, filtered: filteredConversations.length })
 
   return (
     <div className="flex h-screen bg-careersy-cream">
@@ -338,16 +334,54 @@ export default function ChatInterface() {
                   </div>
                 </div>
 
-                {/* Search Field */}
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search..."
-                  className={`px-3 py-1 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-all text-xs ${
-                    showSearch ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'
-                  }`}
-                />
+                {/* Search Field with Dropdown */}
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search..."
+                    className={`px-3 py-1 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-all text-xs ${
+                      showSearch ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'
+                    }`}
+                  />
+
+                  {/* Search Results Dropdown */}
+                  {showSearch && searchQuery.trim() && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 max-h-64 overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200">
+                      {/* Results Count */}
+                      <div className="px-3 py-2 text-xs text-gray-400 border-b border-gray-100">
+                        {filteredConversations.length} {filteredConversations.length === 1 ? 'result' : 'results'}
+                      </div>
+
+                      {/* Results List */}
+                      {filteredConversations.length === 0 ? (
+                        <div className="px-3 py-4 text-xs text-gray-400 text-center">
+                          No matches found
+                        </div>
+                      ) : (
+                        filteredConversations.map((conv) => (
+                          <button
+                            key={conv.id}
+                            onClick={() => {
+                              loadConversation(conv.id)
+                              setSearchQuery('')
+                              setShowSearch(false)
+                            }}
+                            className="w-full text-left px-3 py-2 hover:bg-careersy-cream transition-colors border-b border-gray-50 last:border-b-0"
+                          >
+                            <div className="text-xs text-careersy-black font-medium truncate">
+                              {conv.title}
+                            </div>
+                            <div className="text-xs text-gray-400 mt-0.5">
+                              {new Date(conv.updatedAt).toLocaleDateString()}
+                            </div>
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
