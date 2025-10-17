@@ -13,10 +13,10 @@ export async function GET(
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // First, get the conversation to check if it's public
     const conversation = await prisma.conversation.findUnique({
       where: {
         id: params.id,
-        userId: session.user.id,
       },
       include: {
         messages: {
@@ -34,6 +34,11 @@ export async function GET(
 
     if (!conversation) {
       return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
+    }
+
+    // Check access: either your conversation OR it's public
+    if (conversation.userId !== session.user.id && !conversation.isPublic) {
+      return NextResponse.json({ error: 'Access denied' }, { status: 403 })
     }
 
     return NextResponse.json({
