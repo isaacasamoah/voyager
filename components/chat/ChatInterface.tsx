@@ -338,9 +338,15 @@ export default function ChatInterface() {
               <span className="text-sm text-careersy-black font-medium">Collaborate</span>
               <button
                 onClick={() => {
-                  setMode(mode === 'private' ? 'public' : 'private')
-                  setShowNewConversation(false)
-                  setShowSearch(false)
+                  // Smooth transition: clear screen before mode switch
+                  setMessages([])
+                  setConversationId(null)
+                  // Small delay so the fade feels natural
+                  setTimeout(() => {
+                    setMode(mode === 'private' ? 'public' : 'private')
+                    setShowNewConversation(false)
+                    setShowSearch(false)
+                  }, 100)
                 }}
                 className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
                   mode === 'public' ? 'bg-careersy-yellow' : 'bg-gray-300'
