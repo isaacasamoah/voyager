@@ -9,6 +9,7 @@ export default function VoyagerLanding() {
   const { data: session } = useSession()
   const router = useRouter()
   const [showSidebar, setShowSidebar] = useState(false)
+  const [collaborateMode, setCollaborateMode] = useState(false)
   const [input, setInput] = useState('')
   const [suggestion, setSuggestion] = useState('')
   const [loading, setLoading] = useState(false)
@@ -63,7 +64,7 @@ export default function VoyagerLanding() {
         <div className="flex flex-col h-full">
           {/* Sidebar Header */}
           <div className="flex-shrink-0 p-6 border-b border-gray-200">
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between">
               <h2 className="text-lg font-lexend font-bold text-black">Communities</h2>
               <button
                 onClick={() => setShowSidebar(false)}
@@ -74,34 +75,6 @@ export default function VoyagerLanding() {
                 </svg>
               </button>
             </div>
-
-            {/* User Section */}
-            {session ? (
-              <div className="flex items-center gap-3">
-                {session.user.image && (
-                  <img
-                    src={session.user.image}
-                    alt={session.user.name || 'User'}
-                    className="w-8 h-8 rounded-full"
-                  />
-                )}
-                <div className="flex-1 min-w-0">
-                  <div className="text-sm font-medium text-black truncate">
-                    {session.user.name}
-                  </div>
-                  <div className="text-xs text-gray-500 truncate">
-                    {session.user.email}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <Link
-                href="/login"
-                className="block text-sm text-gray-600 hover:text-black transition-colors"
-              >
-                Sign in
-              </Link>
-            )}
           </div>
 
           {/* Communities List */}
@@ -123,18 +96,6 @@ export default function VoyagerLanding() {
               ))}
             </div>
           </div>
-
-          {/* Sign Out Button */}
-          {session && (
-            <div className="flex-shrink-0 p-4 border-t border-gray-200">
-              <button
-                onClick={() => router.push('/api/auth/signout')}
-                className="w-full px-3 py-2 text-sm text-gray-600 hover:text-black hover:bg-gray-100 rounded-lg transition-colors text-left"
-              >
-                Sign out
-              </button>
-            </div>
-          )}
         </div>
       </div>
 
@@ -154,7 +115,7 @@ export default function VoyagerLanding() {
               </svg>
             </button>
 
-            {/* Right: Search + Collaborate Toggle */}
+            {/* Right: Search + Sign In + Collaborate Toggle */}
             <div className="flex items-center gap-4 ml-auto">
               {/* Search Icon */}
               <button
@@ -222,14 +183,37 @@ export default function VoyagerLanding() {
                 )}
               </div>
 
+              {/* Sign In/Out */}
+              {session ? (
+                <button
+                  onClick={() => router.push('/api/auth/signout')}
+                  className="text-sm text-gray-600 hover:text-black transition-colors"
+                >
+                  Sign out
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  className="text-sm text-gray-600 hover:text-black transition-colors"
+                >
+                  Sign in
+                </Link>
+              )}
+
               {/* Collaborate Toggle */}
               <div className="flex items-center gap-2">
                 <span className="text-sm text-black font-medium">Collaborate</span>
                 <button
-                  disabled
-                  className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors bg-gray-300 opacity-50 cursor-not-allowed"
+                  onClick={() => setCollaborateMode(!collaborateMode)}
+                  className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
+                    collaborateMode ? 'bg-black' : 'bg-gray-300'
+                  }`}
                 >
-                  <span className="inline-block h-3 w-3 transform rounded-full bg-white transition-transform translate-x-1" />
+                  <span
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                      collaborateMode ? 'translate-x-5' : 'translate-x-1'
+                    }`}
+                  />
                 </button>
               </div>
             </div>
