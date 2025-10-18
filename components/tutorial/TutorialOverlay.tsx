@@ -98,10 +98,17 @@ export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChang
         left = spotlightRect.left + spotlightRect.width / 2
         transform = 'translateX(-50%)'
 
-        // If tooltip goes below viewport, move it above
+        // If tooltip goes below viewport, try above
         if (top + tooltipHeight > viewportHeight) {
-          top = spotlightRect.top - padding
-          transform = 'translate(-50%, -100%)'
+          const topPosition = spotlightRect.top - padding - tooltipHeight
+          // If above also goes off-screen, center it vertically
+          if (topPosition < 0) {
+            top = viewportHeight / 2
+            transform = 'translate(-50%, -50%)'
+          } else {
+            top = spotlightRect.top - padding
+            transform = 'translate(-50%, -100%)'
+          }
         }
         break
 
@@ -173,6 +180,13 @@ export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChang
     } else if (left > viewportWidth - tooltipWidth / 2) {
       left = viewportWidth - tooltipWidth / 2 - padding
       transform = 'translateX(-50%)'
+    }
+
+    // Ensure tooltip is visible vertically
+    if (top < padding) {
+      top = padding
+    } else if (top + tooltipHeight > viewportHeight) {
+      top = viewportHeight - tooltipHeight - padding
     }
 
     return {
