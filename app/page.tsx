@@ -15,6 +15,7 @@ export default function VoyagerLanding() {
   const [collaborateMode, setCollaborateMode] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant', content: string }>>([])
 
   // Hardcoded communities for now (could fetch from API later)
   const communities = [
@@ -33,18 +34,39 @@ export default function VoyagerLanding() {
     e.preventDefault()
     if (!input.trim()) return
 
+    const userMessage = input.trim()
+    setInput('')
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
     setLoading(true)
+    setSuggestion('')
 
-    // Simple keyword matching for MVP
-    const lowerInput = input.toLowerCase()
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: userMessage,
+          conversationId: null,
+          communityId: 'voyager',
+          mode: 'private',
+        }),
+      })
 
-    if (lowerInput.includes('career') || lowerInput.includes('job') || lowerInput.includes('tech') || lowerInput.includes('work')) {
-      setSuggestion('Based on what you shared, **Careersy Coaching** might be perfect for you. It\'s a community for ANZ tech professionals looking to level up their careers.')
-    } else {
-      setSuggestion('I\'m not sure which community would be best. Try browsing the communities in the sidebar, or tell me more about what you\'re looking for!')
+      if (!response.ok) {
+        throw new Error('Failed to send message')
+      }
+
+      const data = await response.json()
+      setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+    } catch (error) {
+      console.error('Error sending message:', error)
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: 'Sorry, something went wrong. Please try again.'
+      }])
+    } finally {
+      setLoading(false)
     }
-
-    setLoading(false)
   }
 
   const handleJoinCommunity = (communityId: string) => {
@@ -115,7 +137,7 @@ export default function VoyagerLanding() {
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
         {/* Header - Voyager Style with Collaborate Mode (matches Careersy exactly) */}
-        <div className="flex-shrink-0 px-6 py-4 bg-white flex items-center justify-between border-b border-gray-100">
+        <div className="flex-shrink-0 px-6 py-4 bg-white flex items-center justify-between">
           {/* Left: Hamburger */}
           <div className="flex items-center gap-2">
             <button
@@ -204,11 +226,11 @@ export default function VoyagerLanding() {
               </div>
             )}
 
-            {/* Sign In (only show when NOT logged in) */}
+            {/* Sign In (only show when NOT logged in) - Strong CTA */}
             {!session && (
               <Link
                 href="/login"
-                className="text-sm text-gray-600 hover:text-black transition-colors"
+                className="px-4 py-2 bg-black text-white rounded-full text-sm font-medium hover:scale-105 transition-transform"
               >
                 Sign in
               </Link>
@@ -239,33 +261,35 @@ export default function VoyagerLanding() {
         {/* Messages Container */}
         <div className="flex-1 overflow-y-auto p-8 space-y-6">
           {/* Empty State - VOYAGER Wordmark */}
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center">
-              <h1 className="text-7xl font-lexend font-bold text-black tracking-wider mb-4">
-                VOYAGER
-              </h1>
-              <div className="w-48 h-[1px] bg-gray-200 mx-auto mt-6"></div>
-            </div>
-          </div>
-
-          {/* Suggestion Display (after search) */}
-          {suggestion && (
-            <div className="max-w-2xl mx-auto">
-              <div className="bg-gray-50 border border-gray-200 rounded-xl p-6">
-                <p className="text-gray-700 whitespace-pre-wrap mb-4">{suggestion.replace(/\*\*/g, '')}</p>
-                <button
-                  onClick={() => handleJoinCommunity('careersy')}
-                  className="px-6 py-2 bg-black text-white rounded-full hover:scale-105 transition-transform text-sm font-medium"
-                >
-                  Join Careersy Coaching
-                </button>
+          {messages.length === 0 && (
+            <div className="flex items-center justify-center h-full">
+              <div className="text-center">
+                <h1 className="text-7xl font-lexend font-bold text-black tracking-wider mb-4">
+                  VOYAGER
+                </h1>
+                <div className="w-48 h-[1px] bg-gray-200 mx-auto mt-6"></div>
               </div>
             </div>
           )}
 
+          {/* Chat Messages */}
+          {messages.map((msg, idx) => (
+            <div key={idx} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              <div
+                className={`max-w-[80%] rounded-xl p-4 ${
+                  msg.role === 'user'
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-black'
+                }`}
+              >
+                <p className="whitespace-pre-wrap text-sm">{msg.content}</p>
+              </div>
+            </div>
+          ))}
+
           {loading && (
-            <div className="flex justify-start max-w-2xl mx-auto">
-              <div className="bg-white rounded-xl p-4 shadow-lg border-2 border-gray-200">
+            <div className="flex justify-start">
+              <div className="bg-gray-100 rounded-xl p-4">
                 <div className="flex space-x-2">
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
                   <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>

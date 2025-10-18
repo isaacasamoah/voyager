@@ -20,11 +20,6 @@ export async function POST(req: NextRequest) {
       email: session?.user?.email
     })
 
-    if (!session?.user) {
-      logApi('POST /api/chat - Unauthorized')
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
-
     const { message, conversationId, mode = 'private', title, communityId = 'careersy' } = await req.json()
 
     logApi('POST /api/chat - params', {
@@ -43,6 +38,33 @@ export async function POST(req: NextRequest) {
     const communityConfig = getCommunityConfig(communityId)
     if (!communityConfig) {
       return NextResponse.json({ error: 'Community not found' }, { status: 404 })
+    }
+
+    // Special handling for voyager - allow without auth
+    if (communityId === 'voyager') {
+      // For voyager, we don't require auth or save conversations
+      // Just provide AI responses for navigation help
+      let systemPrompt = getCommunitySystemPrompt(communityConfig)
+
+      const aiMessages: ChatMessage[] = [
+        { role: 'system', content: systemPrompt },
+        { role: 'user', content: message }
+      ]
+
+      const modelConfig = getModelConfig()
+      const completion = await callAIModel(modelConfig, aiMessages)
+      const assistantMessage = completion || 'I apologize, I could not generate a response.'
+
+      return NextResponse.json({
+        message: assistantMessage,
+        conversationId: null,
+      })
+    }
+
+    // For other communities, require authentication
+    if (!session?.user) {
+      logApi('POST /api/chat - Unauthorized')
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     // Check if user is a member of this community
