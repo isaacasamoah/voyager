@@ -45,6 +45,7 @@ export default function ChatInterface() {
   const [demoResume, setDemoResume] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLInputElement>(null)
   const isLoadingConversation = useRef(false)
 
   const scrollToBottom = () => {
@@ -71,6 +72,8 @@ export default function ChatInterface() {
     loadConversations()
     checkResume()
     checkTutorialStatus()
+    // Auto-focus chat input on load
+    inputRef.current?.focus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
@@ -590,6 +593,7 @@ export default function ChatInterface() {
 
               {/* Input Field */}
               <input
+                ref={inputRef}
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
