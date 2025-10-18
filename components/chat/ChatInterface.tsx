@@ -72,12 +72,10 @@ export default function ChatInterface() {
     loadConversations()
     checkResume()
     checkTutorialStatus()
-    // Auto-focus chat input on load (delay to avoid tutorial flash)
-    setTimeout(() => inputRef.current?.focus(), 600)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Re-focus input when tutorial closes
+  // Auto-focus input when tutorial is not showing
   useEffect(() => {
     if (!showTutorial) {
       inputRef.current?.focus()
