@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
       const modelConfig = getModelConfig()
       const completion = await callAIModel(modelConfig, aiMessages)
-      const assistantMessage = completion || 'I apologize, I could not generate a response.'
+      const assistantMessage = completion?.content || 'I apologize, I could not generate a response.'
 
       return NextResponse.json({
         message: assistantMessage,
