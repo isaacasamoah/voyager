@@ -159,9 +159,9 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
   }
 
   return (
-    <div className="fixed inset-0 z-50">
+    <div className="fixed inset-0 z-[100]">
       {/* Dark overlay - blocks all clicks */}
-      <div className="absolute inset-0 bg-black/70">
+      <div className="absolute inset-0 bg-black/70 cursor-not-allowed">
         {spotlightRect && (
           <div
             className="absolute border-2 border-careersy-yellow/60 rounded-lg shadow-xl"

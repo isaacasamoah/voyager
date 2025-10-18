@@ -29,6 +29,20 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     position: 'right',
   },
   {
+    id: 'new-conversation',
+    title: 'Start New Chat',
+    description: 'This button starts a fresh conversation. In private mode, it clears your current chat. In public mode, you can give it a custom title.',
+    targetSelector: 'button:has(svg path[d*="M12 4v16m8-8H4"])',
+    position: 'bottom',
+  },
+  {
+    id: 'search',
+    title: 'Search Conversations',
+    description: 'The search icon helps you find past conversations. In public mode, you can search community discussions too.',
+    targetSelector: 'button:has(svg path[d*="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"])',
+    position: 'bottom',
+  },
+  {
     id: 'collaborate-toggle',
     title: 'Collaborate Mode',
     description: 'This toggle lets you share conversations publicly with the Careersy community for peer feedback.',
