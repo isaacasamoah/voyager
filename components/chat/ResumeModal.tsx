@@ -7,9 +7,10 @@ interface ResumeModalProps {
   onClose: () => void
   onSave: (resumeText: string) => Promise<void>
   initialResume?: string
+  demoMode?: boolean
 }
 
-export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '' }: ResumeModalProps) {
+export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '', demoMode = false }: ResumeModalProps) {
   const [resumeText, setResumeText] = useState(initialResume)
   const [saving, setSaving] = useState(false)
 
@@ -33,6 +34,15 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col">
+        {/* Demo Mode Banner */}
+        {demoMode && (
+          <div className="bg-careersy-yellow/20 border-b-2 border-careersy-yellow px-6 py-3">
+            <p className="text-sm text-careersy-black font-medium">
+              🎬 Demo Mode - Your input won't be saved
+            </p>
+          </div>
+        )}
+
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
           <h2 className="text-2xl font-lexend font-bold text-careersy-black">Add Your Resume</h2>

@@ -7,6 +7,7 @@ import ChatMessage from './ChatMessage'
 import ResumeModal from './ResumeModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
 import { TUTORIAL_STEPS } from '../tutorial/tutorialSteps'
+import { createDemoResponse, DEMO_RESUME_SAVED_MESSAGE, DEMO_RESUME_TEXT, DemoMessage } from '../tutorial/demoData'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -40,6 +41,8 @@ export default function ChatInterface() {
   const [searchQuery, setSearchQuery] = useState('')
   const [showTutorial, setShowTutorial] = useState(false)
   const [demoMode, setDemoMode] = useState(false)
+  const [demoMessages, setDemoMessages] = useState<DemoMessage[]>([])
+  const [demoResume, setDemoResume] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const isLoadingConversation = useRef(false)
@@ -84,14 +87,26 @@ export default function ChatInterface() {
     }
   }
 
+  const resetDemoState = () => {
+    setDemoMessages([])
+    setDemoResume('')
+    setMessages([])
+    setInput('')
+    setConversationId(null)
+  }
+
   const handleTutorialComplete = () => {
     setShowTutorial(false)
     localStorage.setItem('careersy_tutorial_completed', 'true')
+    // Clean slate: reset all demo state
+    resetDemoState()
   }
 
   const handleTutorialSkip = () => {
     setShowTutorial(false)
     localStorage.setItem('careersy_tutorial_completed', 'true')
+    // Clean slate: reset all demo state
+    resetDemoState()
   }
 
   const restartTutorial = () => {
@@ -127,6 +142,19 @@ export default function ChatInterface() {
   }
 
   const saveResume = async (resumeText: string) => {
+    // DEMO MODE: Save to local state only, show success message
+    if (demoMode) {
+      setDemoResume(resumeText)
+      setHasResume(true)
+      // Show a demo success message
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: DEMO_RESUME_SAVED_MESSAGE
+      }])
+      return
+    }
+
+    // NORMAL MODE: Save to database
     const response = await fetch('/api/resume', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -188,6 +216,22 @@ export default function ChatInterface() {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
     setLoading(true)
 
+    // DEMO MODE: Use fake responses, don't hit API
+    if (demoMode) {
+      setTimeout(() => {
+        const demoResponse = createDemoResponse(userMessage)
+        setMessages(prev => [...prev, { role: 'assistant', content: demoResponse }])
+        setDemoMessages(prev => [
+          ...prev,
+          { role: 'user', content: userMessage },
+          { role: 'assistant', content: demoResponse }
+        ])
+        setLoading(false)
+      }, 1000) // Simulate AI thinking time
+      return
+    }
+
+    // NORMAL MODE: Hit real API
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -574,6 +618,7 @@ export default function ChatInterface() {
         isOpen={showResumeModal}
         onClose={() => setShowResumeModal(false)}
         onSave={saveResume}
+        demoMode={demoMode}
       />
 
       {/* Tutorial Overlay */}
