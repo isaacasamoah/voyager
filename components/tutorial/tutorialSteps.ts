@@ -31,7 +31,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
   {
     id: 'collaborate-toggle',
     title: 'Collaborate Mode',
-    description: 'Toggle this to share conversations publicly with the Careersy community for peer feedback.',
+    description: 'Toggle this to share conversations publicly with the Careersy community for peer feedback or Eli\'s personal touch.',
     targetSelector: 'button:has(span[class*="rounded-full"][class*="bg-"])',
     position: 'bottom',
   },
