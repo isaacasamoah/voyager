@@ -7,9 +7,12 @@ export interface TutorialStep {
   title: string
   description: string
   targetSelector?: string // CSS selector for element to highlight
+  resultSelector?: string // CSS selector for what appears after interaction (modal, sidebar, etc.)
   position: 'top' | 'bottom' | 'left' | 'right' | 'center'
   action?: 'click' | 'type' | 'view' // What user should do
   requireInteraction?: boolean // Wait for user to do action before next
+  waitForElement?: boolean // Wait for resultSelector to appear before allowing Next
+  allowInteraction?: boolean // Allow user to click the highlighted element
 }
 
 interface TutorialOverlayProps {
@@ -22,11 +25,16 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
   const [currentStep, setCurrentStep] = useState(0)
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null)
   const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null)
+  const [resultAppeared, setResultAppeared] = useState(false)
+  const [interactionCompleted, setInteractionCompleted] = useState(false)
 
   const step = steps[currentStep]
 
   // Find and highlight target element
   useEffect(() => {
+    setResultAppeared(false)
+    setInteractionCompleted(false)
+
     if (!step.targetSelector) {
       setTargetElement(null)
       setSpotlightRect(null)
@@ -44,14 +52,42 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
 
       // Add pulse animation to element
       element.classList.add('tutorial-highlight')
+
+      // If this step allows interaction, make element clickable
+      if (step.allowInteraction) {
+        element.classList.add('tutorial-interactive')
+      }
     }
 
     return () => {
       if (element) {
         element.classList.remove('tutorial-highlight')
+        element.classList.remove('tutorial-interactive')
       }
     }
-  }, [step.targetSelector])
+  }, [step.targetSelector, step.allowInteraction])
+
+  // Watch for result element to appear
+  useEffect(() => {
+    if (!step.resultSelector || !step.waitForElement) return
+
+    const checkForResult = setInterval(() => {
+      const resultElement = document.querySelector(step.resultSelector!) as HTMLElement
+      if (resultElement) {
+        setResultAppeared(true)
+        setInteractionCompleted(true)
+
+        // Highlight the result too
+        const resultRect = resultElement.getBoundingClientRect()
+        setSpotlightRect(resultRect)
+        setTargetElement(resultElement)
+
+        clearInterval(checkForResult)
+      }
+    }, 100)
+
+    return () => clearInterval(checkForResult)
+  }, [step.resultSelector, step.waitForElement])
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -72,32 +108,65 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
 
     const padding = 20
     const tooltipWidth = 320
+    const tooltipHeight = 250 // Approximate
+    const viewportWidth = window.innerWidth
+    const viewportHeight = window.innerHeight
 
+    let position = { ...step.position } // Start with preferred position
+    let top = 0
+    let left = 0
+    let transform = ''
+
+    // Try preferred position first, but adjust if it goes off screen
     switch (step.position) {
       case 'bottom':
-        return {
-          top: `${spotlightRect.bottom + padding}px`,
-          left: `${spotlightRect.left + spotlightRect.width / 2}px`,
-          transform: 'translateX(-50%)',
+        top = spotlightRect.bottom + padding
+        left = spotlightRect.left + spotlightRect.width / 2
+        transform = 'translateX(-50%)'
+
+        // If tooltip goes below viewport, move it above
+        if (top + tooltipHeight > viewportHeight) {
+          top = spotlightRect.top - padding
+          transform = 'translate(-50%, -100%)'
         }
+        break
+
       case 'top':
-        return {
-          top: `${spotlightRect.top - padding}px`,
-          left: `${spotlightRect.left + spotlightRect.width / 2}px`,
-          transform: 'translate(-50%, -100%)',
+        top = spotlightRect.top - padding
+        left = spotlightRect.left + spotlightRect.width / 2
+        transform = 'translate(-50%, -100%)'
+
+        // If tooltip goes above viewport, move it below
+        if (top - tooltipHeight < 0) {
+          top = spotlightRect.bottom + padding
+          transform = 'translateX(-50%)'
         }
+        break
+
       case 'left':
-        return {
-          top: `${spotlightRect.top + spotlightRect.height / 2}px`,
-          left: `${spotlightRect.left - padding}px`,
-          transform: 'translate(-100%, -50%)',
+        top = spotlightRect.top + spotlightRect.height / 2
+        left = spotlightRect.left - padding
+        transform = 'translate(-100%, -50%)'
+
+        // If tooltip goes off left edge, move it to right
+        if (left - tooltipWidth < 0) {
+          left = spotlightRect.right + padding
+          transform = 'translateY(-50%)'
         }
+        break
+
       case 'right':
-        return {
-          top: `${spotlightRect.top + spotlightRect.height / 2}px`,
-          left: `${spotlightRect.right + padding}px`,
-          transform: 'translateY(-50%)',
+        top = spotlightRect.top + spotlightRect.height / 2
+        left = spotlightRect.right + padding
+        transform = 'translateY(-50%)'
+
+        // If tooltip goes off right edge, move it to left
+        if (left + tooltipWidth > viewportWidth) {
+          left = spotlightRect.left - padding
+          transform = 'translate(-100%, -50%)'
         }
+        break
+
       case 'center':
       default:
         return {
@@ -105,6 +174,21 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
           left: '50%',
           transform: 'translate(-50%, -50%)',
         }
+    }
+
+    // Final bounds check: ensure tooltip is visible horizontally
+    if (left < tooltipWidth / 2) {
+      left = tooltipWidth / 2 + padding
+      transform = 'translateX(-50%)'
+    } else if (left > viewportWidth - tooltipWidth / 2) {
+      left = viewportWidth - tooltipWidth / 2 - padding
+      transform = 'translateX(-50%)'
+    }
+
+    return {
+      top: `${top}px`,
+      left: `${left}px`,
+      transform,
     }
   }
 
@@ -201,7 +285,11 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
         .tutorial-highlight {
           position: relative;
           z-index: 51 !important;
+        }
+
+        .tutorial-interactive {
           pointer-events: auto !important;
+          cursor: pointer !important;
         }
 
         @keyframes pulse-slow {
