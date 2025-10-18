@@ -127,11 +127,20 @@ export async function POST(req: NextRequest) {
     })
 
   } catch (error) {
+    console.error('❌ Chat API Error:', error)
     logError('POST /api/chat', error, {
-      hasSession: !!await getServerSession(authOptions)
+      hasSession: !!await getServerSession(authOptions),
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      errorStack: error instanceof Error ? error.stack : undefined
     })
+
+    // Return more detailed error in development
+    const isDev = process.env.NODE_ENV === 'development'
     return NextResponse.json(
-      { error: 'Failed to process message' },
+      {
+        error: 'Failed to process message',
+        ...(isDev && { details: error instanceof Error ? error.message : String(error) })
+      },
       { status: 500 }
     )
   }

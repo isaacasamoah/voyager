@@ -46,8 +46,14 @@ async function callAnthropic(
 ): Promise<ChatCompletionResponse> {
   const apiKey = process.env.ANTHROPIC_API_KEY
 
+  console.log('🔍 Anthropic API Check:', {
+    hasApiKey: !!apiKey,
+    apiKeyPrefix: apiKey ? apiKey.substring(0, 15) + '...' : 'MISSING',
+    modelId: config.modelId
+  })
+
   if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY is not set')
+    throw new Error('ANTHROPIC_API_KEY is not set in environment variables')
   }
 
   const anthropic = new Anthropic({ apiKey })
@@ -61,12 +67,22 @@ async function callAnthropic(
       content: m.content,
     }))
 
+  console.log('🤖 Calling Anthropic API:', {
+    model: config.modelId,
+    messageCount: conversationMessages.length,
+    systemPromptLength: systemMessage.length
+  })
+
   const response = await anthropic.messages.create({
     model: config.modelId,
     max_tokens: config.maxTokens,
     temperature: config.temperature,
     system: systemMessage,
     messages: conversationMessages,
+  })
+
+  console.log('✅ Anthropic response received:', {
+    tokensUsed: response.usage.input_tokens + response.usage.output_tokens
   })
 
   // Extract text content from response
