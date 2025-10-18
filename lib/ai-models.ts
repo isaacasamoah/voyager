@@ -49,7 +49,7 @@ Ethics: Never store/share data, fabricate history, or break NDAs.`
 export const AVAILABLE_MODELS: Record<string, ModelConfig> = {
   'claude-sonnet': {
     provider: 'anthropic',
-    modelId: 'claude-3-5-sonnet-20241022',
+    modelId: 'claude-3-5-sonnet-20250110', // Latest as of Jan 2025
     displayName: 'Claude 3.5 Sonnet',
     maxTokens: 4096,
     temperature: 0.7,
