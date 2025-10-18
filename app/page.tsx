@@ -228,14 +228,18 @@ export default function VoyagerLanding() {
             )}
 
             {/* Sign In (only show when NOT logged in) - Strong CTA */}
-            {!isLoading && !session && (
+            {isLoading ? (
+              <div className="px-4 py-2 bg-gray-200 text-gray-400 rounded-full text-sm font-medium">
+                Loading...
+              </div>
+            ) : !session ? (
               <Link
                 href="/login"
                 className="px-4 py-2 bg-black text-white rounded-full text-sm font-medium hover:scale-105 transition-transform"
               >
                 Sign in
               </Link>
-            )}
+            ) : null}
 
             {/* Collaborate Toggle */}
             <div className="flex items-center gap-2">
