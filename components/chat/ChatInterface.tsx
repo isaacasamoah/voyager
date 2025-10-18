@@ -543,8 +543,8 @@ export default function ChatInterface() {
                 type="text"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="|"
-                className="flex-1 px-6 py-4 pr-14 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-colors text-base"
+                placeholder="What's your next career move?"
+                className="flex-1 px-6 py-4 pr-14 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-colors text-base placeholder:text-gray-400"
                 disabled={loading}
               />
 

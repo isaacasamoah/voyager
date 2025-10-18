@@ -11,7 +11,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     id: 'send-message',
     title: 'Chat Interface',
     description: 'This is where you\'ll ask about resume reviews, interview prep, salary negotiation, and job search strategies.',
-    targetSelector: 'input[type="text"][placeholder="|"]',
+    targetSelector: 'input[type="text"][placeholder="What\'s your next career move?"]',
     position: 'top',
   },
   {
