@@ -7,6 +7,7 @@ import ChatMessage from './ChatMessage'
 import ResumeModal from './ResumeModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
 import { TUTORIAL_STEPS } from '../tutorial/tutorialSteps'
+import { CommunityConfig } from '@/lib/communities'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -22,7 +23,12 @@ interface Conversation {
 
 type ConversationMode = 'private' | 'public'
 
-export default function ChatInterface() {
+interface ChatInterfaceProps {
+  communityId: string
+  communityConfig: CommunityConfig
+}
+
+export default function ChatInterface({ communityId, communityConfig }: ChatInterfaceProps) {
   const { data: session } = useSession()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -145,7 +151,9 @@ export default function ChatInterface() {
     setLoadingConversations(true)
     try {
       // Fetch different data based on mode
-      const endpoint = mode === 'public' ? '/api/community/threads' : '/api/conversations'
+      const endpoint = mode === 'public'
+        ? `/api/community/threads?communityId=${communityId}`
+        : `/api/conversations?communityId=${communityId}`
       const response = await fetch(endpoint)
       if (response.ok) {
         const data = await response.json()
@@ -196,6 +204,7 @@ export default function ChatInterface() {
         body: JSON.stringify({
           message: userMessage,
           conversationId,
+          communityId,
           mode: mode,
           title: mode === 'public' && publicTitle ? publicTitle : undefined,
         }),
