@@ -5,43 +5,30 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Seeding database...')
 
-  // Create Careersy Career Coaching community
-  const community = await prisma.community.upsert({
-    where: { slug: 'careersy-career-coaching' },
-    update: {},
-    create: {
-      name: 'Careersy Career Coaching',
-      slug: 'careersy-career-coaching',
-      description: 'A community for tech professionals in Australia to share career advice, interview tips, and industry insights.',
-    },
-  })
+  // Communities are now managed via JSON configs in /communities/*.json
+  // This seed script just ensures all users are members of the careersy community
 
-  console.log(`✅ Created community: ${community.name} (${community.id})`)
-
-  // Get all users and add them to the community as members
+  // Get all users and add them to careersy community
   const users = await prisma.user.findMany()
 
   for (const user of users) {
-    const existingMember = await prisma.communityMember.findUnique({
-      where: {
-        communityId_userId: {
-          communityId: community.id,
-          userId: user.id,
-        },
-      },
-    })
-
-    if (!existingMember) {
-      await prisma.communityMember.create({
+    if (!user.communities || !user.communities.includes('careersy')) {
+      await prisma.user.update({
+        where: { id: user.id },
         data: {
-          communityId: community.id,
-          userId: user.id,
-          role: 'member',
+          communities: {
+            push: 'careersy'
+          }
         },
       })
-      console.log(`✅ Added user ${user.email} to community`)
+      console.log(`✅ Added user ${user.email} to careersy community`)
+    } else {
+      console.log(`ℹ️  User ${user.email} already in careersy community`)
     }
   }
+
+  // All conversations now default to 'careersy' via schema default
+  console.log('ℹ️  All conversations automatically assigned to careersy via schema default')
 
   console.log('✅ Seeding complete!')
 }

@@ -14,25 +14,31 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
+    // Get communityId from query params (defaults to 'careersy')
+    const { searchParams } = new URL(req.url)
+    const communityId = searchParams.get('communityId') || 'careersy'
+
     logApi('GET /api/community/threads', {
       userId: session.user.id,
-      email: session.user.email
+      email: session.user.email,
+      communityId
     })
 
-    // Get the Careersy community
-    const community = await prisma.community.findUnique({
-      where: { slug: 'careersy-career-coaching' }
+    // Verify user is member of this community
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { communities: true }
     })
 
-    if (!community) {
-      return NextResponse.json({ threads: [] })
+    if (!user?.communities.includes(communityId)) {
+      return NextResponse.json({ error: 'Not a member of this community' }, { status: 403 })
     }
 
     // Fetch public conversations from the community
     const threads = await prisma.conversation.findMany({
       where: {
         isPublic: true,
-        communityId: community.id
+        communityId
       },
       orderBy: {
         updatedAt: 'desc'

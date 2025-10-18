@@ -70,7 +70,8 @@ export const authOptions: NextAuthOptions = {
           })
 
           const currentCommunities = dbUser?.communities || []
-          const newCommunities = [...new Set([...currentCommunities, ...userCommunities])]
+          const communitySet = new Set([...currentCommunities, ...userCommunities])
+          const newCommunities = Array.from(communitySet)
 
           if (newCommunities.length > currentCommunities.length) {
             await prisma.user.update({
