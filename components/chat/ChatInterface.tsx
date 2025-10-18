@@ -5,6 +5,8 @@ import { useSession, signOut } from 'next-auth/react'
 import Image from 'next/image'
 import ChatMessage from './ChatMessage'
 import ResumeModal from './ResumeModal'
+import TutorialOverlay from '../tutorial/TutorialOverlay'
+import { TUTORIAL_STEPS } from '../tutorial/tutorialSteps'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -36,6 +38,8 @@ export default function ChatInterface() {
   const [showNewConversation, setShowNewConversation] = useState(false)
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showTutorial, setShowTutorial] = useState(false)
+  const [demoMode, setDemoMode] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const isLoadingConversation = useRef(false)
@@ -63,7 +67,45 @@ export default function ChatInterface() {
   useEffect(() => {
     loadConversations()
     checkResume()
+    checkTutorialStatus()
   }, [])
+
+  // Check if user needs tutorial (first time or demo mode)
+  const checkTutorialStatus = () => {
+    const hasSeenTutorial = localStorage.getItem('careersy_tutorial_completed')
+    const isDemoMode = localStorage.getItem('careersy_demo_mode') === 'true'
+
+    setDemoMode(isDemoMode)
+
+    // Show tutorial if first time OR demo mode is enabled
+    if (!hasSeenTutorial || isDemoMode) {
+      setTimeout(() => setShowTutorial(true), 500) // Small delay for smooth entrance
+    }
+  }
+
+  const handleTutorialComplete = () => {
+    setShowTutorial(false)
+    localStorage.setItem('careersy_tutorial_completed', 'true')
+  }
+
+  const handleTutorialSkip = () => {
+    setShowTutorial(false)
+    localStorage.setItem('careersy_tutorial_completed', 'true')
+  }
+
+  const restartTutorial = () => {
+    setShowTutorial(true)
+  }
+
+  const toggleDemoMode = () => {
+    const newDemoMode = !demoMode
+    setDemoMode(newDemoMode)
+    localStorage.setItem('careersy_demo_mode', String(newDemoMode))
+
+    if (newDemoMode) {
+      setShowTutorial(true)
+    }
+  }
 
   // Reload conversations when mode changes
   useEffect(() => {
@@ -245,6 +287,27 @@ export default function ChatInterface() {
                 <div className="text-xs text-careersy-black truncate">{session?.user?.name}</div>
               </div>
             </div>
+
+            {/* Tutorial Controls */}
+            <div className="mb-2 space-y-1">
+              <button
+                onClick={restartTutorial}
+                className="w-full py-1.5 text-xs text-gray-600 hover:text-careersy-black hover:bg-gray-50 rounded transition-colors text-center"
+              >
+                ↻ Restart Tutorial
+              </button>
+              <button
+                onClick={toggleDemoMode}
+                className={`w-full py-1.5 text-xs rounded transition-colors text-center ${
+                  demoMode
+                    ? 'bg-careersy-yellow/20 text-careersy-black font-medium'
+                    : 'text-gray-600 hover:text-careersy-black hover:bg-gray-50'
+                }`}
+              >
+                {demoMode ? '✓ Demo Mode On' : 'Demo Mode Off'}
+              </button>
+            </div>
+
             <button
               onClick={handleLogout}
               className="w-full py-2 bg-careersy-yellow hover:bg-careersy-yellow/90 text-careersy-black rounded-full text-xs font-medium transition-colors text-center"
@@ -473,7 +536,7 @@ export default function ChatInterface() {
                 {/* Custom Careersy Tooltip */}
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg">
                   <div className="relative">
-                    Add files for context
+                    Add context
                     <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent border-t-careersy-black"></div>
                   </div>
                 </div>
@@ -510,6 +573,15 @@ export default function ChatInterface() {
         onClose={() => setShowResumeModal(false)}
         onSave={saveResume}
       />
+
+      {/* Tutorial Overlay */}
+      {showTutorial && (
+        <TutorialOverlay
+          steps={TUTORIAL_STEPS}
+          onComplete={handleTutorialComplete}
+          onSkip={handleTutorialSkip}
+        />
+      )}
     </div>
   )
 }
