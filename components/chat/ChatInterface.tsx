@@ -68,6 +68,7 @@ export default function ChatInterface() {
     loadConversations()
     checkResume()
     checkTutorialStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Check if user needs tutorial (first time or demo mode)
@@ -110,6 +111,7 @@ export default function ChatInterface() {
   // Reload conversations when mode changes
   useEffect(() => {
     loadConversations()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode])
 
   const checkResume = async () => {

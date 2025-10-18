@@ -112,7 +112,6 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
     const viewportWidth = window.innerWidth
     const viewportHeight = window.innerHeight
 
-    let position = { ...step.position } // Start with preferred position
     let top = 0
     let left = 0
     let transform = ''
