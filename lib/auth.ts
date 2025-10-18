@@ -4,6 +4,7 @@ import LinkedInProvider from "next-auth/providers/linkedin"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./db"
 import { logAuth, logError } from "./logger"
+import { getAllCommunityConfigs, isExpert } from "./communities"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
@@ -41,6 +42,49 @@ export const authOptions: NextAuthOptions = {
         email: user.email,
         provider: account?.provider
       })
+
+      // Auto-join user to public communities and expert communities
+      if (user.email) {
+        const allCommunities = getAllCommunityConfigs()
+        const userCommunities: string[] = []
+
+        for (const community of allCommunities) {
+          // Add to public communities
+          if (community.public && !community.inviteOnly) {
+            userCommunities.push(community.id)
+          }
+
+          // Auto-add experts to their communities
+          if (isExpert(user.email, community.id)) {
+            if (!userCommunities.includes(community.id)) {
+              userCommunities.push(community.id)
+            }
+          }
+        }
+
+        // Update user's communities if needed
+        if (userCommunities.length > 0) {
+          const dbUser = await prisma.user.findUnique({
+            where: { id: user.id },
+            select: { communities: true }
+          })
+
+          const currentCommunities = dbUser?.communities || []
+          const newCommunities = [...new Set([...currentCommunities, ...userCommunities])]
+
+          if (newCommunities.length > currentCommunities.length) {
+            await prisma.user.update({
+              where: { id: user.id },
+              data: { communities: newCommunities }
+            })
+            logAuth('Auto-joined communities', {
+              userId: user.id,
+              communities: newCommunities
+            })
+          }
+        }
+      }
+
       return true
     },
     session: async ({ session, user }) => {

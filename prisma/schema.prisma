@@ -25,10 +25,12 @@ model User {
   // Resume
   resumeText             String?   @db.Text
 
+  // Communities (lean approach - simple array of community IDs)
+  communities            String[]  @default([])
+
   accounts          Account[]
   sessions          Session[]
   conversations     Conversation[]
-  communityMembers  CommunityMember[]
   votes             Vote[]
   validations       Validation[]
   messages          Message[]
@@ -66,18 +68,18 @@ model Conversation {
   userId      String
   title       String    @default("New Conversation")
   isPublic    Boolean   @default(false)
-  communityId String?
+  communityId String    @default("careersy") // Every conversation belongs to a community (defaults to careersy for migration)
   viewCount   Int       @default(0)
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
-  community Community? @relation(fields: [communityId], references: [id], onDelete: SetNull)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages  Message[]
 
   @@index([userId])
   @@index([communityId])
   @@index([isPublic])
+  @@index([communityId, isPublic])
 }
 
 model Message {
@@ -114,31 +116,8 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-model Community {
-  id          String   @id @default(cuid())
-  name        String   @unique
-  slug        String   @unique
-  description String?
-  createdAt   DateTime @default(now())
-
-  members       CommunityMember[]
-  conversations Conversation[]
-}
-
-model CommunityMember {
-  id          String   @id @default(cuid())
-  communityId String
-  userId      String
-  role        String   @default("member") // "member" | "expert" | "admin"
-  joinedAt    DateTime @default(now())
-
-  community Community @relation(fields: [communityId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([communityId, userId])
-  @@index([userId])
-  @@index([communityId])
-}
+// Communities are managed via JSON config files (lean approach)
+// No database tables needed for community metadata
 
 model Vote {
   id        String   @id @default(cuid())

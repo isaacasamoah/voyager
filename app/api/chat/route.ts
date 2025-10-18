@@ -5,6 +5,7 @@ import { prisma } from '@/lib/db'
 import { logApi, logError } from '@/lib/logger'
 import { getModelConfig } from '@/lib/ai-models'
 import { callAIModel, ChatMessage } from '@/lib/ai-providers'
+import { getCommunityConfig, getCommunitySystemPrompt } from '@/lib/communities'
 
 // Force dynamic rendering for auth routes
 export const dynamic = 'force-dynamic'
@@ -24,28 +25,35 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { message, conversationId, mode = 'private', title } = await req.json()
+    const { message, conversationId, mode = 'private', title, communityId = 'careersy' } = await req.json()
 
     logApi('POST /api/chat - params', {
       hasMessage: !!message,
       hasConversationId: !!conversationId,
       mode,
-      hasTitle: !!title
+      hasTitle: !!title,
+      communityId
     })
 
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Invalid message' }, { status: 400 })
     }
 
-    // Get the Careersy community ID
-    const community = await prisma.community.findUnique({
-      where: { slug: 'careersy-career-coaching' }
+    // Get community config
+    const communityConfig = getCommunityConfig(communityId)
+    if (!communityConfig) {
+      return NextResponse.json({ error: 'Community not found' }, { status: 404 })
+    }
+
+    // Check if user is a member of this community
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { communities: true, resumeText: true },
     })
 
-    logApi('POST /api/chat - community lookup', {
-      foundCommunity: !!community,
-      communityId: community?.id
-    })
+    if (!user?.communities.includes(communityId)) {
+      return NextResponse.json({ error: 'Not a member of this community' }, { status: 403 })
+    }
 
     let conversation
     if (conversationId) {
@@ -61,6 +69,10 @@ export async function POST(req: NextRequest) {
       if (!conversation) {
         return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
       }
+      // Verify conversation belongs to same community
+      if (conversation.communityId !== communityId) {
+        return NextResponse.json({ error: 'Conversation belongs to different community' }, { status: 403 })
+      }
     } else {
       const conversationTitle = title || (message.length > 50 ? message.substring(0, 50) + '...' : message)
       conversation = await prisma.conversation.create({
@@ -68,7 +80,7 @@ export async function POST(req: NextRequest) {
           userId: session.user.id,
           title: conversationTitle,
           isPublic: mode === 'public',
-          communityId: mode === 'public' && community ? community.id : null,
+          communityId,
         },
         include: { messages: true }
       })
@@ -84,17 +96,11 @@ export async function POST(req: NextRequest) {
       },
     })
 
-    // Get user's resume if available
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { resumeText: true },
-    })
-
     // Get model configuration (defaults to Claude via env or hardcoded)
     const modelConfig = getModelConfig()
 
-    // Build system prompt with resume context
-    let systemPrompt = modelConfig.systemPrompt
+    // Build system prompt from community config with resume context
+    let systemPrompt = getCommunitySystemPrompt(communityConfig)
     if (user?.resumeText) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
     }
