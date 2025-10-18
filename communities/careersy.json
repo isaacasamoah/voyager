@@ -13,6 +13,8 @@
       "background": "#fff9f2",
       "text": "#000000"
     },
-    "logo": "/logos/careersy.svg"
+    "logo": "/logos/careersy.svg",
+    "domains": [],
+    "hideVoyagerBranding": false
   }
 }

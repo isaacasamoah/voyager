@@ -24,6 +24,8 @@ export interface CommunityConfig {
       text: string
     }
     logo?: string
+    domains?: string[]  // Custom domains for this community
+    hideVoyagerBranding?: boolean  // White-label option
   }
 }
 
