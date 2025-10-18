@@ -26,14 +26,14 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Chat History',
     description: 'The hamburger menu shows all your past conversations.',
     targetSelector: 'button:has(svg path[d*="M4 6h16M4 12h16M4 18h16"])',
-    position: 'right',
+    position: 'bottom',
   },
   {
     id: 'collaborate-toggle',
     title: 'Collaborate Mode',
     description: 'Toggle this to share conversations publicly with the Careersy community for peer feedback.',
     targetSelector: 'button:has(span[class*="rounded-full"][class*="bg-"])',
-    position: 'left',
+    position: 'bottom',
   },
   {
     id: 'search',
@@ -54,7 +54,7 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     title: 'Replay Tutorial',
     description: 'You can replay this tutorial anytime by clicking this icon.',
     targetSelector: 'button[title="Replay tutorial"]',
-    position: 'right',
+    position: 'bottom',
   },
   {
     id: 'ready',
