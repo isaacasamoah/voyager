@@ -65,26 +65,23 @@ Create a new community in 3 steps:
 
 ## Documentation
 
-### Getting Started
+### 🚀 Getting Started
 - **[Setup Guide](./docs/getting-started.md)** - Local development (5 minutes)
 - **[Architecture Overview](./docs/architecture.md)** - System design & decisions
-- **[CLAUDE.md](./CLAUDE.md)** - AI assistant instructions
 
-### Core Features
+### 🏗️ Core Features
 - **[Communities System](./docs/communities.md)** - Creating and managing communities
-- **[Custom Domains](./docs/CUSTOM_DOMAINS.md)** - White-label domain setup
-- **[AI Models](./docs/AI_MODEL_SYSTEM.md)** - Provider configuration
+- **[Custom Domains](./docs/custom-domains.md)** - White-label domain setup
+- **[AI Models](./docs/ai-models.md)** - Provider configuration
 
-### Operations
+### 🔧 Operations
 - **[Deployment](./docs/operations.md)** - Production deployment
-- **[Monitoring](./docs/operations.md#monitoring)** - Observability
+- **[Monitoring](./docs/logging.md)** - Logging & observability
 - **[Troubleshooting](./docs/operations.md#troubleshooting)** - Common issues
 
-### Development
-- **[Codebase Review](./docs/CODEBASE_REVIEW.md)** - Principal engineer review (Grade: A-)
-- **[Git Workflow](./GIT_WORKFLOW.md)** - Branching strategy
-
-**→ Browse all docs:** [docs/README.md](./docs/README.md)
+### 📊 Development
+- **[Git Workflow](./docs/git-workflow.md)** - Branching strategy
+- **[Stripe Setup](./docs/stripe-setup.md)** - Payment integration
 
 ---
 
@@ -203,10 +200,10 @@ OPENAI_API_KEY="sk-..."
 
 ## Contributing
 
-1. Read [CLAUDE.md](./CLAUDE.md) for development standards
-2. Follow [Git Workflow](./GIT_WORKFLOW.md)
-3. Create feature branch from `develop`
-4. Open PR to `develop` (auto-deploys preview)
+1. Follow [Git Workflow](./docs/git-workflow.md)
+2. Create feature branch from `develop`
+3. Open PR to `develop` (auto-deploys preview)
+4. Keep documentation updated
 
 ---
 
@@ -265,7 +262,7 @@ Unified interface for OpenAI + Anthropic.
 
 ## Support
 
-- **Documentation:** [docs/README.md](./docs/README.md)
+- **Documentation:** See sections above
 - **Issues:** GitHub Issues
 - **Contact:** [Your email/contact]
 

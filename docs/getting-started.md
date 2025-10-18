@@ -253,8 +253,8 @@ npx prisma studio
 
 - Read [Architecture Overview](./architecture.md)
 - Review [Community System](./communities.md)
-- Explore [Custom Domains](./CUSTOM_DOMAINS.md)
-- Check [Codebase Review](./CODEBASE_REVIEW.md)
+- Explore [Custom Domains](./custom-domains.md)
+- Check [Codebase Review](./../.claude/CODEBASE_REVIEW.md)
 
 ---
 

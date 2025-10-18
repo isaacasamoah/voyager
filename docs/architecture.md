@@ -434,9 +434,9 @@ if (!user.communities.includes(communityId)) {
 
 ## References
 
-- [Codebase Review](./CODEBASE_REVIEW.md)
+- [Codebase Review](./../.claude/CODEBASE_REVIEW.md)
 - [Community System](./communities.md)
-- [Custom Domains](./CUSTOM_DOMAINS.md)
+- [Custom Domains](./custom-domains.md)
 - [Getting Started](./getting-started.md)
 
 ---

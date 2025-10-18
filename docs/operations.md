@@ -660,8 +660,8 @@ import Image from 'next/image'
 - [Getting Started](./getting-started.md)
 - [Architecture](./architecture.md)
 - [Communities](./communities.md)
-- [Custom Domains](./CUSTOM_DOMAINS.md)
-- [Codebase Review](./CODEBASE_REVIEW.md)
+- [Custom Domains](./custom-domains.md)
+- [Codebase Review](./../.claude/CODEBASE_REVIEW.md)
 
 ---
 

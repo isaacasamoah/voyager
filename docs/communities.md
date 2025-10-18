@@ -294,7 +294,7 @@ Applied via CSS variables:
 
 ### Custom Domains
 
-See [Custom Domains Guide](./CUSTOM_DOMAINS.md) for full setup.
+See [Custom Domains Guide](./custom-domains.md) for full setup.
 
 ```json
 {
@@ -560,7 +560,7 @@ git push
 
 ## References
 
-- [Custom Domains](./CUSTOM_DOMAINS.md)
+- [Custom Domains](./custom-domains.md)
 - [Architecture](./architecture.md)
 - [Getting Started](./getting-started.md)
 
