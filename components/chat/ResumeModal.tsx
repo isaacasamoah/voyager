@@ -38,7 +38,7 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
         {demoMode && (
           <div className="bg-careersy-yellow/20 border-b-2 border-careersy-yellow px-6 py-3">
             <p className="text-sm text-careersy-black font-medium">
-              🎬 Demo Mode - Your input won't be saved
+              🎬 Demo Mode - Your input won&apos;t be saved
             </p>
           </div>
         )}
