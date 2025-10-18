@@ -75,11 +75,9 @@ export default function ChatInterface() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Auto-focus input when tutorial is not showing
+  // Auto-focus input when tutorial starts or ends
   useEffect(() => {
-    if (!showTutorial) {
-      inputRef.current?.focus()
-    }
+    inputRef.current?.focus()
   }, [showTutorial])
 
   // Check if user needs tutorial (first time or demo mode)
