@@ -276,25 +276,15 @@ export default function ChatInterface() {
             )}
           </div>
 
-          {/* User Info & Logout - Minimal */}
-          <div className="px-3 py-3 border-t border-gray-100">
-            <div className="flex items-center gap-2 mb-2 px-2">
-              <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-careersy-black text-xs font-medium">
+          {/* User Info & Logout - Centered */}
+          <div className="px-3 py-4 border-t border-gray-100">
+            <div className="flex flex-col items-center mb-3">
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-careersy-black text-sm font-medium mb-2">
                 {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="text-xs text-careersy-black truncate">{session?.user?.name}</div>
+              <div className="text-xs text-careersy-black truncate text-center max-w-full px-2">
+                {session?.user?.name}
               </div>
-            </div>
-
-            {/* Tutorial Controls */}
-            <div className="mb-2 space-y-1">
-              <button
-                onClick={restartTutorial}
-                className="w-full py-1.5 text-xs text-gray-600 hover:text-careersy-black hover:bg-gray-50 rounded transition-colors text-center"
-              >
-                ↻ Restart Tutorial
-              </button>
             </div>
 
             <button
@@ -311,15 +301,27 @@ export default function ChatInterface() {
       <div className="flex-1 flex flex-col">
         {/* Header - Voyager Style with Collaborate Mode */}
         <div className="flex-shrink-0 px-6 py-4 bg-white flex items-center justify-between border-b border-gray-100">
-          {/* Left: Hamburger */}
-          <button
-            onClick={() => setShowSidebar(!showSidebar)}
-            className="p-2 hover:bg-gray-50 rounded transition-colors"
-          >
-            <svg className="w-4 h-4 text-careersy-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
-          </button>
+          {/* Left: Hamburger + Replay Tutorial */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="p-2 hover:bg-gray-50 rounded transition-colors"
+            >
+              <svg className="w-4 h-4 text-careersy-black" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+
+            <button
+              onClick={restartTutorial}
+              className="p-1.5 hover:bg-gray-50 rounded transition-colors group"
+              title="Replay tutorial"
+            >
+              <svg className="w-3.5 h-3.5 text-gray-400 group-hover:text-careersy-yellow transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
 
           {/* Right: Collaborate Tools + Toggle */}
           <div className="flex items-center gap-0.5">

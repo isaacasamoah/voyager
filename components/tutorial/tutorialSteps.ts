@@ -50,6 +50,13 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     position: 'bottom',
   },
   {
+    id: 'replay-tutorial',
+    title: 'Replay Tutorial',
+    description: 'You can replay this tutorial anytime by clicking this icon.',
+    targetSelector: 'button[title="Replay tutorial"]',
+    position: 'right',
+  },
+  {
     id: 'ready',
     title: 'You\'re All Set! 🚀',
     description: 'Start chatting to level up your ANZ tech career. All features are now available to explore.',
