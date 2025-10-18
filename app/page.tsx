@@ -6,8 +6,9 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 export default function VoyagerLanding() {
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const router = useRouter()
+  const isLoading = status === 'loading'
   const [showSidebar, setShowSidebar] = useState(false)
   const [input, setInput] = useState('')
   const [suggestion, setSuggestion] = useState('')
@@ -227,7 +228,7 @@ export default function VoyagerLanding() {
             )}
 
             {/* Sign In (only show when NOT logged in) - Strong CTA */}
-            {!session && (
+            {!isLoading && !session && (
               <Link
                 href="/login"
                 className="px-4 py-2 bg-black text-white rounded-full text-sm font-medium hover:scale-105 transition-transform"
