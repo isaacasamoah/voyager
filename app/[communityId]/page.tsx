@@ -5,6 +5,9 @@ import { getCommunityConfig } from '@/lib/communities'
 import { prisma } from '@/lib/db'
 import ChatInterface from '@/components/chat/ChatInterface'
 
+// Force dynamic rendering
+export const dynamic = 'force-dynamic'
+
 interface CommunityPageProps {
   params: {
     communityId: string
@@ -43,11 +46,4 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
       communityConfig={communityConfig}
     />
   )
-}
-
-// Generate static params for known communities (optional optimization)
-export async function generateStaticParams() {
-  // For now, just return empty array - we'll render dynamically
-  // Later can return list of community IDs for static generation
-  return []
 }
