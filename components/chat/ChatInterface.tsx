@@ -222,8 +222,11 @@ export default function ChatInterface() {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
     setLoading(true)
 
+    console.log('💬 Sending message. Demo mode:', demoMode)
+
     // DEMO MODE: Use fake responses, don't hit API
     if (demoMode) {
+      console.log('🎬 Demo mode active - using fake response')
       setTimeout(() => {
         const demoResponse = createDemoResponse(userMessage)
         setMessages(prev => [...prev, { role: 'assistant', content: demoResponse }])
@@ -236,6 +239,8 @@ export default function ChatInterface() {
       }, 1000) // Simulate AI thinking time
       return
     }
+
+    console.log('🔴 Demo mode NOT active - hitting real API')
 
     // NORMAL MODE: Hit real API
     try {
