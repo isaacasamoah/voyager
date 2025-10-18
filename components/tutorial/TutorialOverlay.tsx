@@ -25,16 +25,11 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
   const [currentStep, setCurrentStep] = useState(0)
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null)
   const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null)
-  const [resultAppeared, setResultAppeared] = useState(false)
-  const [interactionCompleted, setInteractionCompleted] = useState(false)
 
   const step = steps[currentStep]
 
   // Find and highlight target element
   useEffect(() => {
-    setResultAppeared(false)
-    setInteractionCompleted(false)
-
     if (!step.targetSelector) {
       setTargetElement(null)
       setSpotlightRect(null)
@@ -50,44 +45,16 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
       // Scroll element into view
       element.scrollIntoView({ behavior: 'smooth', block: 'center' })
 
-      // Add pulse animation to element
+      // Add highlight class
       element.classList.add('tutorial-highlight')
-
-      // If this step allows interaction, make element clickable
-      if (step.allowInteraction) {
-        element.classList.add('tutorial-interactive')
-      }
     }
 
     return () => {
       if (element) {
         element.classList.remove('tutorial-highlight')
-        element.classList.remove('tutorial-interactive')
       }
     }
-  }, [step.targetSelector, step.allowInteraction])
-
-  // Watch for result element to appear
-  useEffect(() => {
-    if (!step.resultSelector || !step.waitForElement) return
-
-    const checkForResult = setInterval(() => {
-      const resultElement = document.querySelector(step.resultSelector!) as HTMLElement
-      if (resultElement) {
-        setResultAppeared(true)
-        setInteractionCompleted(true)
-
-        // Highlight the result too
-        const resultRect = resultElement.getBoundingClientRect()
-        setSpotlightRect(resultRect)
-        setTargetElement(resultElement)
-
-        clearInterval(checkForResult)
-      }
-    }, 100)
-
-    return () => clearInterval(checkForResult)
-  }, [step.resultSelector, step.waitForElement])
+  }, [step.targetSelector])
 
   const handleNext = () => {
     if (currentStep < steps.length - 1) {
@@ -193,11 +160,11 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
 
   return (
     <div className="fixed inset-0 z-50">
-      {/* Dark overlay with spotlight cutout */}
-      <div className="absolute inset-0 bg-black/70 pointer-events-none">
+      {/* Dark overlay - blocks all clicks */}
+      <div className="absolute inset-0 bg-black/70">
         {spotlightRect && (
           <div
-            className="absolute border-4 border-careersy-yellow rounded-lg shadow-xl animate-pulse-slow"
+            className="absolute border-2 border-careersy-yellow/60 rounded-lg shadow-xl"
             style={{
               top: `${spotlightRect.top - 8}px`,
               left: `${spotlightRect.left - 8}px`,
@@ -244,16 +211,6 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
             {step.title}
           </h3>
           <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
-
-          {step.action && (
-            <div className="mt-3 px-3 py-2 bg-careersy-cream rounded-lg">
-              <p className="text-xs text-careersy-black font-medium">
-                {step.action === 'click' && '👆 Click the highlighted element'}
-                {step.action === 'type' && '⌨️ Try typing a message'}
-                {step.action === 'view' && '👀 Take a look at this feature'}
-              </p>
-            </div>
-          )}
         </div>
 
         {/* Navigation */}
@@ -284,20 +241,6 @@ export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialO
         .tutorial-highlight {
           position: relative;
           z-index: 51 !important;
-        }
-
-        .tutorial-interactive {
-          pointer-events: auto !important;
-          cursor: pointer !important;
-        }
-
-        @keyframes pulse-slow {
-          0%, 100% { opacity: 1; }
-          50% { opacity: 0.7; }
-        }
-
-        .animate-pulse-slow {
-          animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
       `}</style>
     </div>
