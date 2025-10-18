@@ -19,14 +19,22 @@ interface TutorialOverlayProps {
   steps: TutorialStep[]
   onComplete: () => void
   onSkip: () => void
+  onStepChange?: (stepId: string) => void
 }
 
-export default function TutorialOverlay({ steps, onComplete, onSkip }: TutorialOverlayProps) {
+export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChange }: TutorialOverlayProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null)
   const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null)
 
   const step = steps[currentStep]
+
+  // Notify parent when step changes
+  useEffect(() => {
+    if (onStepChange) {
+      onStepChange(step.id)
+    }
+  }, [step.id, onStepChange])
 
   // Find and highlight target element
   useEffect(() => {

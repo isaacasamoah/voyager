@@ -98,6 +98,13 @@ export default function ChatInterface() {
     setShowTutorial(true)
   }
 
+  const handleTutorialStepChange = (stepId: string) => {
+    // When tutorial reaches collaborate toggle, enable public mode
+    if (stepId === 'collaborate-toggle') {
+      setMode('public')
+    }
+  }
+
   // Reload conversations when mode changes
   useEffect(() => {
     loadConversations()
@@ -563,6 +570,7 @@ export default function ChatInterface() {
           steps={TUTORIAL_STEPS}
           onComplete={handleTutorialComplete}
           onSkip={handleTutorialSkip}
+          onStepChange={handleTutorialStepChange}
         />
       )}
     </div>
