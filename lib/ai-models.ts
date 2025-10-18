@@ -49,9 +49,25 @@ Ethics: Never store/share data, fabricate history, or break NDAs.`
 export const AVAILABLE_MODELS: Record<string, ModelConfig> = {
   'claude-sonnet': {
     provider: 'anthropic',
-    modelId: 'claude-3-5-sonnet-20250110', // Latest as of Jan 2025
-    displayName: 'Claude 3.5 Sonnet',
-    maxTokens: 4096,
+    modelId: 'claude-sonnet-4-5-20250929', // Claude Sonnet 4.5 (recommended for production)
+    displayName: 'Claude Sonnet 4.5',
+    maxTokens: 8192,
+    temperature: 0.7,
+    systemPrompt: ANZ_TECH_CAREER_COACH_PROMPT,
+  },
+  'claude-haiku': {
+    provider: 'anthropic',
+    modelId: 'claude-haiku-4-5-20251001', // Fastest, cheapest Claude model
+    displayName: 'Claude Haiku 4.5',
+    maxTokens: 8192,
+    temperature: 0.7,
+    systemPrompt: ANZ_TECH_CAREER_COACH_PROMPT,
+  },
+  'claude-opus': {
+    provider: 'anthropic',
+    modelId: 'claude-opus-4-1-20250805', // Most capable, for complex reasoning
+    displayName: 'Claude Opus 4.1',
+    maxTokens: 8192,
     temperature: 0.7,
     systemPrompt: ANZ_TECH_CAREER_COACH_PROMPT,
   },
