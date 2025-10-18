@@ -1,3 +1,5 @@
+import ReactMarkdown from 'react-markdown'
+
 interface ChatMessageProps {
   message: {
     role: 'user' | 'assistant'
@@ -15,7 +17,15 @@ export default function ChatMessage({ message }: ChatMessageProps) {
             : 'bg-white text-gray-900 border-2 border-careersy-yellow/20'
         }`}
       >
-        <p className="whitespace-pre-wrap">{message.content}</p>
+        {message.role === 'user' ? (
+          <p className="whitespace-pre-wrap">{message.content}</p>
+        ) : (
+          <ReactMarkdown
+            className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:text-careersy-black prose-strong:font-semibold"
+          >
+            {message.content}
+          </ReactMarkdown>
+        )}
       </div>
     </div>
   )
