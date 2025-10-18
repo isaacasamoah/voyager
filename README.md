@@ -1,297 +1,281 @@
-# AI Career Coach - Australian Tech Market
+# Voyager Platform
 
-A production-ready AI-powered career coaching application built with Next.js 14, focused on the Australian tech market.
+> Multi-community AI platform with custom domains and white-label support
 
-## Features
+**Production:** https://careersy-wingman.vercel.app
+**Staging:** https://careersy-wingman-git-develop.vercel.app
 
-✅ **Authentication**: Google & LinkedIn OAuth via NextAuth.js
-✅ **AI Chat**: GPT-4 powered career coaching
-✅ **Persistent Storage**: PostgreSQL with Prisma ORM
-✅ **Protected Routes**: Server-side authentication guards
-✅ **Responsive UI**: Tailwind CSS with clean, modern design
-✅ **Production Ready**: Optimized for Vercel deployment
+---
 
-## Tech Stack
+## Overview
 
-- **Frontend**: Next.js 14 (App Router), TypeScript, Tailwind CSS
-- **Backend**: Next.js API Routes
-- **Database**: PostgreSQL with Prisma
-- **Auth**: NextAuth.js v5 (Google + LinkedIn OAuth)
-- **AI**: OpenAI GPT-4 API
-- **Deployment**: Vercel
+Voyager is a platform for deploying AI-powered communities with zero code. Each community has its own branding, AI prompt, and user base - deployed via simple JSON configuration.
 
-## Prerequisites
+**Current Communities:**
+- **Careersy** - Australian tech career coaching
+- **Voyager** - Platform navigator
 
-- Node.js 18+ and npm
-- PostgreSQL database
-- OpenAI API key
-- Google OAuth credentials
-- LinkedIn OAuth credentials
+---
 
-## Setup Instructions
+## Quick Start
 
-### 1. Install Dependencies
+### For Developers
 
 ```bash
+# Clone and install
+git clone [repository]
+cd careersy_wingman
 npm install
-```
 
-### 2. Database Setup
-
-Create a PostgreSQL database and update your connection string:
-
-```bash
-# Copy environment template
+# Setup environment
 cp .env.local.example .env.local
+# Edit .env.local with your credentials
 
-# Edit .env.local with your database credentials
-DATABASE_URL="postgresql://user:password@localhost:5432/ai_career_coach"
-```
+# Setup database
+npx prisma migrate dev
 
-Run migrations:
-
-```bash
-npx prisma migrate dev --name init
-npx prisma generate
-```
-
-### 3. Configure OAuth Providers
-
-#### Google OAuth
-1. Go to [Google Cloud Console](https://console.cloud.google.com/apis/credentials)
-2. Create OAuth 2.0 Client ID
-3. Add authorized redirect URI: `http://localhost:3000/api/auth/callback/google`
-4. Copy Client ID and Secret to `.env.local`
-
-#### LinkedIn OAuth
-1. Go to [LinkedIn Developers](https://www.linkedin.com/developers/apps)
-2. Create new app with OAuth 2.0 scopes: `openid`, `profile`, `email`
-3. Add redirect URL: `http://localhost:3000/api/auth/callback/linkedin`
-4. Copy Client ID and Secret to `.env.local`
-
-### 4. Generate NextAuth Secret
-
-```bash
-openssl rand -base64 32
-```
-
-Add to `.env.local`:
-```
-NEXTAUTH_SECRET="your-generated-secret"
-```
-
-### 5. Add OpenAI API Key
-
-Add your OpenAI API key to `.env.local`:
-```
-OPENAI_API_KEY="sk-..."
-```
-
-### 6. Run Development Server
-
-```bash
+# Run development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+**→ Full setup guide:** [docs/getting-started.md](./docs/getting-started.md)
 
-## Environment Variables
+### For Community Creators
 
-Complete `.env.local` template:
+Create a new community in 3 steps:
 
-```bash
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/ai_career_coach"
+1. **Create config:** `communities/my-community.json`
+2. **Define community:**
+   ```json
+   {
+     "id": "my-community",
+     "name": "My Community",
+     "customPrompt": "You are an expert in...",
+     "public": true,
+     "branding": {
+       "colors": { "primary": "#3B82F6", "background": "#FFFFFF", "text": "#000000" }
+     }
+   }
+   ```
+3. **Deploy:** `git push` - that's it!
 
-# NextAuth
-NEXTAUTH_URL="http://localhost:3000"
-NEXTAUTH_SECRET="your-secret-here"
+**→ Full guide:** [docs/communities.md](./docs/communities.md)
 
-# Google OAuth
-GOOGLE_CLIENT_ID="your-google-client-id"
-GOOGLE_CLIENT_SECRET="your-google-client-secret"
+---
 
-# LinkedIn OAuth
-LINKEDIN_CLIENT_ID="your-linkedin-client-id"
-LINKEDIN_CLIENT_SECRET="your-linkedin-client-secret"
+## Documentation
 
-# OpenAI
-OPENAI_API_KEY="sk-..."
-```
+### Getting Started
+- **[Setup Guide](./docs/getting-started.md)** - Local development (5 minutes)
+- **[Architecture Overview](./docs/architecture.md)** - System design & decisions
+- **[CLAUDE.md](./CLAUDE.md)** - AI assistant instructions
+
+### Core Features
+- **[Communities System](./docs/communities.md)** - Creating and managing communities
+- **[Custom Domains](./docs/CUSTOM_DOMAINS.md)** - White-label domain setup
+- **[AI Models](./docs/AI_MODEL_SYSTEM.md)** - Provider configuration
+
+### Operations
+- **[Deployment](./docs/operations.md)** - Production deployment
+- **[Monitoring](./docs/operations.md#monitoring)** - Observability
+- **[Troubleshooting](./docs/operations.md#troubleshooting)** - Common issues
+
+### Development
+- **[Codebase Review](./docs/CODEBASE_REVIEW.md)** - Principal engineer review (Grade: A-)
+- **[Git Workflow](./GIT_WORKFLOW.md)** - Branching strategy
+
+**→ Browse all docs:** [docs/README.md](./docs/README.md)
+
+---
+
+## Tech Stack
+
+- **Framework:** Next.js 14 (App Router)
+- **Language:** TypeScript (strict mode)
+- **Database:** PostgreSQL + Prisma
+- **Auth:** NextAuth.js (OAuth)
+- **AI:** OpenAI + Anthropic
+- **Hosting:** Vercel + Neon
+
+---
+
+## Key Features
+
+✅ **Zero-code community deployment** - JSON configs only
+✅ **Custom domains** - White-label support
+✅ **Multi-provider AI** - OpenAI + Anthropic
+✅ **OAuth authentication** - Google + LinkedIn
+✅ **Public & private communities** - Flexible permissions
+✅ **Production-ready** - Deployed on Vercel
+
+---
 
 ## Project Structure
 
 ```
-├── app/
-│   ├── (auth)/              # Auth pages (login)
-│   ├── (dashboard)/         # Protected pages (chat)
-│   ├── api/                 # API routes
-│   │   ├── auth/           # NextAuth endpoints
-│   │   └── chat/           # Chat API
-│   ├── layout.tsx          # Root layout
-│   └── page.tsx            # Landing page
-├── components/
-│   ├── chat/               # Chat UI components
-│   └── SessionProvider.tsx # Auth session provider
-├── lib/
-│   ├── auth.ts             # NextAuth configuration
-│   ├── db.ts               # Prisma client
-│   └── openai.ts           # OpenAI client & prompts
-├── prisma/
-│   └── schema.prisma       # Database schema
-└── types/
-    └── next-auth.d.ts      # TypeScript definitions
+careersy_wingman/
+├── app/                    # Next.js routes (App Router)
+│   ├── page.tsx           # Voyager landing
+│   ├── [communityId]/     # Dynamic community pages
+│   └── api/               # API routes
+├── components/            # React components
+│   ├── chat/             # Chat interface
+│   └── ui/               # Reusable UI
+├── lib/                   # Business logic
+│   ├── communities.ts    # Community loader
+│   ├── auth.ts           # Authentication
+│   └── ai-providers.ts   # AI integration
+├── communities/           # Community configs (JSON)
+│   ├── careersy.json
+│   └── voyager.json
+├── prisma/               # Database
+│   └── schema.prisma
+├── middleware.ts         # Custom domain routing
+└── docs/                 # Documentation
 ```
-
-## Deployment to Vercel
-
-### 1. Install Vercel CLI
-
-```bash
-npm install -g vercel
-```
-
-### 2. Setup Database
-
-Use a managed PostgreSQL service:
-- [Vercel Postgres](https://vercel.com/docs/storage/vercel-postgres)
-- [Neon](https://neon.tech/)
-- [Supabase](https://supabase.com/)
-- [Railway](https://railway.app/)
-
-### 3. Configure Environment Variables
-
-In Vercel dashboard, add all environment variables from `.env.local`
-
-Update OAuth redirect URLs to production domain:
-- Google: `https://your-domain.vercel.app/api/auth/callback/google`
-- LinkedIn: `https://your-domain.vercel.app/api/auth/callback/linkedin`
-
-### 4. Deploy
-
-```bash
-vercel
-```
-
-### 5. Run Migrations on Production
-
-```bash
-npx prisma migrate deploy
-```
-
-## Database Management
-
-```bash
-# Open Prisma Studio (GUI for database)
-npx prisma studio
-
-# Create new migration
-npx prisma migrate dev --name your_migration_name
-
-# Reset database (CAUTION: deletes all data)
-npx prisma migrate reset
-
-# Generate Prisma Client after schema changes
-npx prisma generate
-```
-
-## Development Commands
-
-```bash
-# Development server
-npm run dev
-
-# Production build
-npm run build
-
-# Start production server
-npm start
-
-# Linting
-npm run lint
-
-# Database GUI
-npx prisma studio
-```
-
-## Key Features Implementation
-
-### Authentication Flow
-1. User visits `/` → redirected to `/chat` if authenticated, else sees landing page
-2. Click "Get Started" → `/login` with OAuth options
-3. After OAuth → redirect to `/chat`
-4. Protected routes use server-side session checks
-
-### Chat System
-- Messages stored in PostgreSQL with conversation threading
-- Context window limited to last 20 messages per conversation
-- GPT-4 with Australian tech market system prompt
-- Real-time UI updates with optimistic rendering
-
-### Security
-- Server-side authentication guards
-- Database session storage
-- OAuth token encryption
-- Environment variable validation
-- CSRF protection via NextAuth
-
-## Best Practices Implemented
-
-✅ **Type Safety**: Full TypeScript coverage
-✅ **Error Handling**: Try-catch blocks with user-friendly messages
-✅ **Database Optimization**: Indexed queries, connection pooling
-✅ **Security**: Environment validation, secure session storage
-✅ **UX**: Loading states, optimistic updates, auto-scroll
-✅ **Code Organization**: Modular structure, separation of concerns
-✅ **Production Ready**: Logging, error boundaries, build optimization
-
-## Future Enhancements
-
-- [ ] Conversation history sidebar
-- [ ] New conversation button
-- [ ] User profile page with usage stats
-- [ ] Rate limiting & usage quotas
-- [ ] Stripe integration for subscriptions
-- [ ] Resume upload & parsing
-- [ ] Export conversations as PDF
-- [ ] Mobile app (React Native)
-- [ ] Email notifications
-- [ ] Admin dashboard
-
-## Troubleshooting
-
-### Database Connection Issues
-```bash
-# Test connection
-npx prisma db pull
-
-# Reset if needed
-npx prisma migrate reset
-```
-
-### OAuth Errors
-- Verify redirect URIs match exactly (http vs https)
-- Check OAuth scopes are approved
-- Ensure credentials are correct in `.env.local`
-
-### Build Errors
-```bash
-# Clear cache
-rm -rf .next
-npm run build
-```
-
-## Support
-
-For issues or questions:
-1. Check existing [GitHub Issues](https://github.com/yourusername/ai-career-coach/issues)
-2. Review [Next.js Documentation](https://nextjs.org/docs)
-3. Check [NextAuth.js Docs](https://next-auth.js.org)
-
-## License
-
-MIT License - feel free to use for personal or commercial projects.
 
 ---
 
-Built with ❤️ for the Australian tech community
+## Development
+
+### Common Commands
+
+```bash
+# Development
+npm run dev              # Start dev server
+npm run build            # Production build
+npx tsc --noEmit         # Type check
+
+# Database
+npx prisma studio        # Database GUI
+npx prisma migrate dev   # Create migration
+npx prisma generate      # Generate client
+
+# Deployment
+git push origin develop  # Deploy to staging
+git push origin main     # Deploy to production
+```
+
+### Adding a New Community
+
+```bash
+# 1. Create config
+touch communities/my-community.json
+
+# 2. Define community (see docs/communities.md)
+
+# 3. Deploy
+git add communities/my-community.json
+git commit -m "feat: add my-community"
+git push
+```
+
+Community is live at: `voyager.ai/my-community`
+
+---
+
+## Environment Variables
+
+Required variables (see `.env.local.example`):
+
+```bash
+# Database
+DATABASE_URL="postgresql://..."
+
+# NextAuth
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="[generate with: openssl rand -base64 32]"
+
+# OAuth
+GOOGLE_CLIENT_ID="..."
+GOOGLE_CLIENT_SECRET="..."
+LINKEDIN_CLIENT_ID="..."
+LINKEDIN_CLIENT_SECRET="..."
+
+# AI
+ANTHROPIC_API_KEY="sk-ant-..."
+OPENAI_API_KEY="sk-..."
+```
+
+**→ Full setup:** [docs/getting-started.md](./docs/getting-started.md)
+
+---
+
+## Contributing
+
+1. Read [CLAUDE.md](./CLAUDE.md) for development standards
+2. Follow [Git Workflow](./GIT_WORKFLOW.md)
+3. Create feature branch from `develop`
+4. Open PR to `develop` (auto-deploys preview)
+
+---
+
+## Architecture Highlights
+
+### JSON-Based Communities
+Communities defined by configuration files, not database records.
+
+**Benefits:**
+- Instant deployment (no migrations)
+- Git version control
+- Zero database queries for metadata
+- Developer-friendly
+
+### Custom Domain Routing
+Next.js middleware maps domains to communities.
+
+```
+community.acme.com  → /acme-corp
+careersy.voyager.ai → /careersy
+voyager.ai/careersy → /careersy
+```
+
+**Benefits:**
+- Zero-config on Vercel
+- Auto SSL certificates
+- White-label ready
+
+### Multi-Provider AI
+Unified interface for OpenAI + Anthropic.
+
+**Benefits:**
+- Cost optimization
+- Redundancy
+- Switch providers without code changes
+
+**→ Full architecture:** [docs/architecture.md](./docs/architecture.md)
+
+---
+
+## Deployment
+
+### Staging
+- Branch: `develop`
+- URL: https://careersy-wingman-git-develop.vercel.app
+- Auto-deploy: ✅
+
+### Production
+- Branch: `main`
+- URL: https://careersy-wingman.vercel.app
+- Auto-deploy: ✅
+
+**→ Full guide:** [docs/operations.md](./docs/operations.md)
+
+---
+
+## Support
+
+- **Documentation:** [docs/README.md](./docs/README.md)
+- **Issues:** GitHub Issues
+- **Contact:** [Your email/contact]
+
+---
+
+## License
+
+MIT License
+
+---
+
+**Built with ❤️ for multi-community platforms**
+**Last Updated:** 2025-10-19
