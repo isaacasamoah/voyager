@@ -87,11 +87,15 @@ export default function ChatInterface() {
   const handleTutorialComplete = () => {
     setShowTutorial(false)
     localStorage.setItem('careersy_tutorial_completed', 'true')
+    // Restore private mode after tutorial
+    setMode('private')
   }
 
   const handleTutorialSkip = () => {
     setShowTutorial(false)
     localStorage.setItem('careersy_tutorial_completed', 'true')
+    // Restore private mode after tutorial
+    setMode('private')
   }
 
   const restartTutorial = () => {
