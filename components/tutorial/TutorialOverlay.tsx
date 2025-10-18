@@ -122,10 +122,18 @@ export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChang
         left = spotlightRect.left - padding
         transform = 'translate(-100%, -50%)'
 
-        // If tooltip goes off left edge, move it to right
+        // If tooltip goes off left edge, try bottom then right
         if (left - tooltipWidth < 0) {
-          left = spotlightRect.right + padding
-          transform = 'translateY(-50%)'
+          // Try bottom first
+          if (spotlightRect.bottom + padding + tooltipHeight < viewportHeight) {
+            top = spotlightRect.bottom + padding
+            left = spotlightRect.left + spotlightRect.width / 2
+            transform = 'translateX(-50%)'
+          } else {
+            // Fall back to right if bottom doesn't work
+            left = spotlightRect.right + padding
+            transform = 'translateY(-50%)'
+          }
         }
         break
 
@@ -134,10 +142,18 @@ export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChang
         left = spotlightRect.right + padding
         transform = 'translateY(-50%)'
 
-        // If tooltip goes off right edge, move it to left
+        // If tooltip goes off right edge, try bottom then left
         if (left + tooltipWidth > viewportWidth) {
-          left = spotlightRect.left - padding
-          transform = 'translate(-100%, -50%)'
+          // Try bottom first
+          if (spotlightRect.bottom + padding + tooltipHeight < viewportHeight) {
+            top = spotlightRect.bottom + padding
+            left = spotlightRect.left + spotlightRect.width / 2
+            transform = 'translateX(-50%)'
+          } else {
+            // Fall back to left if bottom doesn't work
+            left = spotlightRect.left - padding
+            transform = 'translate(-100%, -50%)'
+          }
         }
         break
 
