@@ -79,7 +79,7 @@ export default function VoyagerLanding() {
   }
 
   const handleLogout = () => {
-    signOut({ callbackUrl: '/login' })
+    signOut({ callbackUrl: '/' })
   }
 
   return (
