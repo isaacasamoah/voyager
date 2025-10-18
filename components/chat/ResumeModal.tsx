@@ -7,10 +7,9 @@ interface ResumeModalProps {
   onClose: () => void
   onSave: (resumeText: string) => Promise<void>
   initialResume?: string
-  demoMode?: boolean
 }
 
-export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '', demoMode = false }: ResumeModalProps) {
+export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '' }: ResumeModalProps) {
   const [resumeText, setResumeText] = useState(initialResume)
   const [saving, setSaving] = useState(false)
 
@@ -34,20 +33,11 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col">
-        {/* Demo Mode Banner */}
-        {demoMode && (
-          <div className="bg-careersy-yellow/20 border-b-2 border-careersy-yellow px-6 py-3">
-            <p className="text-sm text-careersy-black font-medium">
-              🎬 Demo Mode - Your input won&apos;t be saved
-            </p>
-          </div>
-        )}
-
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-lexend font-bold text-careersy-black">Add Your Resume</h2>
+          <h2 className="text-2xl font-lexend font-bold text-careersy-black">Add Context</h2>
           <p className="text-sm text-gray-600 mt-1">
-            Paste your resume text below for personalized career advice
+            Add information to get personalized career advice
           </p>
         </div>
 
@@ -56,7 +46,7 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
           <textarea
             value={resumeText}
             onChange={(e) => setResumeText(e.target.value)}
-            placeholder="Paste your resume here...&#10;&#10;Include:&#10;• Work experience&#10;• Skills&#10;• Education&#10;• Projects"
+            placeholder="Paste any of the following:&#10;&#10;• Resume/CV&#10;• Job description&#10;• LinkedIn profile&#10;• Cover letter&#10;• Interview questions&#10;• Career goals"
             className="w-full h-full min-h-[300px] p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-careersy-yellow focus:border-transparent resize-none"
           />
         </div>
@@ -75,7 +65,7 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
             disabled={saving || !resumeText.trim()}
             className="px-6 py-3 bg-careersy-yellow text-careersy-black rounded-[30px] font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100 shadow-lg"
           >
-            {saving ? 'Saving...' : 'Save Resume'}
+            {saving ? 'Saving...' : 'Add Context'}
           </button>
         </div>
       </div>

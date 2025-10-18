@@ -7,7 +7,6 @@ import ChatMessage from './ChatMessage'
 import ResumeModal from './ResumeModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
 import { TUTORIAL_STEPS } from '../tutorial/tutorialSteps'
-import { createDemoResponse, DEMO_RESUME_SAVED_MESSAGE, DEMO_RESUME_TEXT, DemoMessage } from '../tutorial/demoData'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -40,9 +39,6 @@ export default function ChatInterface() {
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showTutorial, setShowTutorial] = useState(false)
-  const [demoMode, setDemoMode] = useState(false)
-  const [demoMessages, setDemoMessages] = useState<DemoMessage[]>([])
-  const [demoResume, setDemoResume] = useState('')
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -80,53 +76,26 @@ export default function ChatInterface() {
     inputRef.current?.focus()
   }, [showTutorial])
 
-  // Check if user needs tutorial (first time or demo mode)
+  // Check if user needs tutorial (first time only)
   const checkTutorialStatus = () => {
     const hasSeenTutorial = localStorage.getItem('careersy_tutorial_completed')
-    const isDemoMode = localStorage.getItem('careersy_demo_mode') === 'true'
-
-    setDemoMode(isDemoMode)
-
-    // Show tutorial if first time OR demo mode is enabled
-    if (!hasSeenTutorial || isDemoMode) {
+    if (!hasSeenTutorial) {
       setTimeout(() => setShowTutorial(true), 500) // Small delay for smooth entrance
     }
-  }
-
-  const resetDemoState = () => {
-    setDemoMessages([])
-    setDemoResume('')
-    setMessages([])
-    setInput('')
-    setConversationId(null)
   }
 
   const handleTutorialComplete = () => {
     setShowTutorial(false)
     localStorage.setItem('careersy_tutorial_completed', 'true')
-    // Clean slate: reset all demo state
-    resetDemoState()
   }
 
   const handleTutorialSkip = () => {
     setShowTutorial(false)
     localStorage.setItem('careersy_tutorial_completed', 'true')
-    // Clean slate: reset all demo state
-    resetDemoState()
   }
 
   const restartTutorial = () => {
     setShowTutorial(true)
-  }
-
-  const toggleDemoMode = () => {
-    const newDemoMode = !demoMode
-    setDemoMode(newDemoMode)
-    localStorage.setItem('careersy_demo_mode', String(newDemoMode))
-
-    if (newDemoMode) {
-      setShowTutorial(true)
-    }
   }
 
   // Reload conversations when mode changes
@@ -148,19 +117,6 @@ export default function ChatInterface() {
   }
 
   const saveResume = async (resumeText: string) => {
-    // DEMO MODE: Save to local state only, show success message
-    if (demoMode) {
-      setDemoResume(resumeText)
-      setHasResume(true)
-      // Show a demo success message
-      setMessages(prev => [...prev, {
-        role: 'assistant',
-        content: DEMO_RESUME_SAVED_MESSAGE
-      }])
-      return
-    }
-
-    // NORMAL MODE: Save to database
     const response = await fetch('/api/resume', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -222,27 +178,6 @@ export default function ChatInterface() {
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
     setLoading(true)
 
-    console.log('💬 Sending message. Demo mode:', demoMode)
-
-    // DEMO MODE: Use fake responses, don't hit API
-    if (demoMode) {
-      console.log('🎬 Demo mode active - using fake response')
-      setTimeout(() => {
-        const demoResponse = createDemoResponse(userMessage)
-        setMessages(prev => [...prev, { role: 'assistant', content: demoResponse }])
-        setDemoMessages(prev => [
-          ...prev,
-          { role: 'user', content: userMessage },
-          { role: 'assistant', content: demoResponse }
-        ])
-        setLoading(false)
-      }, 1000) // Simulate AI thinking time
-      return
-    }
-
-    console.log('🔴 Demo mode NOT active - hitting real API')
-
-    // NORMAL MODE: Hit real API
     try {
       const response = await fetch('/api/chat', {
         method: 'POST',
@@ -352,16 +287,6 @@ export default function ChatInterface() {
                 className="w-full py-1.5 text-xs text-gray-600 hover:text-careersy-black hover:bg-gray-50 rounded transition-colors text-center"
               >
                 ↻ Restart Tutorial
-              </button>
-              <button
-                onClick={toggleDemoMode}
-                className={`w-full py-1.5 text-xs rounded transition-colors text-center ${
-                  demoMode
-                    ? 'bg-careersy-yellow/20 text-careersy-black font-medium'
-                    : 'text-gray-600 hover:text-careersy-black hover:bg-gray-50'
-                }`}
-              >
-                {demoMode ? '✓ Demo Mode On' : 'Demo Mode Off'}
               </button>
             </div>
 
@@ -630,7 +555,6 @@ export default function ChatInterface() {
         isOpen={showResumeModal}
         onClose={() => setShowResumeModal(false)}
         onSave={saveResume}
-        demoMode={demoMode}
       />
 
       {/* Tutorial Overlay */}
