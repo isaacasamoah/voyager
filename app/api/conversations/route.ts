@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
     const conversations = await prisma.course.findMany({
       where: {
         userId: session.user.id,
-        communityId,
+        voyageId: communityId,
         isPublic: false, // Only show private conversations
       },
       orderBy: {

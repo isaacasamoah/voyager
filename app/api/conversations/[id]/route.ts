@@ -28,7 +28,7 @@ export async function GET(
           },
           select: {
             role: true,
-            content: true,
+            entry: true,
             createdAt: true,
           },
         },
