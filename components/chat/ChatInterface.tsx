@@ -259,7 +259,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
               {mode === 'public' ? (
-                searchQuery ? `Results (${filteredConversations.length})` : 'Community'
+                searchQuery ? `Results (${filteredConversations.length})` : terms.voyage
               ) : (
                 'History'
               )}
@@ -270,7 +270,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
               <div className="text-center text-gray-400 py-4 text-xs">
                 {searchQuery
                   ? 'No matches found'
-                  : mode === 'public' ? 'No threads yet' : 'No history yet'
+                  : mode === 'public' ? `No ${terms.course}s yet` : 'No history yet'
                 }
               </div>
             ) : (

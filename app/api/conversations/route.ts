@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('Error fetching conversations:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch conversations' },
+      { error: 'Failed to fetch courses' },
       { status: 500 }
     )
   }

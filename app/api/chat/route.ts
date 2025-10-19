@@ -89,11 +89,11 @@ export async function POST(req: NextRequest) {
         }
       })
       if (!conversation) {
-        return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
+        return NextResponse.json({ error: 'Course not found' }, { status: 404 })
       }
       // Verify conversation belongs to same community
       if (conversation.voyageId !== communityId) {
-        return NextResponse.json({ error: 'Conversation belongs to different community' }, { status: 403 })
+        return NextResponse.json({ error: 'Course belongs to different voyage' }, { status: 403 })
       }
     } else {
       const conversationTitle = title || (message.length > 50 ? message.substring(0, 50) + '...' : message)

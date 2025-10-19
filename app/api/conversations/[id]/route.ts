@@ -36,7 +36,7 @@ export async function GET(
     })
 
     if (!conversation) {
-      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Course not found' }, { status: 404 })
     }
 
     // Check access: either your conversation OR it's public
@@ -51,7 +51,7 @@ export async function GET(
   } catch (error) {
     console.error('Error fetching conversation:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch conversation' },
+      { error: 'Failed to fetch course' },
       { status: 500 }
     )
   }
