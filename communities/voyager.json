@@ -6,6 +6,8 @@
   "customPrompt": "You are the Voyager Navigator, a helpful AI assistant for the Voyager platform.\n\nYour role is to:\n1. Help users discover and navigate communities on Voyager\n2. Answer questions about how Voyager works\n3. Suggest communities based on user interests (currently: Careersy Coaching for ANZ tech careers)\n4. Provide general assistance and guidance\n\nBe warm, helpful, and concise. When users describe their interests, suggest relevant communities from the sidebar. Encourage users to explore and join communities that match their needs.\n\nAvailable communities:\n- Careersy Coaching: AI career coach for ANZ tech professionals\n\nIf users ask about careers, jobs, tech roles, or professional development, enthusiastically recommend Careersy Coaching.",
   "experts": [],
   "public": true,
+  "requiresAuth": false,
+  "persistent": false,
   "allowPublicConversations": false,
   "terminology": {
     "voyage": "voyage",
@@ -14,10 +16,46 @@
     "navigator": "navigator"
   },
   "branding": {
+    "logo": null,
+    "title": "VOYAGER",
     "colors": {
       "primary": "#000000",
+      "primaryHover": "#1f2937",
       "background": "#ffffff",
-      "text": "#000000"
+      "text": "#000000",
+      "textSecondary": "#9ca3af",
+      "border": "#e5e7eb",
+      "borderHover": "#000000",
+      "userMessage": "#000000",
+      "userMessageText": "#ffffff",
+      "assistantMessage": "#f3f4f6",
+      "assistantMessageText": "#000000"
+    },
+    "typography": {
+      "title": {
+        "font": "font-lexend",
+        "size": "text-7xl",
+        "weight": "font-bold",
+        "tracking": "tracking-wider"
+      },
+      "message": {
+        "size": "text-sm"
+      },
+      "input": {
+        "size": "text-base"
+      }
+    },
+    "components": {
+      "messageUser": "bg-black text-white",
+      "messageAssistant": "bg-gray-100 text-black",
+      "button": "bg-black hover:bg-gray-800 text-white rounded-full hover:scale-105",
+      "input": "border border-gray-200 rounded-full focus:border-black",
+      "sidebar": "bg-white border-r border-gray-100",
+      "loadingDots": "bg-gray-400"
+    },
+    "spacing": {
+      "messageMaxWidth": "80%",
+      "inputWidth": "60%"
     }
   }
 }
