@@ -7,6 +7,12 @@
   "experts": ["eli@careersy.com"],
   "public": true,
   "allowPublicConversations": true,
+  "terminology": {
+    "voyage": "voyage",
+    "course": "course",
+    "log": "log",
+    "navigator": "navigator"
+  },
   "branding": {
     "colors": {
       "primary": "#fad02c",

@@ -30,10 +30,10 @@ model User {
 
   accounts          Account[]
   sessions          Session[]
-  conversations     Conversation[]
+  courses           Course[]
   votes             Vote[]
   validations       Validation[]
-  messages          Message[]
+  logs              Log[]
 }
 
 model Account {
@@ -63,49 +63,51 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Conversation {
-  id          String    @id @default(cuid())
-  userId      String
-  title       String    @default("New Conversation")
-  isPublic    Boolean   @default(false)
-  communityId String    @default("careersy") // Every conversation belongs to a community (defaults to careersy for migration)
-  viewCount   Int       @default(0)
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+model Course {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String    @default("New Course")
+  isPublic  Boolean   @default(false)
+  voyageId  String    @default("careersy") // Every course belongs to a voyage (community)
+  viewCount Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages  Message[]
+  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+  logs Log[]
 
   @@index([userId])
-  @@index([communityId])
+  @@index([voyageId])
   @@index([isPublic])
-  @@index([communityId, isPublic])
+  @@index([voyageId, isPublic])
+  @@map("conversations")
 }
 
-model Message {
-  id             String       @id @default(cuid())
-  conversationId String
-  userId         String?
-  role           String       // "user" or "assistant"
-  content        String       @db.Text
-  messageType    String?      @default("comment") // "question" | "answer" | "comment"
-  parentId       String?      // For threading
-  isAiGenerated  Boolean      @default(false)
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @default(now()) @updatedAt
+model Log {
+  id            String       @id @default(cuid())
+  courseId      String
+  userId        String?
+  role          String       // "user" or "assistant"
+  entry         String       @db.Text
+  logType       String?      @default("comment") // "question" | "answer" | "comment"
+  parentId      String?      // For threading
+  isAiGenerated Boolean      @default(false)
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @default(now()) @updatedAt
 
-  conversation      Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
-  user              User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
-  parent            Message?       @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies           Message[]      @relation("MessageReplies")
+  course            Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  user              User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  parent            Log?         @relation("LogReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies           Log[]        @relation("LogReplies")
   votes             Vote[]
   validations       Validation[]
   trainingQuestions TrainingData[] @relation("QuestionTraining")
   trainingAnswers   TrainingData[] @relation("AnswerTraining")
 
-  @@index([conversationId])
+  @@index([courseId])
   @@index([userId])
   @@index([parentId])
+  @@map("messages")
 }
 
 model VerificationToken {
@@ -121,48 +123,48 @@ model VerificationToken {
 
 model Vote {
   id        String   @id @default(cuid())
-  messageId String
+  logId     String
   userId    String
   value     Int      // -1 or 1
   createdAt DateTime @default(now())
 
-  message Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  log  Log  @relation(fields: [logId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@unique([messageId, userId])
-  @@index([messageId])
+  @@unique([logId, userId])
+  @@index([logId])
   @@index([userId])
 }
 
 model Validation {
   id                String   @id @default(cuid())
-  messageId         String
+  logId             String
   validatedBy       String
   validationType    String   // "affirm" | "contest" | "affirm_and_add"
   additionalContext String?  @db.Text
   createdAt         DateTime @default(now())
 
-  message   Message @relation(fields: [messageId], references: [id], onDelete: Cascade)
-  validator User    @relation(fields: [validatedBy], references: [id], onDelete: Cascade)
+  log       Log  @relation(fields: [logId], references: [id], onDelete: Cascade)
+  validator User @relation(fields: [validatedBy], references: [id], onDelete: Cascade)
 
-  @@unique([messageId, validatedBy])
-  @@index([messageId])
+  @@unique([logId, validatedBy])
+  @@index([logId])
   @@index([validatedBy])
 }
 
 model TrainingData {
-  id                String   @id @default(cuid())
-  questionMessageId String
-  answerMessageId   String
-  validationScore   Int      @default(0)
-  isValidated       Boolean  @default(false)
-  createdAt         DateTime @default(now())
+  id              String   @id @default(cuid())
+  questionLogId   String
+  answerLogId     String
+  validationScore Int      @default(0)
+  isValidated     Boolean  @default(false)
+  createdAt       DateTime @default(now())
 
-  question Message @relation("QuestionTraining", fields: [questionMessageId], references: [id], onDelete: Cascade)
-  answer   Message @relation("AnswerTraining", fields: [answerMessageId], references: [id], onDelete: Cascade)
+  question Log @relation("QuestionTraining", fields: [questionLogId], references: [id], onDelete: Cascade)
+  answer   Log @relation("AnswerTraining", fields: [answerLogId], references: [id], onDelete: Cascade)
 
-  @@unique([questionMessageId, answerMessageId])
+  @@unique([questionLogId, answerLogId])
   @@index([isValidated])
-  @@index([questionMessageId])
-  @@index([answerMessageId])
+  @@index([questionLogId])
+  @@index([answerLogId])
 }

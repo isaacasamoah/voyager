@@ -1,6 +1,13 @@
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
 
+export interface VoyageTerminology {
+  voyage: string      // Default: "voyage" (previously "community")
+  course: string      // Default: "course" (previously "conversation")
+  log: string         // Default: "log" (previously "message")
+  navigator: string   // Default: "navigator" (previously "expert")
+}
+
 export interface CommunityConfig {
   id: string
   name: string
@@ -17,6 +24,7 @@ export interface CommunityConfig {
   allowPublicConversations: boolean
   inviteOnly?: boolean
   inviteToken?: string
+  terminology?: VoyageTerminology  // Per-voyage custom terminology
   branding?: {
     colors: {
       primary: string
@@ -110,4 +118,22 @@ export function validateInviteToken(communityId: string, token: string): boolean
  */
 export function getPublicCommunities(): CommunityConfig[] {
   return getAllCommunityConfigs().filter(config => config.public)
+}
+
+/**
+ * Get terminology for a voyage (community)
+ * Returns custom terminology if configured, otherwise defaults
+ */
+export const DEFAULT_TERMINOLOGY: VoyageTerminology = {
+  voyage: 'voyage',
+  course: 'course',
+  log: 'log',
+  navigator: 'navigator',
+}
+
+export function getVoyageTerminology(config: CommunityConfig): VoyageTerminology {
+  return {
+    ...DEFAULT_TERMINOLOGY,
+    ...config.terminology,
+  }
 }

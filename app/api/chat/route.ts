@@ -20,11 +20,11 @@ export async function POST(req: NextRequest) {
       email: session?.user?.email
     })
 
-    const { message, conversationId, mode = 'private', title, communityId = 'careersy' } = await req.json()
+    const { message, courseId, mode = 'private', title, communityId = 'careersy' } = await req.json()
 
     logApi('POST /api/chat - params', {
       hasMessage: !!message,
-      hasConversationId: !!conversationId,
+      hasConversationId: !!courseId,
       mode,
       hasTitle: !!title,
       communityId
@@ -57,7 +57,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         message: assistantMessage,
-        conversationId: null,
+        courseId: null,
       })
     }
 
@@ -78,11 +78,11 @@ export async function POST(req: NextRequest) {
     }
 
     let conversation
-    if (conversationId) {
-      conversation = await prisma.conversation.findUnique({
-        where: { id: conversationId, userId: session.user.id },
+    if (courseId) {
+      conversation = await prisma.course.findUnique({
+        where: { id: courseId, userId: session.user.id },
         include: {
-          messages: {
+          logs: {
             orderBy: { createdAt: 'asc' },
             take: 20 // Limit context window
           }
@@ -92,28 +92,28 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
       }
       // Verify conversation belongs to same community
-      if (conversation.communityId !== communityId) {
+      if (conversation.voyageId !== communityId) {
         return NextResponse.json({ error: 'Conversation belongs to different community' }, { status: 403 })
       }
     } else {
       const conversationTitle = title || (message.length > 50 ? message.substring(0, 50) + '...' : message)
-      conversation = await prisma.conversation.create({
+      conversation = await prisma.course.create({
         data: {
           userId: session.user.id,
           title: conversationTitle,
           isPublic: mode === 'public',
-          communityId,
+          voyageId: communityId,
         },
-        include: { messages: true }
+        include: { logs: true }
       })
     }
 
-    await prisma.message.create({
+    await prisma.log.create({
       data: {
-        conversationId: conversation.id,
+        courseId: conversation.id,
         userId: session.user.id,
         role: 'user',
-        content: message,
+        entry: message,
         isAiGenerated: false,
       },
     })
@@ -127,31 +127,31 @@ export async function POST(req: NextRequest) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
     }
 
-    const messages: ChatMessage[] = [
+    const logs: ChatMessage[] = [
       { role: 'system', content: systemPrompt },
-      ...conversation.messages.map(m => ({
+      ...conversation.logs.map(m => ({
         role: m.role as 'user' | 'assistant',
-        content: m.content
+        content: m.entry
       })),
       { role: 'user', content: message }
     ]
 
     // Call AI model through unified interface
-    const response = await callAIModel(modelConfig, messages)
+    const response = await callAIModel(modelConfig, logs)
     const assistantMessage = response.content
 
-    await prisma.message.create({
+    await prisma.log.create({
       data: {
-        conversationId: conversation.id,
+        courseId: conversation.id,
         role: 'assistant',
-        content: assistantMessage,
+        entry: assistantMessage,
         isAiGenerated: true,
       },
     })
 
     return NextResponse.json({
       message: assistantMessage,
-      conversationId: conversation.id,
+      courseId: conversation.id,
     })
 
   } catch (error) {

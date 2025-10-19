@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
     logApi('GET /api/community/threads', {
       userId: session.user.id,
       email: session.user.email,
-      communityId
+      voyageId: communityId
     })
 
     // Verify user is member of this community
@@ -35,10 +35,10 @@ export async function GET(req: NextRequest) {
     }
 
     // Fetch public conversations from the community
-    const threads = await prisma.conversation.findMany({
+    const threads = await prisma.course.findMany({
       where: {
         isPublic: true,
-        communityId
+        voyageId: communityId
       },
       orderBy: {
         updatedAt: 'desc'
@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
         },
         _count: {
           select: {
-            messages: true
+            logs: true
           }
         }
       }

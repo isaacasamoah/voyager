@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Not a member of this community' }, { status: 403 })
     }
 
-    const conversations = await prisma.conversation.findMany({
+    const conversations = await prisma.course.findMany({
       where: {
         userId: session.user.id,
         communityId,

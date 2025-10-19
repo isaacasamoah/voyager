@@ -7,6 +7,12 @@
   "experts": [],
   "public": true,
   "allowPublicConversations": false,
+  "terminology": {
+    "voyage": "voyage",
+    "course": "course",
+    "log": "log",
+    "navigator": "navigator"
+  },
   "branding": {
     "colors": {
       "primary": "#000000",

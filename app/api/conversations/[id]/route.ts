@@ -17,12 +17,12 @@ export async function GET(
     }
 
     // First, get the conversation to check if it's public
-    const conversation = await prisma.conversation.findUnique({
+    const conversation = await prisma.course.findUnique({
       where: {
         id: params.id,
       },
       include: {
-        messages: {
+        logs: {
           orderBy: {
             createdAt: 'asc',
           },
@@ -46,7 +46,7 @@ export async function GET(
 
     return NextResponse.json({
       conversation,
-      messages: conversation.messages,
+      logs: conversation.logs,
     })
   } catch (error) {
     console.error('Error fetching conversation:', error)
