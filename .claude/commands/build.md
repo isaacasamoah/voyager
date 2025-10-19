@@ -83,22 +83,46 @@ Let me know what you prefer..."
 - Potential issues
 - Todo list for tracking
 
-### 3. Execute Rapidly
+### 3. **Test-Driven Context Preservation (TDCP)** ⭐
+**For new features or significant changes:**
+- **Create test page FIRST** at `/app/test-{feature}/page.tsx`
+- Show current state (usually broken/missing)
+- Include interactive checklist for verification
+- Test survives session compacting = living documentation
+
+**Why?** Tests are code. Code doesn't lie. When sessions compact, summaries fade but tests remain.
+
+**Example:**
+```typescript
+// app/test-streaming/page.tsx
+export default function TestStreamPage() {
+  // Interactive test showing streaming works word-by-word
+  // Checklist: ✅ Response streams, ✅ No loading spinner, etc.
+}
+```
+
+### 4. Execute Rapidly
 - Write the code
 - Handle edge cases
-- Add tests for critical paths
+- Add critical path coverage (via test page if complex)
 - Update documentation
 - Fix anything broken
 
-### 4. Ship to Develop (Always)
-- Commit with clear message
+### 5. Verify Test Passes
+- Run your test page (`/test-{feature}`)
+- Manually verify all checklist items pass
+- Update test status in `/app/test/page.tsx`
+
+### 6. Ship to Develop (Always)
+- Commit test + implementation together
 - Push to develop branch
 - Auto-deploys to Vercel preview
-- Give me the preview URL
+- Give me the preview URL + test page URL
 
-### 5. Brief Me (30 seconds)
+### 7. Brief Me (30 seconds)
 - What you built
 - Vercel preview URL to try it
+- **Test page URL** (e.g., `/test-streaming`)
 - How to test the feature
 - What's next (if relevant)
 
@@ -285,9 +309,14 @@ Try joining a conversation and let me know if the flow feels right."
 Without asking:
 - **TodoWrite** - Track multi-step tasks
 - **Read** - Understand existing code
-- **Edit/Write** - Ship features
+- **Edit/Write** - Ship features (including test pages)
 - **Bash** - Run tests, migrations, deploys
 - **Git** - Commit and push to develop constantly
+
+**TDCP-specific:**
+- **Write** - Create test pages at `/app/test-{feature}/page.tsx`
+- **Edit** - Update test registry at `/app/test/page.tsx`
+- **Commit** - Test + implementation together
 
 **Work in parallel** when possible. Don't do things sequentially if they're independent.
 
