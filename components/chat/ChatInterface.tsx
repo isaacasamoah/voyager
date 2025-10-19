@@ -200,15 +200,14 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
     setLoading(true)
 
     try {
-      const response = await fetch('/api/chat', {
+      // Start streaming response
+      const response = await fetch('/api/chat-stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
-          conversationId,
+          courseId: conversationId,
           communityId,
-          mode: mode,
-          title: mode === 'public' && publicTitle ? publicTitle : undefined,
         }),
       })
 
@@ -216,10 +215,46 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
         throw new Error('Failed to send message')
       }
 
-      const data = await response.json()
+      // Create placeholder for streaming response
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }])
 
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
-      setConversationId(data.conversationId)
+      // Read stream and update message in real-time
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let fullResponse = ''
+
+      while (true) {
+        const { done, value } = await reader!.read()
+        if (done) break
+
+        fullResponse += decoder.decode(value)
+        setMessages(prev => {
+          const updated = [...prev]
+          updated[updated.length - 1] = { role: 'assistant', content: fullResponse }
+          return updated
+        })
+      }
+
+      // Save to database after streaming completes (only for authenticated communities)
+      if (communityId !== 'voyager') {
+        const saveResponse = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: userMessage,
+            assistantMessage: fullResponse,
+            conversationId,
+            communityId,
+            mode,
+            title: mode === 'public' && publicTitle ? publicTitle : undefined,
+          }),
+        })
+
+        if (saveResponse.ok) {
+          const data = await saveResponse.json()
+          setConversationId(data.conversationId)
+        }
+      }
 
       // Clear public title after sending
       if (mode === 'public') {
@@ -227,7 +262,9 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
       }
 
       // Reload conversations to show the new one
-      loadConversations()
+      if (communityId !== 'voyager') {
+        loadConversations()
+      }
     } catch (error) {
       console.error('Error sending message:', error)
       setMessages(prev => [...prev, {

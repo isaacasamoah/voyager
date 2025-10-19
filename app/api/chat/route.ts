@@ -20,10 +20,11 @@ export async function POST(req: NextRequest) {
       email: session?.user?.email
     })
 
-    const { message, courseId, mode = 'private', title, communityId = 'careersy' } = await req.json()
+    const { message, assistantMessage, conversationId: courseId, mode = 'private', title, communityId = 'careersy' } = await req.json()
 
     logApi('POST /api/chat - params', {
       hasMessage: !!message,
+      hasAssistantMessage: !!assistantMessage,
       hasConversationId: !!courseId,
       mode,
       hasTitle: !!title,
@@ -33,6 +34,9 @@ export async function POST(req: NextRequest) {
     if (!message || typeof message !== 'string') {
       return NextResponse.json({ error: 'Invalid message' }, { status: 400 })
     }
+
+    // If assistantMessage provided, this is a save-only request (streaming already happened)
+    const isSaveOnly = !!assistantMessage
 
     // Get community config
     const communityConfig = getCommunityConfig(communityId)
@@ -136,21 +140,28 @@ export async function POST(req: NextRequest) {
       { role: 'user', content: message }
     ]
 
-    // Call AI model through unified interface
-    const response = await callAIModel(modelConfig, logs)
-    const assistantMessage = response.content
+    // If save-only mode, use provided assistant message
+    // Otherwise, call AI model
+    let finalAssistantMessage: string
+
+    if (isSaveOnly) {
+      finalAssistantMessage = assistantMessage
+    } else {
+      const response = await callAIModel(modelConfig, logs)
+      finalAssistantMessage = response.content
+    }
 
     await prisma.log.create({
       data: {
         courseId: conversation.id,
         role: 'assistant',
-        entry: assistantMessage,
+        entry: finalAssistantMessage,
         isAiGenerated: true,
       },
     })
 
     return NextResponse.json({
-      message: assistantMessage,
+      message: finalAssistantMessage,
       courseId: conversation.id,
     })
 
