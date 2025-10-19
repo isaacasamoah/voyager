@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
-import { getAllCommunityConfigs } from './lib/communities'
 
 /**
  * Middleware for custom domain routing
@@ -9,7 +8,19 @@ import { getAllCommunityConfigs } from './lib/communities'
  * - Custom domains (e.g., community.acme.com → /acme-corp)
  * - Subdomains (e.g., careersy.voyager.ai → /careersy)
  * - Path-based routing (e.g., voyager.ai/careersy → /careersy)
+ *
+ * Note: Domain mappings are hardcoded here because Edge Runtime
+ * doesn't support filesystem access (can't read community configs)
  */
+
+// Domain to community ID mappings
+// Update this when adding custom domains in community configs
+const DOMAIN_MAPPINGS: Record<string, string> = {
+  // Add custom domains here as they're configured
+  // 'community.acme.com': 'acme-corp',
+  // 'careersy.voyager.ai': 'careersy',
+}
+
 export function middleware(request: NextRequest) {
   const hostname = request.headers.get('host') || ''
   const url = request.nextUrl
@@ -27,36 +38,31 @@ export function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // Get all community configurations
-  const communities = getAllCommunityConfigs()
+  // Strip port for local dev
+  const cleanHostname = hostname.split(':')[0]
 
-  // Check if hostname matches a community domain
-  for (const community of communities) {
-    if (community.branding?.domains && community.branding.domains.length > 0) {
-      // Match against configured domains (strip port for local dev)
-      const cleanHostname = hostname.split(':')[0]
+  // Check if hostname matches a custom domain
+  const communityId = DOMAIN_MAPPINGS[cleanHostname]
 
-      if (community.branding.domains.includes(cleanHostname)) {
-        // Custom domain matched! Rewrite to community page
+  if (communityId) {
+    // Custom domain matched! Rewrite to community page
 
-        // If already on community path, continue
-        if (url.pathname.startsWith(`/${community.id}`)) {
-          return NextResponse.next()
-        }
-
-        // If on root, rewrite to community page
-        if (url.pathname === '/' || url.pathname === '') {
-          return NextResponse.rewrite(
-            new URL(`/${community.id}`, request.url)
-          )
-        }
-
-        // For other paths, prepend community id
-        return NextResponse.rewrite(
-          new URL(`/${community.id}${url.pathname}`, request.url)
-        )
-      }
+    // If already on community path, continue
+    if (url.pathname.startsWith(`/${communityId}`)) {
+      return NextResponse.next()
     }
+
+    // If on root, rewrite to community page
+    if (url.pathname === '/' || url.pathname === '') {
+      return NextResponse.rewrite(
+        new URL(`/${communityId}`, request.url)
+      )
+    }
+
+    // For other paths, prepend community id
+    return NextResponse.rewrite(
+      new URL(`/${communityId}${url.pathname}`, request.url)
+    )
   }
 
   // No custom domain match - use path-based routing
