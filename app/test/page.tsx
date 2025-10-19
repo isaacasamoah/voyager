@@ -66,7 +66,7 @@ export default function TestIndexPage() {
           <h2 className="text-xl font-semibold text-blue-900 mb-3">💡 What is TDCP?</h2>
           <p className="text-blue-800 mb-4">
             <strong>Test-Driven Context Preservation</strong> is our approach to preserving knowledge
-            across AI session compacting. When sessions get long, context is summarized - but code doesn't lie.
+            across AI session compacting. When sessions get long, context is summarized - but code doesn&apos;t lie.
           </p>
           <div className="space-y-2 text-sm text-blue-700">
             <div className="flex items-start gap-2">
