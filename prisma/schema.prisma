@@ -64,14 +64,16 @@ model Session {
 }
 
 model Course {
-  id        String    @id @default(cuid())
-  userId    String
-  title     String    @default("New Course")
-  isPublic  Boolean   @default(false)
-  voyageId  String    @default("careersy") // Every course belongs to a voyage (community)
-  viewCount Int       @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id                     String    @id @default(cuid())
+  userId                 String
+  title                  String    @default("New Course")
+  isPublic               Boolean   @default(false)
+  voyageId               String    @default("careersy") // Every course belongs to a voyage (community)
+  viewCount              Int       @default(0)
+  collaborationPrompted  Boolean   @default(false) // Have we suggested collaboration?
+  collaborationDeclined  Boolean   @default(false) // Did user decline collaboration?
+  createdAt              DateTime  @default(now())
+  updatedAt              DateTime  @updatedAt
 
   user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
   logs Log[]
