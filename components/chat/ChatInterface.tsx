@@ -8,6 +8,7 @@ import ResumeModal from './ResumeModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
 import { TUTORIAL_STEPS } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
+import { getVoyageTerminology } from '@/lib/terminology'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -30,6 +31,7 @@ interface ChatInterfaceProps {
 
 export default function ChatInterface({ communityId, communityConfig }: ChatInterfaceProps) {
   const { data: session } = useSession()
+  const terms = getVoyageTerminology(communityConfig)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -357,7 +359,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                   </button>
                   {/* Tooltip - Below Icon */}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
-                    Start new conversation
+                    Start new course
                     <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-careersy-black"></div>
                   </div>
                 </div>
@@ -368,7 +370,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                     type="text"
                     value={publicTitle}
                     onChange={(e) => setPublicTitle(e.target.value)}
-                    placeholder="Conversation title..."
+                    placeholder="Course title..."
                     className="w-full px-3 py-1 pr-8 border border-gray-200 rounded-full focus:outline-none focus:border-careersy-yellow transition-colors text-xs"
                   />
                   {publicTitle && (
@@ -396,7 +398,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                   </button>
                   {/* Tooltip - Below Icon */}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-careersy-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
-                    Search conversations
+                    Search courses
                     <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-careersy-black"></div>
                   </div>
                 </div>

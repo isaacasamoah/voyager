@@ -91,11 +91,11 @@ export default function VoyagerLanding() {
           {/* Communities List */}
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
-              Communities
+              Voyages
             </div>
             {communities.length === 0 ? (
               <div className="text-center text-gray-400 py-4 text-xs">
-                No communities yet
+                No voyages yet
               </div>
             ) : (
               communities.map((community) => (
@@ -172,7 +172,7 @@ export default function VoyagerLanding() {
                   </button>
                   {/* Tooltip - Below Icon */}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 bg-black text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50">
-                    Search communities
+                    Search voyages
                     <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent border-b-black"></div>
                   </div>
                 </div>

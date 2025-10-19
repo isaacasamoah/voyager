@@ -1,12 +1,7 @@
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
-
-export interface VoyageTerminology {
-  voyage: string      // Default: "voyage" (previously "community")
-  course: string      // Default: "course" (previously "conversation")
-  log: string         // Default: "log" (previously "message")
-  navigator: string   // Default: "navigator" (previously "expert")
-}
+import type { VoyageTerminology } from './terminology'
+export type { VoyageTerminology } from './terminology'
 
 export interface CommunityConfig {
   id: string
@@ -122,18 +117,6 @@ export function getPublicCommunities(): CommunityConfig[] {
 
 /**
  * Get terminology for a voyage (community)
- * Returns custom terminology if configured, otherwise defaults
+ * Re-exported from ./terminology for convenience
  */
-export const DEFAULT_TERMINOLOGY: VoyageTerminology = {
-  voyage: 'voyage',
-  course: 'course',
-  log: 'log',
-  navigator: 'navigator',
-}
-
-export function getVoyageTerminology(config: CommunityConfig): VoyageTerminology {
-  return {
-    ...DEFAULT_TERMINOLOGY,
-    ...config.terminology,
-  }
-}
+export { DEFAULT_TERMINOLOGY, getVoyageTerminology } from './terminology'
