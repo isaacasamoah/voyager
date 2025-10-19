@@ -43,14 +43,13 @@ export default function VoyagerLanding() {
     setSuggestion('')
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/chat-stream', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
-          conversationId: null,
+          courseId: null,
           communityId: 'voyager',
-          mode: 'private',
         }),
       })
 
@@ -58,15 +57,34 @@ export default function VoyagerLanding() {
         throw new Error('Failed to send message')
       }
 
-      const data = await response.json()
-      setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+      // Create placeholder for streaming response
+      setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+
+      // Turn off loading - streaming started
+      setLoading(false)
+
+      // Read stream and update in real-time
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+      let fullResponse = ''
+
+      while (true) {
+        const { done, value } = await reader!.read()
+        if (done) break
+
+        fullResponse += decoder.decode(value)
+        setMessages(prev => {
+          const updated = [...prev]
+          updated[updated.length - 1] = { role: 'assistant', content: fullResponse }
+          return updated
+        })
+      }
     } catch (error) {
       console.error('Error sending message:', error)
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: 'Sorry, something went wrong. Please try again.'
       }])
-    } finally {
       setLoading(false)
     }
   }

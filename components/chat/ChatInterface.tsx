@@ -218,6 +218,9 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
       // Create placeholder for streaming response
       setMessages(prev => [...prev, { role: 'assistant', content: '' }])
 
+      // Turn off loading spinner - streaming has started
+      setLoading(false)
+
       // Read stream and update message in real-time
       const reader = response.body?.getReader()
       const decoder = new TextDecoder()
