@@ -80,7 +80,7 @@ model Course {
   @@index([voyageId])
   @@index([isPublic])
   @@index([voyageId, isPublic])
-  @@map("conversations")
+  @@map("Conversation")
 }
 
 model Log {
@@ -107,7 +107,7 @@ model Log {
   @@index([courseId])
   @@index([userId])
   @@index([parentId])
-  @@map("messages")
+  @@map("Message")
 }
 
 model VerificationToken {
