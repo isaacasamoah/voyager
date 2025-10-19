@@ -26,6 +26,14 @@ const testPages: TestPage[] = [
     path: '/test-branding',
     description: 'Verifies dynamic branding configs for Voyager and Careersy (colors, fonts, components)',
     category: 'visual',
+    status: 'passing',
+    lastRun: '2025-10-19'
+  },
+  {
+    name: 'Collaborative Mode',
+    path: '/test-collaborative',
+    description: 'Tests depth detection, collaboration prompts, and mode switching (Explore/Craft)',
+    category: 'feature',
     status: 'unknown',
   },
 ]
