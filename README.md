@@ -2,8 +2,8 @@
 
 > Multi-community AI platform with custom domains and white-label support
 
-**Production:** https://careersy-wingman.vercel.app
-**Staging:** https://careersy-wingman-git-develop.vercel.app
+**Production:** https://voyager.vercel.app
+**Staging:** https://voyager-git-develop.vercel.app
 
 ---
 
