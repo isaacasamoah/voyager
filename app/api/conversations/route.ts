@@ -27,10 +27,10 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: 'Not a member of this community' }, { status: 403 })
     }
 
-    const conversations = await prisma.course.findMany({
+    const conversations = await prisma.conversation.findMany({
       where: {
         userId: session.user.id,
-        voyageId: communityId,
+        communityId: communityId,
         isPublic: false, // Only show private conversations
       },
       orderBy: {
@@ -48,7 +48,7 @@ export async function GET(req: NextRequest) {
   } catch (error) {
     console.error('Error fetching conversations:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch courses' },
+      { error: 'Failed to fetch conversations' },
       { status: 500 }
     )
   }

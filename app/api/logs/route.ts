@@ -19,7 +19,7 @@ export async function GET(req: Request) {
     const limit = parseInt(url.searchParams.get('limit') || '100')
 
     return NextResponse.json({
-      logs: logs.slice(-limit).reverse(),
+      messages: logs.slice(-limit).reverse(),
       total: logs.length
     })
   } catch (error) {

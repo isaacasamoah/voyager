@@ -17,18 +17,18 @@ export async function GET(
     }
 
     // First, get the conversation to check if it's public
-    const conversation = await prisma.course.findUnique({
+    const conversation = await prisma.conversation.findUnique({
       where: {
         id: params.id,
       },
       include: {
-        logs: {
+        messages: {
           orderBy: {
             createdAt: 'asc',
           },
           select: {
             role: true,
-            entry: true,
+            content: true,
             createdAt: true,
           },
         },
@@ -36,7 +36,7 @@ export async function GET(
     })
 
     if (!conversation) {
-      return NextResponse.json({ error: 'Course not found' }, { status: 404 })
+      return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
     }
 
     // Check access: either your conversation OR it's public
@@ -46,12 +46,12 @@ export async function GET(
 
     return NextResponse.json({
       conversation,
-      logs: conversation.logs,
+      messages: conversation.messages,
     })
   } catch (error) {
     console.error('Error fetching conversation:', error)
     return NextResponse.json(
-      { error: 'Failed to fetch course' },
+      { error: 'Failed to fetch conversation' },
       { status: 500 }
     )
   }

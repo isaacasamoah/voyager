@@ -46,6 +46,7 @@ export interface CommunityConfig {
   experts: string[]
   public: boolean
   allowPublicConversations: boolean
+  showsCommunities?: boolean  // If true, sidebar shows communities instead of conversations
   inviteOnly?: boolean
   inviteToken?: string
   terminology?: VoyageTerminology  // Per-voyage custom terminology

@@ -20,12 +20,12 @@ export async function POST(req: NextRequest) {
       email: session?.user?.email
     })
 
-    const { message, assistantMessage, conversationId: courseId, mode = 'private', title, communityId = 'careersy' } = await req.json()
+    const { message, assistantMessage, conversationId: conversationId, mode = 'private', title, communityId = 'careersy' } = await req.json()
 
     logApi('POST /api/chat - params', {
       hasMessage: !!message,
       hasAssistantMessage: !!assistantMessage,
-      hasConversationId: !!courseId,
+      hasConversationId: !!conversationId,
       mode,
       hasTitle: !!title,
       communityId
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
       return NextResponse.json({
         message: assistantMessage,
-        courseId: null,
+        conversationId: null,
       })
     }
 
@@ -82,42 +82,42 @@ export async function POST(req: NextRequest) {
     }
 
     let conversation
-    if (courseId) {
-      conversation = await prisma.course.findUnique({
-        where: { id: courseId, userId: session.user.id },
+    if (conversationId) {
+      conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId, userId: session.user.id },
         include: {
-          logs: {
+          messages: {
             orderBy: { createdAt: 'asc' },
             take: 20 // Limit context window
           }
         }
       })
       if (!conversation) {
-        return NextResponse.json({ error: 'Course not found' }, { status: 404 })
+        return NextResponse.json({ error: 'Conversation not found' }, { status: 404 })
       }
       // Verify conversation belongs to same community
-      if (conversation.voyageId !== communityId) {
-        return NextResponse.json({ error: 'Course belongs to different voyage' }, { status: 403 })
+      if (conversation.communityId !== communityId) {
+        return NextResponse.json({ error: 'Conversation belongs to different community' }, { status: 403 })
       }
     } else {
       const conversationTitle = title || (message.length > 50 ? message.substring(0, 50) + '...' : message)
-      conversation = await prisma.course.create({
+      conversation = await prisma.conversation.create({
         data: {
           userId: session.user.id,
           title: conversationTitle,
           isPublic: mode === 'public',
-          voyageId: communityId,
+          communityId: communityId,
         },
-        include: { logs: true }
+        include: { messages: true }
       })
     }
 
-    await prisma.log.create({
+    await prisma.message.create({
       data: {
-        courseId: conversation.id,
+        conversationId: conversation.id,
         userId: session.user.id,
         role: 'user',
-        entry: message,
+        content: message,
         isAiGenerated: false,
       },
     })
@@ -131,11 +131,11 @@ export async function POST(req: NextRequest) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
     }
 
-    const logs: ChatMessage[] = [
+    const messages: ChatMessage[] = [
       { role: 'system', content: systemPrompt },
-      ...conversation.logs.map(m => ({
+      ...conversation.messages.map(m => ({
         role: m.role as 'user' | 'assistant',
-        content: m.entry
+        content: m.content
       })),
       { role: 'user', content: message }
     ]
@@ -147,22 +147,22 @@ export async function POST(req: NextRequest) {
     if (isSaveOnly) {
       finalAssistantMessage = assistantMessage
     } else {
-      const response = await callAIModel(modelConfig, logs)
+      const response = await callAIModel(modelConfig, messages)
       finalAssistantMessage = response.content
     }
 
-    await prisma.log.create({
+    await prisma.message.create({
       data: {
-        courseId: conversation.id,
+        conversationId: conversation.id,
         role: 'assistant',
-        entry: finalAssistantMessage,
+        content: finalAssistantMessage,
         isAiGenerated: true,
       },
     })
 
     return NextResponse.json({
       message: finalAssistantMessage,
-      courseId: conversation.id,
+      conversationId: conversation.id,
     })
 
   } catch (error) {

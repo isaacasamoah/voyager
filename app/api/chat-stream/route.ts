@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, courseId, communityId = 'careersy' } = await req.json()
+    const { message, conversationId, communityId = 'careersy' } = await req.json()
 
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -71,24 +71,24 @@ export async function POST(req: NextRequest) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
     }
 
-    // Get conversation history if courseId provided
+    // Get conversation history if conversationId provided
     let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
-    if (courseId) {
-      const conversation = await prisma.course.findUnique({
-        where: { id: courseId, userId: session.user.id },
+    if (conversationId) {
+      const conversation = await prisma.conversation.findUnique({
+        where: { id: conversationId, userId: session.user.id },
         include: {
-          logs: {
+          messages: {
             orderBy: { createdAt: 'asc' },
             take: 20 // Limit context window
           }
         }
       })
 
-      if (conversation && conversation.voyageId === communityId) {
-        conversationHistory = conversation.logs.map(log => ({
+      if (conversation && conversation.communityId === communityId) {
+        conversationHistory = conversation.messages.map(log => ({
           role: log.role as 'user' | 'assistant',
-          content: log.entry
+          content: log.content
         }))
       }
     }

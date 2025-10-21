@@ -22,26 +22,26 @@ async function main() {
     console.log(`   ✓ ${user.email}: communities =`, user.communities)
   })
 
-  // Test 2: Check conversations have voyageId
-  console.log('\n2. Check conversations have voyageId:')
-  const conversations = await prisma.course.findMany({
+  // Test 2: Check conversations have communityId
+  console.log('\n2. Check conversations have communityId:')
+  const conversations = await prisma.conversation.findMany({
     select: {
       id: true,
       title: true,
-      voyageId: true,
+      communityId: true,
       isPublic: true,
     },
     take: 5
   })
   console.log(`   ✓ Found ${conversations.length} conversations`)
   conversations.forEach(conv => {
-    console.log(`     - "${conv.title.substring(0, 40)}..." → ${conv.voyageId} (public: ${conv.isPublic})`)
+    console.log(`     - "${conv.title.substring(0, 40)}..." → ${conv.communityId} (public: ${conv.isPublic})`)
   })
 
   // Test 3: Count conversations by community
   console.log('\n3. Count conversations by community:')
-  const careersyCount = await prisma.course.count({
-    where: { voyageId: 'careersy' }
+  const careersyCount = await prisma.conversation.count({
+    where: { communityId: 'careersy' }
   })
   console.log(`   ✓ Careersy: ${careersyCount} conversations`)
 

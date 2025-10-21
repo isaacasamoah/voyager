@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { useSession, signOut } from 'next-auth/react'
+import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import ChatMessage from './ChatMessage'
 import ResumeModal from './ResumeModal'
@@ -32,6 +33,7 @@ interface ChatInterfaceProps {
 
 export default function ChatInterface({ communityId, communityConfig, fullBranding }: ChatInterfaceProps) {
   const { data: session } = useSession()
+  const router = useRouter()
   const terms = getVoyageTerminology(communityConfig)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
@@ -153,15 +155,23 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const loadConversations = async () => {
     setLoadingConversations(true)
     try {
-      // Fetch different data based on mode
-      const endpoint = mode === 'public'
-        ? `/api/community/threads?communityId=${communityId}`
-        : `/api/conversations?communityId=${communityId}`
+      // Fetch different data based on community config
+      let endpoint
+      if (communityConfig.showsCommunities) {
+        // Voyager: show communities in sidebar
+        endpoint = `/api/communities`
+      } else if (mode === 'public') {
+        // Public mode: show threads
+        endpoint = `/api/community/threads?communityId=${communityId}`
+      } else {
+        // Private mode: show user's conversations
+        endpoint = `/api/conversations?communityId=${communityId}`
+      }
+
       const response = await fetch(endpoint)
       if (response.ok) {
         const data = await response.json()
-        // Threads endpoint returns { threads }, conversations returns { conversations }
-        setConversations(data.threads || data.conversations || [])
+        setConversations(data.communities || data.threads || data.conversations || [])
       }
     } catch (error) {
       console.error('Error loading conversations:', error)
@@ -207,7 +217,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           message: userMessage,
-          courseId: conversationId,
+          conversationId: conversationId,
           communityId,
         }),
       })
@@ -318,7 +328,15 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
               filteredConversations.map((conv) => (
                 <button
                   key={conv.id}
-                  onClick={() => loadConversation(conv.id)}
+                  onClick={() => {
+                    if (communityConfig.showsCommunities) {
+                      // Navigate to community
+                      router.push(`/${conv.id}`)
+                    } else {
+                      // Load conversation
+                      loadConversation(conv.id)
+                    }
+                  }}
                   className={`w-full text-left px-3 py-2 mb-1 rounded hover:bg-gray-50 transition-colors ${
                     conversationId === conv.id ? 'bg-gray-50' : ''
                   }`}
