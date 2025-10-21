@@ -7,8 +7,8 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
 const lexend = Lexend_Deca({ subsets: ['latin'], variable: '--font-lexend' })
 
 export const metadata: Metadata = {
-  title: 'Careersy Wingman - Australian Tech Career Coach',
-  description: 'Your AI-powered career wingman for the Australian tech industry',
+  title: 'Voyager - AI Co-Learning Communities',
+  description: 'A co-learning AI ecosystem where you connect, learn, and collaborate on what you\'re passionate about',
 }
 
 export default function RootLayout({

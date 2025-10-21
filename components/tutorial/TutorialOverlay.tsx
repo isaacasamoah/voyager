@@ -20,14 +20,25 @@ interface TutorialOverlayProps {
   onComplete: () => void
   onSkip: () => void
   onStepChange?: (stepId: string) => void
+  accentColor?: string // Hex color for borders and highlights (defaults to Careersy yellow)
 }
 
-export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChange }: TutorialOverlayProps) {
+export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChange, accentColor = '#fad02c' }: TutorialOverlayProps) {
   const [currentStep, setCurrentStep] = useState(0)
   const [targetElement, setTargetElement] = useState<HTMLElement | null>(null)
   const [spotlightRect, setSpotlightRect] = useState<DOMRect | null>(null)
 
   const step = steps[currentStep]
+
+  // Determine if we need light or dark text based on accent color brightness
+  const getTextColor = (hexColor: string): string => {
+    const hex = hexColor.replace('#', '')
+    const r = parseInt(hex.substring(0, 2), 16)
+    const g = parseInt(hex.substring(2, 4), 16)
+    const b = parseInt(hex.substring(4, 6), 16)
+    const brightness = (r * 299 + g * 587 + b * 114) / 1000
+    return brightness > 128 ? '#000000' : '#ffffff'
+  }
 
   // Notify parent when step changes
   useEffect(() => {
@@ -202,12 +213,13 @@ export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChang
       <div className="absolute inset-0 bg-black/70 cursor-not-allowed">
         {spotlightRect && (
           <div
-            className="absolute border-2 border-careersy-yellow/60 rounded-lg shadow-xl"
+            className="absolute border-2 rounded-lg shadow-xl"
             style={{
               top: `${spotlightRect.top - 8}px`,
               left: `${spotlightRect.left - 8}px`,
               width: `${spotlightRect.width + 16}px`,
               height: `${spotlightRect.height + 16}px`,
+              borderColor: `${accentColor}99`, // 60% opacity
               boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.7)',
             }}
           />
@@ -216,8 +228,11 @@ export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChang
 
       {/* Tutorial tooltip */}
       <div
-        className="absolute bg-white rounded-xl shadow-2xl border-2 border-careersy-yellow max-w-sm w-80 p-6 animate-in fade-in slide-in-from-bottom-4 duration-300"
-        style={getTooltipPosition()}
+        className="absolute bg-white rounded-xl shadow-2xl border-2 max-w-sm w-80 p-6 animate-in fade-in slide-in-from-bottom-4 duration-300"
+        style={{
+          ...getTooltipPosition(),
+          borderColor: accentColor,
+        }}
       >
         {/* Progress indicator */}
         <div className="flex items-center justify-between mb-4">
@@ -227,11 +242,14 @@ export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChang
                 key={idx}
                 className={`h-1.5 rounded-full transition-all ${
                   idx === currentStep
-                    ? 'w-6 bg-careersy-yellow'
+                    ? 'w-6'
                     : idx < currentStep
-                    ? 'w-1.5 bg-careersy-yellow/50'
+                    ? 'w-1.5'
                     : 'w-1.5 bg-gray-200'
                 }`}
+                style={{
+                  backgroundColor: idx <= currentStep ? (idx === currentStep ? accentColor : `${accentColor}80`) : undefined
+                }}
               />
             ))}
           </div>
@@ -267,7 +285,17 @@ export default function TutorialOverlay({ steps, onComplete, onSkip, onStepChang
 
           <button
             onClick={handleNext}
-            className="px-6 py-2 bg-careersy-yellow hover:bg-careersy-yellow/90 text-careersy-black rounded-full text-sm font-medium transition-all hover:scale-105"
+            className="px-6 py-2 rounded-full text-sm font-medium transition-all hover:scale-105"
+            style={{
+              backgroundColor: accentColor,
+              color: getTextColor(accentColor),
+            }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.opacity = '0.9'
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.opacity = '1'
+            }}
           >
             {currentStep === steps.length - 1 ? 'Finish' : 'Next'}
           </button>

@@ -7,7 +7,7 @@ import Image from 'next/image'
 import ChatMessage from './ChatMessage'
 import ResumeModal from './ResumeModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
-import { TUTORIAL_STEPS } from '../tutorial/tutorialSteps'
+import { getTutorialSteps } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
 import { getVoyageTerminology } from '@/lib/terminology'
 
@@ -89,22 +89,25 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
 
   // Check if user needs tutorial (first time only)
   const checkTutorialStatus = () => {
-    const hasSeenTutorial = localStorage.getItem('careersy_tutorial_completed')
-    if (!hasSeenTutorial) {
+    const tutorialKey = `${communityId}_tutorial_completed`
+    const hasSeenTutorial = localStorage.getItem(tutorialKey)
+    if (!hasSeenTutorial && getTutorialSteps(communityId).length > 0) {
       setTimeout(() => setShowTutorial(true), 500) // Small delay for smooth entrance
     }
   }
 
   const handleTutorialComplete = () => {
     setShowTutorial(false)
-    localStorage.setItem('careersy_tutorial_completed', 'true')
+    const tutorialKey = `${communityId}_tutorial_completed`
+    localStorage.setItem(tutorialKey, 'true')
     // Restore private mode after tutorial
     setMode('private')
   }
 
   const handleTutorialSkip = () => {
     setShowTutorial(false)
-    localStorage.setItem('careersy_tutorial_completed', 'true')
+    const tutorialKey = `${communityId}_tutorial_completed`
+    localStorage.setItem(tutorialKey, 'true')
     // Restore private mode after tutorial
     setMode('private')
   }
@@ -310,7 +313,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
               {mode === 'public' ? (
-                searchQuery ? `Results (${filteredConversations.length})` : terms.voyage
+                searchQuery ? `Results (${filteredConversations.length})` : (communityConfig.showsCommunities ? 'Communities' : 'Community')
               ) : (
                 'History'
               )}
@@ -421,7 +424,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   </button>
                   {/* Tooltip - Below Icon */}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
-                    Start new course
+                    {communityConfig.showsCommunities ? 'Add community' : 'Start new conversation'}
                     <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
                   </div>
                 </div>
@@ -460,7 +463,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   </button>
                   {/* Tooltip - Below Icon */}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
-                    Search courses
+                    {communityConfig.showsCommunities ? 'Search communities' : 'Search conversations'}
                     <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
                   </div>
                 </div>
@@ -653,10 +656,11 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
       {/* Tutorial Overlay */}
       {showTutorial && (
         <TutorialOverlay
-          steps={TUTORIAL_STEPS}
+          steps={getTutorialSteps(communityId)}
           onComplete={handleTutorialComplete}
           onSkip={handleTutorialSkip}
           onStepChange={handleTutorialStepChange}
+          accentColor={communityConfig.branding.colors.primary}
         />
       )}
     </div>

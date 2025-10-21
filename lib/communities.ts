@@ -45,6 +45,7 @@ export interface CommunityConfig {
   }
   experts: string[]
   public: boolean
+  requiresAuth?: boolean  // If true, requires user to be logged in to access
   allowPublicConversations: boolean
   showsCommunities?: boolean  // If true, sidebar shows communities instead of conversations
   inviteOnly?: boolean

@@ -1,6 +1,6 @@
 import { TutorialStep } from './TutorialOverlay'
 
-export const TUTORIAL_STEPS: TutorialStep[] = [
+export const CAREERSY_TUTORIAL: TutorialStep[] = [
   {
     id: 'welcome',
     title: 'Welcome to Careersy Wingman! 👋',
@@ -63,3 +63,58 @@ export const TUTORIAL_STEPS: TutorialStep[] = [
     position: 'center',
   },
 ]
+
+export const VOYAGER_TUTORIAL: TutorialStep[] = [
+  {
+    id: 'welcome',
+    title: 'Welcome to Voyager! 🗺️',
+    description: 'A co-learning AI ecosystem where you connect, learn, and collaborate on what you\'re passionate about. Each community has an AI co-pilot who learns from community interactions and elevates every contribution.',
+    position: 'center',
+  },
+  {
+    id: 'ask-navigator',
+    title: 'Ask the Navigator',
+    description: 'Not sure which community is right for you? Ask me! I can help you discover the perfect community based on your needs.',
+    targetSelector: 'input[type="text"]',
+    position: 'top',
+  },
+  {
+    id: 'communities-sidebar',
+    title: 'Browse Communities',
+    description: 'Click the menu to see available communities. Each one has its own personality, expertise, and purpose. Click any community to dive in!',
+    targetSelector: 'button:has(svg path[d*="M4 6h16M4 12h16M4 18h16"])',
+    position: 'bottom',
+  },
+  {
+    id: 'replay-tutorial',
+    title: 'Replay Tutorial',
+    description: 'You can replay this tutorial anytime by clicking this icon.',
+    targetSelector: 'button[title="Replay tutorial"]',
+    position: 'bottom',
+  },
+  {
+    id: 'ready',
+    title: 'Start Exploring! 🚀',
+    description: 'Click any community in the sidebar to begin your journey. Each one is a unique AI experience waiting for you.',
+    position: 'center',
+  },
+]
+
+// Backwards compatibility - default to Careersy
+export const TUTORIAL_STEPS = CAREERSY_TUTORIAL
+
+/**
+ * Get tutorial steps for a specific community
+ * @param communityId - The community identifier (e.g., 'careersy', 'voyager')
+ * @returns Tutorial steps for the community, or empty array if no tutorial configured
+ */
+export function getTutorialSteps(communityId: string): TutorialStep[] {
+  switch (communityId) {
+    case 'careersy':
+      return CAREERSY_TUTORIAL
+    case 'voyager':
+      return VOYAGER_TUTORIAL
+    default:
+      return [] // No tutorial for other communities (yet!)
+  }
+}

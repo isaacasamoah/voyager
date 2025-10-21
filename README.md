@@ -2,8 +2,8 @@
 
 > Multi-community AI platform with custom domains and white-label support
 
-**Production:** https://voyager.vercel.app
-**Staging:** https://voyager-git-develop.vercel.app
+**Production:** https://voyager-platform.vercel.app
+**Staging:** https://voyager-git-develop-isaac-asamoahs-projects.vercel.app
 
 ---
 
@@ -98,7 +98,10 @@ Create a new community in 3 steps:
 
 ## Key Features
 
+✅ **Community discovery platform** - Browse and join public communities
+✅ **Interactive tutorials** - Community-specific onboarding with dynamic branding
 ✅ **Zero-code community deployment** - JSON configs only
+✅ **Dynamic branding system** - Colors, logos, typography per community
 ✅ **Custom domains** - White-label support
 ✅ **Multi-provider AI** - OpenAI + Anthropic
 ✅ **OAuth authentication** - Google + LinkedIn
