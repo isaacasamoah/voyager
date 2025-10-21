@@ -13,15 +13,9 @@ export default function LandingPage() {
     // Don't redirect while loading auth state
     if (isLoading) return
 
-    if (session) {
-      // Logged in - redirect to their default community or last visited
-      // For now, default to Careersy for authenticated users
-      router.push('/careersy')
-    } else {
-      // Not logged in - redirect to Voyager (public discovery)
-      router.push('/voyager')
-    }
-  }, [session, isLoading, router])
+    // Demo phase: everyone goes to Voyager (discovery landing)
+    router.push('/voyager')
+  }, [isLoading, router])
 
   // Show loading state while redirecting
   return (
