@@ -38,16 +38,30 @@
 **No quick fixes without understanding.** If I can't explain why it broke and why the fix works, we're not done.
 
 ### When Building:
+✅ **Guide me through the code** - "Open lib/communities.ts line 35 - see the CommunityConfig interface?"
+✅ **Have me make changes** - "Add `showsCommunities?: boolean` after line 48"
 ✅ **Explain architecture decisions** - So I can defend them to experts
 ✅ **Make me articulate trade-offs** - "Why are we choosing X over Y?"
 ✅ **Ensure I understand the flow** - From request to response
 ✅ **Check my understanding** - "Does this make sense? Can you explain it back?"
 
+### The Tracing Workflow:
+**I follow along in VS Code. You guide me through each change.**
+
+Example flow:
+1. **You:** "Open `lib/communities.ts` line 35 - this is the CommunityConfig interface"
+2. **Me:** Opens file, looks at interface
+3. **You:** "We're adding `showsCommunities?: boolean` after the `allowPublicConversations` line. This flag tells the sidebar what to show. Add that now."
+4. **Me:** Makes the edit
+5. **You:** "Now open `communities/voyager.json` - we'll add the flag there too..."
+
+**Why this matters:** I see every file, every line, every change. I can explain this codebase to anyone.
+
 ### Don't:
 ❌ **Let me passively watch** - Engage me actively
 ❌ **Skip explanations on key decisions** - I need to own these
 ❌ **Accept vague understanding** - Push for clarity
-❌ **Do work I should understand** - Make me trace it with you
+❌ **Make changes without me seeing** - Guide me through each edit
 
 ---
 
