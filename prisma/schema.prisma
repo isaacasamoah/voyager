@@ -8,32 +8,25 @@ datasource db {
 }
 
 model User {
-  id                     String    @id @default(cuid())
-  email                  String    @unique
-  emailVerified          DateTime?
+  id                     String       @id @default(cuid())
+  email                  String       @unique
   name                   String?
   image                  String?
-  createdAt              DateTime  @default(now())
-  updatedAt              DateTime  @updatedAt
-
-  // Stripe subscription fields
-  stripeCustomerId       String?   @unique
-  stripeSubscriptionId   String?   @unique
-  stripePriceId          String?
+  createdAt              DateTime     @default(now())
+  updatedAt              DateTime     @updatedAt
+  emailVerified          DateTime?
   stripeCurrentPeriodEnd DateTime?
-
-  // Resume
-  resumeText             String?   @db.Text
-
-  // Communities (lean approach - simple array of community IDs)
-  communities            String[]  @default([])
-
-  accounts          Account[]
-  sessions          Session[]
-  courses           Course[]
-  votes             Vote[]
-  validations       Validation[]
-  logs              Log[]
+  stripeCustomerId       String?      @unique
+  stripePriceId          String?
+  stripeSubscriptionId   String?      @unique
+  resumeText             String?
+  communities            String[]     @default([])
+  accounts               Account[]
+  conversations          Conversation[]
+  messages               Message[]
+  sessions               Session[]
+  validations            Validation[]
+  votes                  Vote[]
 }
 
 model Account {
@@ -42,15 +35,14 @@ model Account {
   type              String
   provider          String
   providerAccountId String
-  refresh_token     String?  @db.Text
-  access_token      String?  @db.Text
+  refresh_token     String?
+  access_token      String?
   expires_at        Int?
   token_type        String?
   scope             String?
-  id_token          String?  @db.Text
+  id_token          String?
   session_state     String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([provider, providerAccountId])
 }
@@ -63,51 +55,49 @@ model Session {
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
-model Course {
-  id        String    @id @default(cuid())
-  userId    String
-  title     String    @default("New Course")
-  isPublic  Boolean   @default(false)
-  voyageId  String    @default("careersy") // Every course belongs to a voyage (community)
-  viewCount Int       @default(0)
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-
-  user User  @relation(fields: [userId], references: [id], onDelete: Cascade)
-  logs Log[]
+model Conversation {
+  id                    String    @id @default(cuid())
+  userId                String
+  title                 String    @default("New Conversation")
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+  communityId           String    @default("careersy")
+  isPublic              Boolean   @default(false)
+  viewCount             Int       @default(0)
+  collaborationPrompted Boolean   @default(false)
+  collaborationDeclined Boolean   @default(false)
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  messages              Message[]
 
   @@index([userId])
-  @@index([voyageId])
   @@index([isPublic])
-  @@index([voyageId, isPublic])
-  @@map("Conversation")
+  @@index([communityId])
+  @@index([communityId, isPublic])
 }
 
-model Log {
-  id            String       @id @default(cuid())
-  courseId      String
-  userId        String?
-  role          String       // "user" or "assistant"
-  entry         String       @db.Text
-  logType       String?      @default("comment") // "question" | "answer" | "comment"
-  parentId      String?      // For threading
-  isAiGenerated Boolean      @default(false)
-  createdAt     DateTime     @default(now())
-  updatedAt     DateTime     @default(now()) @updatedAt
+model Message {
+  id                                                   String         @id @default(cuid())
+  conversationId                                       String
+  role                                                 String
+  content                                              String
+  createdAt                                            DateTime       @default(now())
+  isAiGenerated                                        Boolean        @default(false)
+  messageType                                          String?        @default("comment")
+  parentId                                             String?
+  updatedAt                                            DateTime       @default(now()) @updatedAt
+  userId                                               String?
+  conversation                                         Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  parent                                               Message?       @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies                                              Message[]      @relation("MessageReplies")
+  user                                                 User?          @relation(fields: [userId], references: [id])
+  answerTraining                                       TrainingData[] @relation("AnswerMessages")
+  questionTraining                                     TrainingData[] @relation("QuestionMessages")
+  validations                                          Validation[]
+  votes                                                Vote[]
 
-  course            Course       @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  user              User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
-  parent            Log?         @relation("LogReplies", fields: [parentId], references: [id], onDelete: Cascade)
-  replies           Log[]        @relation("LogReplies")
-  votes             Vote[]
-  validations       Validation[]
-  trainingQuestions TrainingData[] @relation("QuestionTraining")
-  trainingAnswers   TrainingData[] @relation("AnswerTraining")
-
-  @@index([courseId])
   @@index([userId])
   @@index([parentId])
-  @@map("Message")
+  @@index([conversationId])
 }
 
 model VerificationToken {
@@ -118,53 +108,47 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
-// Communities are managed via JSON config files (lean approach)
-// No database tables needed for community metadata
-
 model Vote {
   id        String   @id @default(cuid())
-  logId     String
+  messageId String
   userId    String
-  value     Int      // -1 or 1
+  value     Int
   createdAt DateTime @default(now())
+  message   Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  log  Log  @relation(fields: [logId], references: [id], onDelete: Cascade)
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([logId, userId])
-  @@index([logId])
+  @@unique([messageId, userId])
   @@index([userId])
+  @@index([messageId])
 }
 
 model Validation {
   id                String   @id @default(cuid())
-  logId             String
+  messageId         String
   validatedBy       String
-  validationType    String   // "affirm" | "contest" | "affirm_and_add"
-  additionalContext String?  @db.Text
+  validationType    String
+  additionalContext String?
   createdAt         DateTime @default(now())
+  message           Message  @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  validator         User     @relation(fields: [validatedBy], references: [id], onDelete: Cascade)
 
-  log       Log  @relation(fields: [logId], references: [id], onDelete: Cascade)
-  validator User @relation(fields: [validatedBy], references: [id], onDelete: Cascade)
-
-  @@unique([logId, validatedBy])
-  @@index([logId])
+  @@unique([messageId, validatedBy])
   @@index([validatedBy])
+  @@index([messageId])
 }
 
 model TrainingData {
-  id              String   @id @default(cuid())
-  questionLogId   String
-  answerLogId     String
-  validationScore Int      @default(0)
-  isValidated     Boolean  @default(false)
-  createdAt       DateTime @default(now())
+  id                String   @id @default(cuid())
+  questionMessageId String
+  answerMessageId   String
+  validationScore   Int      @default(0)
+  isValidated       Boolean  @default(false)
+  createdAt         DateTime @default(now())
+  answerMessage     Message  @relation("AnswerMessages", fields: [answerMessageId], references: [id], onDelete: Cascade)
+  questionMessage   Message  @relation("QuestionMessages", fields: [questionMessageId], references: [id], onDelete: Cascade)
 
-  question Log @relation("QuestionTraining", fields: [questionLogId], references: [id], onDelete: Cascade)
-  answer   Log @relation("AnswerTraining", fields: [answerLogId], references: [id], onDelete: Cascade)
-
-  @@unique([questionLogId, answerLogId])
+  @@unique([questionMessageId, answerMessageId])
   @@index([isValidated])
-  @@index([questionLogId])
-  @@index([answerLogId])
+  @@index([answerMessageId])
+  @@index([questionMessageId])
 }
