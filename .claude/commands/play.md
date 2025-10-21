@@ -33,6 +33,19 @@
 
 ---
 
+## When Bugs Appear in /play Mode
+
+**If bugs appear while in /play mode, use the /play approach:**
+
+✅ **Question the design** - "Why did this design allow this bug?"
+✅ **Rethink from first principles** - "What if we designed this differently?"
+✅ **Make it impossible** - "How could we make this class of bug impossible?"
+✅ **Simplify** - "Is there a simpler design that eliminates this?"
+
+**We're not just fixing bugs, we're redesigning to prevent them.**
+
+---
+
 ## Your Approach
 
 ### 1. Start with the Experience

@@ -25,11 +25,17 @@
 
 ## Your Approach: Execute While Teaching
 
-### When Debugging:
-✅ **Make sure I'm reading code with you** - "Open ChatInterface.tsx line 294 - what do you see?"
-✅ **Follow tracebacks to the end** - Don't just paste errors, trace them
-✅ **Use Sentry properly** - Check full context, not just error messages
-✅ **Explain the "why"** - Why this fix? Why this approach?
+### When Debugging (Use /build Approach):
+**If bugs appear while in /build mode, debug WITH the /build philosophy:**
+
+✅ **Isolate to relevant microfeature** - Which microfeature broke? Debug that piece
+✅ **Small steps = high velocity** - Decreases context challenges
+✅ **Make me trace with you** - "Open ChatInterface.tsx line 294 - what do you see?"
+✅ **Follow tracebacks to the end together** - Walk through stack traces, Sentry breadcrumbs
+✅ **Make me understand root cause** - Not just the fix, WHY it broke
+✅ **Have me explain the fix back** - "Why does this solve it? What was the actual problem?"
+
+**No quick fixes without understanding.** If I can't explain why it broke and why the fix works, we're not done.
 
 ### When Building:
 ✅ **Explain architecture decisions** - So I can defend them to experts
@@ -108,21 +114,34 @@ Let me know what you prefer..."
 - Potential issues
 - Todo list for tracking
 
-### 3. Execute Rapidly
-- Write the code
-- Handle edge cases
-- Add tests for critical paths
-- Update documentation
-- Fix anything broken
+### 3. Build in Microfeatures (CRITICAL)
+**One microfeature at a time. Small steps = high velocity.**
 
-### 4. Ship to Develop (Always)
+**The Microfeature Rhythm:**
+1. **Pick smallest functional slice**
+2. **Write automated test** (proves it works)
+3. **Build the slice**
+4. **Run test locally** - must pass before continuing
+5. **Test in UI locally** - verify it feels right
+6. **Commit**
+7. **Next microfeature**
+
+**Only when ALL microfeatures work locally:**
+- Push full feature to develop
+- Test on Vercel dev preview
+- If working → tag → prod
+
+**Why?** Avoids context loss. Each piece proven before moving on.
+
+### 4. Ship Full Feature to Develop
+- All microfeatures working locally
 - Commit with clear message
 - Push to develop branch
 - Auto-deploys to Vercel preview
 - Give me the preview URL
 
 ### 5. Brief Me (30 seconds)
-- What you built
+- What you built (which microfeatures)
 - Vercel preview URL to try it
 - How to test the feature
 - What's next (if relevant)
