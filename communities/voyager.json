@@ -16,46 +16,13 @@
     "navigator": "navigator"
   },
   "branding": {
-    "logo": null,
-    "title": "VOYAGER",
-    "colors": {
-      "primary": "#000000",
-      "primaryHover": "#1f2937",
-      "background": "#ffffff",
-      "text": "#000000",
-      "textSecondary": "#9ca3af",
-      "border": "#e5e7eb",
-      "borderHover": "#000000",
-      "userMessage": "#000000",
-      "userMessageText": "#ffffff",
-      "assistantMessage": "#f3f4f6",
-      "assistantMessageText": "#000000"
-    },
-    "typography": {
-      "title": {
-        "font": "font-lexend",
-        "size": "text-7xl",
-        "weight": "font-bold",
-        "tracking": "tracking-wider"
+      "colors": {
+        "primary": "#000000",
+        "background": "#ffffff",
+        "text": "#000000",
+        "textSecondary": "#9ca3af"
       },
-      "message": {
-        "size": "text-sm"
-      },
-      "input": {
-        "size": "text-base"
-      }
-    },
-    "components": {
-      "messageUser": "bg-black text-white",
-      "messageAssistant": "bg-gray-100 text-black",
-      "button": "bg-black hover:bg-gray-800 text-white rounded-full hover:scale-105",
-      "input": "border border-gray-200 rounded-full focus:border-black",
-      "sidebar": "bg-white border-r border-gray-100",
-      "loadingDots": "bg-gray-400"
-    },
-    "spacing": {
-      "messageMaxWidth": "80%",
-      "inputWidth": "60%"
+      "logo": null,
+      "title": "VOYAGER"
     }
-  }
 }

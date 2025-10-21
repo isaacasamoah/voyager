@@ -15,49 +15,14 @@
     "log": "log",
     "navigator": "navigator"
   },
-  "branding": {
-    "logo": "/logos/careersy.svg",
-    "title": "CAREERSY WINGMAN",
-    "colors": {
-      "primary": "#fad02c",
-      "primaryHover": "#f0c520",
-      "background": "#fff9f2",
-      "text": "#000000",
-      "textSecondary": "#9ca3af",
-      "border": "#e5e7eb",
-      "borderHover": "#fad02c",
-      "userMessage": "#000000",
-      "userMessageText": "#ffffff",
-      "assistantMessage": "#ffffff",
-      "assistantMessageText": "#000000"
-    },
-    "typography": {
-      "title": {
-        "font": "font-lexend",
-        "size": "text-4xl",
-        "weight": "font-bold",
-        "tracking": "tracking-tight"
+   "branding": {
+      "colors": {
+        "primary": "#fad02c",
+        "background": "#fff9f2",
+        "text": "#000000",
+        "textSecondary": "#6b7280"
       },
-      "message": {
-        "size": "text-sm"
-      },
-      "input": {
-        "size": "text-base"
-      }
-    },
-    "components": {
-      "messageUser": "bg-black text-white",
-      "messageAssistant": "bg-white text-black border border-gray-100",
-      "button": "bg-careersy-yellow hover:bg-careersy-yellow/90 text-black rounded-[30px] hover:scale-105",
-      "input": "border border-gray-200 rounded-[30px] focus:border-careersy-yellow",
-      "sidebar": "bg-white border-r border-gray-100",
-      "loadingDots": "bg-gray-400"
-    },
-    "spacing": {
-      "messageMaxWidth": "80%",
-      "inputWidth": "60%"
-    },
-    "domains": [],
-    "hideVoyagerBranding": false
-  }
+      "logo": "/careersy-logo.webp",
+      "title": "CAREERSY"
+    }
 }

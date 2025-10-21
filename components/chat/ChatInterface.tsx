@@ -27,9 +27,10 @@ type ConversationMode = 'private' | 'public'
 interface ChatInterfaceProps {
   communityId: string
   communityConfig: CommunityConfig
+  fullBranding: any
 }
 
-export default function ChatInterface({ communityId, communityConfig }: ChatInterfaceProps) {
+export default function ChatInterface({ communityId, communityConfig, fullBranding }: ChatInterfaceProps) {
   const { data: session } = useSession()
   const terms = getVoyageTerminology(communityConfig)
   const [messages, setMessages] = useState<Message[]>([])
@@ -291,10 +292,10 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
     : conversations
 
   return (
-    <div className="flex h-screen" style={{ backgroundColor: communityConfig.branding.colors.background }}>
+    <div className="flex h-screen" style={{ backgroundColor: fullBranding.colors.background }}>
       {/* Sidebar - Minimal Space Style */}
       {showSidebar && (
-        <div className={`w-64 ${communityConfig.branding.components.sidebar} flex flex-col`}>
+        <div className={`w-64 ${fullBranding.components.sidebar} flex flex-col`}>
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
@@ -322,8 +323,8 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                     conversationId === conv.id ? 'bg-gray-50' : ''
                   }`}
                 >
-                  <div className="text-sm truncate" style={{ color: communityConfig.branding.colors.text }}>{conv.title}</div>
-                  <div className="text-xs mt-0.5" style={{ color: communityConfig.branding.colors.textSecondary }}>
+                  <div className="text-sm truncate" style={{ color: fullBranding.colors.text }}>{conv.title}</div>
+                  <div className="text-xs mt-0.5" style={{ color: fullBranding.colors.textSecondary }}>
                     {new Date(conv.updatedAt).toLocaleDateString()}
                   </div>
                 </button>
@@ -334,17 +335,17 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
           {/* User Info & Logout - Centered */}
           <div className="px-3 py-4 border-t border-gray-100">
             <div className="flex flex-col items-center mb-3">
-              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium mb-2" style={{ color: communityConfig.branding.colors.text }}>
+              <div className="w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-sm font-medium mb-2" style={{ color: fullBranding.colors.text }}>
                 {session?.user?.name?.charAt(0).toUpperCase() || 'U'}
               </div>
-              <div className="text-xs truncate text-center max-w-full px-2" style={{ color: communityConfig.branding.colors.text }}>
+              <div className="text-xs truncate text-center max-w-full px-2" style={{ color: fullBranding.colors.text }}>
                 {session?.user?.name}
               </div>
             </div>
 
             <button
               onClick={handleLogout}
-              className={`w-full py-2 ${communityConfig.branding.components.button} text-xs font-medium transition-colors text-center`}
+              className={`w-full py-2 ${fullBranding.components.button} text-xs font-medium transition-colors text-center`}
             >
               Logout
             </button>
@@ -362,7 +363,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
               onClick={() => setShowSidebar(!showSidebar)}
               className="p-2 hover:bg-gray-50 rounded transition-colors"
             >
-              <svg className="w-4 h-4" style={{ color: communityConfig.branding.colors.text }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4" style={{ color: fullBranding.colors.text }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
@@ -372,7 +373,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
               className="p-1.5 hover:bg-gray-50 rounded transition-colors group"
               title="Replay tutorial"
             >
-              <svg className="w-3.5 h-3.5 transition-colors" style={{ color: communityConfig.branding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-3.5 h-3.5 transition-colors" style={{ color: fullBranding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
               </svg>
             </button>
@@ -393,17 +394,17 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                     }}
                     className="w-5 h-5 border rounded-full flex items-center justify-center transition-colors"
                     style={{ borderColor: '#d1d5db' }}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = communityConfig.branding.colors.primary}
+                    onMouseEnter={(e) => e.currentTarget.style.borderColor = fullBranding.colors.primary}
                     onMouseLeave={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
                   >
-                    <svg className="w-3 h-3 transition-colors" style={{ color: communityConfig.branding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-3 h-3 transition-colors" style={{ color: fullBranding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
                     </svg>
                   </button>
                   {/* Tooltip - Below Icon */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: communityConfig.branding.colors.text }}>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
                     Start new course
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: communityConfig.branding.colors.text }}></div>
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
                   </div>
                 </div>
 
@@ -414,10 +415,10 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                     value={publicTitle}
                     onChange={(e) => setPublicTitle(e.target.value)}
                     placeholder="Course title..."
-                    className={`w-full px-3 py-1 pr-8 ${communityConfig.branding.components.input} transition-colors text-xs`}
+                    className={`w-full px-3 py-1 pr-8 ${fullBranding.components.input} transition-colors text-xs`}
                   />
                   {publicTitle && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2" style={{ color: communityConfig.branding.colors.primary }}>
+                    <div className="absolute right-2 top-1/2 -translate-y-1/2" style={{ color: fullBranding.colors.primary }}>
                       <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                       </svg>
@@ -435,14 +436,14 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                     }}
                     className="w-5 h-5 flex items-center justify-center transition-colors"
                   >
-                    <svg className="w-4 h-4 transition-colors" style={{ color: communityConfig.branding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-4 transition-colors" style={{ color: fullBranding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
                   </button>
                   {/* Tooltip - Below Icon */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: communityConfig.branding.colors.text }}>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
                     Search courses
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: communityConfig.branding.colors.text }}></div>
+                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
                   </div>
                 </div>
 
@@ -453,7 +454,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search..."
-                    className={`px-3 py-1 ${communityConfig.branding.components.input} transition-all text-xs ${
+                    className={`px-3 py-1 ${fullBranding.components.input} transition-all text-xs ${
                       showSearch ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'
                     }`}
                   />
@@ -482,13 +483,13 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                             }}
                             className="w-full text-left px-3 py-2 transition-colors border-b border-gray-50 last:border-b-0"
                             style={{ backgroundColor: 'transparent' }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = communityConfig.branding.colors.background}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = fullBranding.colors.background}
                             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
                           >
-                            <div className="text-xs font-medium truncate" style={{ color: communityConfig.branding.colors.text }}>
+                            <div className="text-xs font-medium truncate" style={{ color: fullBranding.colors.text }}>
                               {conv.title}
                             </div>
-                            <div className="text-xs mt-0.5" style={{ color: communityConfig.branding.colors.textSecondary }}>
+                            <div className="text-xs mt-0.5" style={{ color: fullBranding.colors.textSecondary }}>
                               {new Date(conv.updatedAt).toLocaleDateString()}
                             </div>
                           </button>
@@ -502,7 +503,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
 
             {/* Collaborate Toggle */}
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium" style={{ color: communityConfig.branding.colors.text }}>Collaborate</span>
+              <span className="text-sm font-medium" style={{ color: fullBranding.colors.text }}>Collaborate</span>
               <button
                 onClick={() => {
                   // Smooth transition: clear screen before mode switch
@@ -516,7 +517,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                   }, 100)
                 }}
                 className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-                style={{ backgroundColor: mode === 'public' ? communityConfig.branding.colors.primary : '#d1d5db' }}
+                style={{ backgroundColor: mode === 'public' ? fullBranding.colors.primary : '#d1d5db' }}
               >
                 <span
                   className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
@@ -533,17 +534,17 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
-                {communityConfig.branding.logo && (
+                {fullBranding.logo && (
                   <Image
-                    src={communityConfig.branding.logo}
+                    src={fullBranding.logo}
                     alt={communityConfig.name}
                     width={120}
                     height={120}
                     className="object-contain mx-auto mb-6 opacity-90"
                   />
                 )}
-                <h1 className={`${communityConfig.branding.typography.title.font} ${communityConfig.branding.typography.title.size} ${communityConfig.branding.typography.title.weight} ${communityConfig.branding.typography.title.tracking} mb-2`} style={{ color: communityConfig.branding.colors.text }}>
-                  {communityConfig.branding.title}
+                <h1 className={`${fullBranding.typography.title.font} ${fullBranding.typography.title.size} ${fullBranding.typography.title.weight} ${fullBranding.typography.title.tracking} mb-2`} style={{ color: fullBranding.colors.text }}>
+                  {fullBranding.title}
                 </h1>
                 <div className="w-48 h-[1px] bg-gray-200 mx-auto mt-6"></div>
               </div>
@@ -556,11 +557,11 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
 
           {loading && (
             <div className="flex justify-start">
-              <div className={`${communityConfig.branding.components.messageAssistant} rounded-xl p-4`}>
+              <div className={`${fullBranding.components.messageAssistant} rounded-xl p-4`}>
                 <div className="flex space-x-2">
-                  <div className={`w-2 h-2 ${communityConfig.branding.components.loadingDots} rounded-full animate-bounce`}></div>
-                  <div className={`w-2 h-2 ${communityConfig.branding.components.loadingDots} rounded-full animate-bounce`} style={{ animationDelay: '0.1s' }}></div>
-                  <div className={`w-2 h-2 ${communityConfig.branding.components.loadingDots} rounded-full animate-bounce`} style={{ animationDelay: '0.2s' }}></div>
+                  <div className={`w-2 h-2 ${fullBranding.components.loadingDots} rounded-full animate-bounce`}></div>
+                  <div className={`w-2 h-2 ${fullBranding.components.loadingDots} rounded-full animate-bounce`} style={{ animationDelay: '0.1s' }}></div>
+                  <div className={`w-2 h-2 ${fullBranding.components.loadingDots} rounded-full animate-bounce`} style={{ animationDelay: '0.2s' }}></div>
                 </div>
               </div>
             </div>
@@ -571,7 +572,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
 
         {/* Input Form - Voyager Style */}
         <form onSubmit={sendMessage} className="flex-shrink-0 p-8 bg-white">
-          <div style={{ width: communityConfig.branding.spacing.inputWidth }} className="mx-auto">
+          <div style={{ width: fullBranding.spacing.inputWidth }} className="mx-auto">
             {/* Message Input with Add Context + Submit */}
             <div className="relative flex items-center gap-2">
               {/* Add Files Button */}
@@ -579,21 +580,21 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                 type="button"
                 onClick={() => setShowResumeModal(true)}
                 className="flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center transition-colors group relative"
-                style={{ borderColor: communityConfig.branding.colors.border }}
-                onMouseEnter={(e) => e.currentTarget.style.borderColor = communityConfig.branding.colors.borderHover}
-                onMouseLeave={(e) => e.currentTarget.style.borderColor = communityConfig.branding.colors.border}
+                style={{ borderColor: fullBranding.colors.border }}
+                onMouseEnter={(e) => e.currentTarget.style.borderColor = fullBranding.colors.borderHover}
+                onMouseLeave={(e) => e.currentTarget.style.borderColor = fullBranding.colors.border}
               >
-                <svg className="w-5 h-5 transition-colors" style={{ color: communityConfig.branding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 transition-colors" style={{ color: fullBranding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                 </svg>
                 {hasResume && (
-                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white" style={{ backgroundColor: communityConfig.branding.colors.primary }}></div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 rounded-full border-2 border-white" style={{ backgroundColor: fullBranding.colors.primary }}></div>
                 )}
                 {/* Tooltip */}
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg" style={{ backgroundColor: communityConfig.branding.colors.text }}>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg" style={{ backgroundColor: fullBranding.colors.text }}>
                   <div className="relative">
                     Add context
-                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent" style={{ borderTopColor: communityConfig.branding.colors.text }}></div>
+                    <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 translate-y-full w-0 h-0 border-l-4 border-r-4 border-t-4 border-transparent" style={{ borderTopColor: fullBranding.colors.text }}></div>
                   </div>
                 </div>
               </button>
@@ -605,7 +606,7 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="What's your next career move?"
-                className={`flex-1 px-6 py-4 pr-14 ${communityConfig.branding.components.input} transition-colors ${communityConfig.branding.typography.input.size} placeholder:text-gray-400`}
+                className={`flex-1 px-6 py-4 pr-14 ${fullBranding.components.input} transition-colors ${fullBranding.typography.input.size} placeholder:text-gray-400`}
                 disabled={loading}
               />
 
@@ -613,9 +614,9 @@ export default function ChatInterface({ communityId, communityConfig }: ChatInte
               <button
                 type="submit"
                 disabled={loading || !input.trim()}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 ${communityConfig.branding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+                className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
               >
-                <svg className="w-5 h-5" style={{ color: communityConfig.branding.colors.userMessageText }} fill="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5" style={{ color: fullBranding.colors.userMessageText }} fill="currentColor" viewBox="0 0 24 24">
                   <path d="M8 5v14l11-7z" />
                 </svg>
               </button>
