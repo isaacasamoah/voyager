@@ -15,30 +15,34 @@ interface CommunityPageProps {
 }
 
 export default async function CommunityPage({ params }: CommunityPageProps) {
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    redirect('/login')
-  }
-
   const { communityId } = params
 
-  // Check if community exists
+  // Check if community exists (do this FIRST before any auth checks)
   const communityConfig = getCommunityConfig(communityId)
   if (!communityConfig) {
     redirect('/')
   }
   const fullBranding = getFullBranding(communityConfig.branding)
 
-  // Check if user is a member of this community
-  const user = await prisma.user.findUnique({
-    where: { id: session.user.id },
-    select: { communities: true }
-  })
+  // Get session
+  const session = await getServerSession(authOptions)
 
-  if (!user?.communities.includes(communityId)) {
-    // User not a member - redirect to Voyager landing with error message
-    redirect(`/?error=not-a-member&community=${communityId}`)
+  // Check auth requirements based on community config
+  if (communityConfig.requiresAuth && !session) {
+    redirect('/login')
+  }
+
+  // Check community membership (only if authenticated)
+  if (session) {
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { communities: true }
+    })
+
+    if (!user?.communities.includes(communityId)) {
+      // User not a member - redirect to Voyager landing with error message
+      redirect(`/?error=not-a-member&community=${communityId}`)
+    }
   }
 
   return (

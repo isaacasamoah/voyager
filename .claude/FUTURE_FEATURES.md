@@ -138,6 +138,44 @@ Ready to post, or want to refine further?"
 
 ---
 
+## 3. Voyager Meta-Community (Platform Feedback & Collaboration)
+
+**Purpose:** Turn Voyager itself into a community about building Voyager - a place for users to collaborate on improving the open-source platform.
+
+**The Question:** Should Voyager (the community discovery guide) also be a community about the platform itself?
+
+**Vision:**
+- Users can share feedback, ideas, and feature requests
+- Contribute to open-source development
+- Learn how Voyager works under the hood
+- Collaborate on making the platform better
+- AI co-pilot learns from community interactions about platform improvement
+
+**Considerations:**
+- Does "collaborate mode" make sense for Voyager if it becomes a meta-community?
+- Should conversations about the platform be public/persistent?
+- How do we distinguish between "personal guide to communities" vs "community about communities"?
+- Would this confuse the core Voyager experience (discovery guide)?
+
+**Potential Features:**
+- Public threads about feature requests/bugs
+- Community voting on priorities
+- Open-source contribution guides
+- Platform changelog and updates
+- Search communities AND platform discussions
+
+**Design questions to explore in /play:**
+- Is Voyager two things? (1) Personal guide + (2) Platform community?
+- Or should there be a separate "Platform" community?
+- How do we make the distinction clear in the UI?
+- What does collaborate mode mean in this context?
+
+**Priority:** Medium (interesting meta-concept, but not blocking core features)
+**Estimated effort:** TBD (depends on design direction)
+**Dependencies:** Clear product vision for Voyager's role
+
+---
+
 ## Marketing Language
 
 **The Dandelion Effect:**
