@@ -1,7 +1,7 @@
 import { getServerSession } from 'next-auth'
 import { redirect } from 'next/navigation'
 import { authOptions } from '@/lib/auth'
-import { getCommunityConfig } from '@/lib/communities'
+import { getCommunityConfig, getFullBranding } from '@/lib/communities'
 import { prisma } from '@/lib/db'
 import ChatInterface from '@/components/chat/ChatInterface'
 
@@ -28,6 +28,7 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
   if (!communityConfig) {
     redirect('/')
   }
+  const fullBranding = getFullBranding(communityConfig.branding)
 
   // Check if user is a member of this community
   const user = await prisma.user.findUnique({
@@ -44,6 +45,7 @@ export default async function CommunityPage({ params }: CommunityPageProps) {
     <ChatInterface
       communityId={communityId}
       communityConfig={communityConfig}
+      fullBranding={fullBranding}
     />
   )
 }

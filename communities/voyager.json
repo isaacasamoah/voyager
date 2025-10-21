@@ -6,6 +6,8 @@
   "customPrompt": "You are the Voyager Navigator, a helpful AI assistant for the Voyager platform.\n\nYour role is to:\n1. Help users discover and navigate communities on Voyager\n2. Answer questions about how Voyager works\n3. Suggest communities based on user interests (currently: Careersy Coaching for ANZ tech careers)\n4. Provide general assistance and guidance\n\nBe warm, helpful, and concise. When users describe their interests, suggest relevant communities from the sidebar. Encourage users to explore and join communities that match their needs.\n\nAvailable communities:\n- Careersy Coaching: AI career coach for ANZ tech professionals\n\nIf users ask about careers, jobs, tech roles, or professional development, enthusiastically recommend Careersy Coaching.",
   "experts": [],
   "public": true,
+  "requiresAuth": false,
+  "persistent": false,
   "allowPublicConversations": false,
   "terminology": {
     "voyage": "voyage",
@@ -14,10 +16,13 @@
     "navigator": "navigator"
   },
   "branding": {
-    "colors": {
-      "primary": "#000000",
-      "background": "#ffffff",
-      "text": "#000000"
+      "colors": {
+        "primary": "#000000",
+        "background": "#ffffff",
+        "text": "#000000",
+        "textSecondary": "#9ca3af"
+      },
+      "logo": null,
+      "title": "VOYAGER"
     }
-  }
 }

@@ -3,6 +3,35 @@ import { join } from 'path'
 import type { VoyageTerminology } from './terminology'
 export type { VoyageTerminology } from './terminology'
 
+const VOYAGER_BASE_THEME = {
+  typography: {
+    title: {
+      font: "font-lexend",
+      size: "text-7xl",
+      weight: "font-bold",
+      tracking: "tracking-wider"
+    },
+    message: {
+      size: "text-sm"
+    },
+    input: {
+      size: "text-base"
+    }
+  },
+  components: {
+    messageUser: "bg-black text-white",
+    messageAssistant: "bg-gray-100 text-black",
+    button: "bg-black hover:bg-gray-800 text-white rounded-full hover:scale-105",
+    input: "border border-gray-200 rounded-full focus:border-black",
+    sidebar: "bg-white border-r border-gray-100",
+    loadingDots: "bg-gray-400"
+  },
+  spacing: {
+    messageMaxWidth: "80%",
+    inputWidth: "60%"
+  }
+} as const
+
 export interface CommunityConfig {
   id: string
   name: string
@@ -20,16 +49,16 @@ export interface CommunityConfig {
   inviteOnly?: boolean
   inviteToken?: string
   terminology?: VoyageTerminology  // Per-voyage custom terminology
-  branding?: {
-    colors: {
-      primary: string
-      background: string
-      text: string
+  branding: {
+      colors: {
+        primary: string
+        background: string
+        text: string
+        textSecondary?: string
+      }
+      logo?: string | null
+      title?: string
     }
-    logo?: string
-    domains?: string[]  // Custom domains for this community
-    hideVoyagerBranding?: boolean  // White-label option
-  }
 }
 
 const COMMUNITIES_DIR = join(process.cwd(), 'communities')
@@ -37,6 +66,24 @@ const COMMUNITIES_DIR = join(process.cwd(), 'communities')
 /**
  * Load a specific community configuration
  */
+
+ /**
+   * Merge base Voyager theme with community branding
+   */
+  export function getFullBranding(communityBranding:
+  CommunityConfig['branding']) {
+    return {
+      ...VOYAGER_BASE_THEME,
+      colors: {
+        ...communityBranding.colors,
+        textSecondary: communityBranding.colors.textSecondary ||
+  communityBranding.colors.text
+      },
+      logo: communityBranding.logo,
+      title: communityBranding.title
+    }
+  }
+
 export function getCommunityConfig(communityId: string): CommunityConfig | null {
   try {
     const configPath = join(COMMUNITIES_DIR, `${communityId}.json`)
