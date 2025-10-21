@@ -9,6 +9,7 @@
   "requiresAuth": false,
   "persistent": false,
   "allowPublicConversations": false,
+  "showsCommunities": true,
   "terminology": {
     "voyage": "voyage",
     "course": "course",
