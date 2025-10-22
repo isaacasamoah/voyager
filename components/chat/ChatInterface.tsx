@@ -593,6 +593,50 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           <div ref={messagesEndRef} />
         </div>
 
+        {/* Post to Community Button (Curate Mode Only) */}
+        {mode === 'public' && messages.length > 0 && conversationId && (
+          <div className="flex-shrink-0 px-8 pt-4 pb-2 bg-white border-t" style={{ borderColor: '#e5e7eb' }}>
+            <div style={{ width: fullBranding.spacing.inputWidth }} className="mx-auto flex items-center justify-between">
+              <div className="flex items-center gap-2 text-sm" style={{ color: fullBranding.colors.textSecondary }}>
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span>Curate Mode: Draft your post with AI, then publish to community</span>
+              </div>
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!conversationId) return
+
+                  try {
+                    const response = await fetch(`/api/conversations/${conversationId}/publish`, {
+                      method: 'POST',
+                    })
+
+                    if (response.ok) {
+                      const data = await response.json()
+                      // Success! Redirect to the published post or show success message
+                      alert('Post published successfully!')
+                      // TODO: Redirect to public feed or show the published post
+                      router.push(`/${communityId}`)
+                    } else {
+                      const error = await response.json()
+                      alert(`Failed to publish: ${error.error}`)
+                    }
+                  } catch (error) {
+                    console.error('Publish error:', error)
+                    alert('Failed to publish post')
+                  }
+                }}
+                className="px-6 py-2 rounded-full font-medium transition-all hover:scale-105 text-white"
+                style={{ backgroundColor: fullBranding.colors.primary }}
+              >
+                Post to Community
+              </button>
+            </div>
+          </div>
+        )}
+
         {/* Input Form - Voyager Style */}
         <form onSubmit={sendMessage} className="flex-shrink-0 p-8 bg-white">
           <div style={{ width: fullBranding.spacing.inputWidth }} className="mx-auto">
