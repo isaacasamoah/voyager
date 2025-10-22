@@ -21,6 +21,9 @@ interface Conversation {
   title: string
   createdAt: string
   updatedAt: string
+  curateMode?: boolean
+  isPublic?: boolean
+  publishedPostId?: string
 }
 
 type ConversationMode = 'private' | 'public'
@@ -50,6 +53,10 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [showSearch, setShowSearch] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [showTutorial, setShowTutorial] = useState(false)
+  const [publishing, setPublishing] = useState(false)
+  const [published, setPublished] = useState(false)
+  const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
+  const [showSpotlight, setShowSpotlight] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -191,6 +198,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         const data = await response.json()
         setMessages(data.messages || [])
         setConversationId(id)
+        setCurrentConversation(data.conversation || null)
       }
     } catch (error) {
       console.error('Error loading conversation:', error)
@@ -201,7 +209,141 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const startNewChat = () => {
     setMessages([])
     setConversationId(null)
+    setCurrentConversation(null)
     setInput('')
+  }
+
+  const startNewPost = () => {
+    // Smart confirmation: only ask if there's content to lose
+    const hasContent = messages.length > 0 || input.trim().length > 0
+
+    if (hasContent) {
+      if (confirm('Start new draft? Your current draft will be discarded.')) {
+        setMessages([])
+        setInput('')
+      }
+    } else {
+      // No content, just clear
+      setMessages([])
+      setInput('')
+    }
+  }
+
+  /**
+   * Parse structured post format from curator AI
+   * Expected format:
+   * TITLE: [title text]
+   * POST: [post content]
+   * [READY_TO_POST]
+   */
+  const parseStructuredPost = (content: string): { title: string; post: string } | null => {
+    const titleMatch = content.match(/TITLE:\s*(.+?)(?:\n|$)/i)
+    const postMatch = content.match(/POST:\s*([\s\S]+?)(?:\[READY_TO_POST\]|$)/i)
+
+    if (titleMatch && postMatch) {
+      return {
+        title: titleMatch[1].trim(),
+        post: postMatch[1].trim().replace(/\[READY_TO_POST\]/g, '').trim()
+      }
+    }
+
+    return null
+  }
+
+  /**
+   * Smart publish from ephemeral draft
+   * Priority 1: If last AI message has [READY_TO_POST], use AI's polished version
+   * Priority 2: Otherwise, offer to post user's last message directly
+   */
+  const publishFromDraft = async () => {
+    if (!session || messages.length === 0) return
+
+    setPublishing(true)
+    setShowSpotlight(true) // Start transition effect
+    try {
+      let title = ''
+      let content = ''
+
+      // Check if last AI message has [READY_TO_POST]
+      const lastAiMessage = messages.filter(m => m.role === 'assistant').pop()
+      const hasReadyMarker = lastAiMessage?.content.includes('[READY_TO_POST]')
+
+      if (hasReadyMarker && lastAiMessage) {
+        // Priority 1: Use AI's polished version
+        const parsed = parseStructuredPost(lastAiMessage.content)
+
+        if (parsed) {
+          title = parsed.title
+          content = parsed.post
+        } else {
+          throw new Error('Could not parse AI post format. Expected TITLE: and POST: format.')
+        }
+      } else {
+        // Priority 2: Offer to post user's last message
+        const lastUserMessage = messages.filter(m => m.role === 'user').pop()
+
+        if (!lastUserMessage) {
+          throw new Error('No message to post')
+        }
+
+        // Ask for confirmation and title
+        const userTitle = prompt('Enter a title for your post:')
+
+        if (!userTitle) {
+          // User cancelled
+          setPublishing(false)
+          return
+        }
+
+        title = userTitle.trim()
+        content = lastUserMessage.content
+      }
+
+      // Create the public post via new endpoint
+      const res = await fetch('/api/conversations/create-public', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          title,
+          content,
+          communityId
+        })
+      })
+
+      if (!res.ok) {
+        const error = await res.json()
+        throw new Error(error.error || 'Failed to publish')
+      }
+
+      const data = await res.json()
+      const publishedPostId = data.conversation?.id
+
+      setPublished(true)
+
+      // Show "Published!" briefly, then load the published post in current view
+      setTimeout(() => {
+        if (publishedPostId) {
+          // Load the published post in the current chat interface
+          loadConversation(publishedPostId)
+          // Reload conversations list to show the new post
+          loadConversations()
+          // Clear ephemeral draft
+          setMessages([])
+        } else {
+          // Fallback: reload conversations and start fresh
+          loadConversations()
+          startNewChat()
+        }
+        setPublished(false)
+        setShowSpotlight(false) // End transition effect
+      }, 800)
+    } catch (error) {
+      console.error('Publish error:', error)
+      alert(error instanceof Error ? error.message : 'Failed to publish post')
+      setShowSpotlight(false) // End transition on error
+    } finally {
+      setPublishing(false)
+    }
   }
 
   const sendMessage = async (e: React.FormEvent) => {
@@ -253,8 +395,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         })
       }
 
-      // Save to database after streaming completes (only for authenticated communities)
-      if (communityId !== 'voyager') {
+      // Save to database after streaming completes
+      // Skip saving for voyager and collaborate mode (ephemeral drafting)
+      const isCollaborateMode = mode === 'public'
+      const shouldSave = communityId !== 'voyager' && !isCollaborateMode
+
+      if (shouldSave) {
         const saveResponse = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -264,14 +410,17 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             conversationId,
             communityId,
             mode,
-            curateMode: mode === 'public', // Enable curator when collaborate toggle is ON
-            title: mode === 'public' && publicTitle ? publicTitle : undefined,
+            curateMode: false, // No longer using curateMode
+            title: publicTitle || undefined,
           }),
         })
 
         if (saveResponse.ok) {
           const data = await saveResponse.json()
           setConversationId(data.conversationId)
+          if (data.conversation) {
+            setCurrentConversation(data.conversation)
+          }
         }
       }
 
@@ -407,14 +556,11 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             {/* Collaborate Mode Tools */}
             {mode === 'public' && (
               <div className="flex items-center gap-0.5 animate-in fade-in slide-in-from-right-5 duration-300">
-                {/* New Conversation */}
+                {/* New Post (in collaborate mode) */}
                 <div className="relative group">
                   <button
                     type="button"
-                    onClick={() => {
-                      setShowNewConversation(!showNewConversation)
-                      setShowSearch(false)
-                    }}
+                    onClick={startNewPost}
                     className="w-5 h-5 border rounded-full flex items-center justify-center transition-colors"
                     style={{ borderColor: '#d1d5db' }}
                     onMouseEnter={(e) => e.currentTarget.style.borderColor = fullBranding.colors.primary}
@@ -426,7 +572,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   </button>
                   {/* Tooltip - Below Icon */}
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
-                    {communityConfig.showsCommunities ? 'Add community' : 'Start new conversation'}
+                    New Post
                     <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
                   </div>
                 </div>
@@ -524,30 +670,50 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
               </div>
             )}
 
-            {/* Collaborate Toggle */}
+            {/* Collaborate Toggle with Draft Indicator */}
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium" style={{ color: fullBranding.colors.text }}>Collaborate</span>
-              <button
-                onClick={() => {
-                  // Smooth transition: clear screen before mode switch
-                  setMessages([])
-                  setConversationId(null)
-                  // Small delay so the fade feels natural
-                  setTimeout(() => {
-                    setMode(mode === 'private' ? 'public' : 'private')
-                    setShowNewConversation(false)
-                    setShowSearch(false)
-                  }, 100)
-                }}
-                className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-                style={{ backgroundColor: mode === 'public' ? fullBranding.colors.primary : '#d1d5db' }}
-              >
-                <span
-                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    mode === 'public' ? 'translate-x-5' : 'translate-x-1'
-                  }`}
-                />
-              </button>
+              <div className="relative">
+                <button
+                  onClick={() => {
+                    // Smart confirmation: only ask if switching away from collaborate mode with unsaved draft
+                    const hasUnsavedDraft = mode === 'public' && messages.length > 0
+
+                    if (hasUnsavedDraft) {
+                      if (!confirm('Discard draft? Your messages will be lost.')) {
+                        return // User cancelled
+                      }
+                    }
+
+                    // Smooth transition: clear screen before mode switch
+                    setMessages([])
+                    setConversationId(null)
+                    // Small delay so the fade feels natural
+                    setTimeout(() => {
+                      setMode(mode === 'private' ? 'public' : 'private')
+                      setShowNewConversation(false)
+                      setShowSearch(false)
+                    }, 100)
+                  }}
+                  className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
+                  style={{ backgroundColor: mode === 'public' ? fullBranding.colors.primary : '#d1d5db' }}
+                >
+                  <span
+                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
+                      mode === 'public' ? 'translate-x-5' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+                {/* Draft indicator badge */}
+                {mode === 'public' && messages.length > 0 && (
+                  <div
+                    className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center text-white text-[10px] font-medium shadow-sm animate-in fade-in zoom-in duration-200"
+                    style={{ backgroundColor: fullBranding.colors.primary }}
+                  >
+                    {messages.length}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -592,6 +758,42 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
 
           <div ref={messagesEndRef} />
         </div>
+
+        {/* Post to Community Button - Always visible in collaborate mode when there are messages */}
+        {mode === 'public' && messages.length > 0 && !loading && (
+          <div className="flex justify-start px-8 pb-4">
+            <button
+              onClick={publishFromDraft}
+              disabled={publishing || published}
+              className="px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-50 hover:scale-105 shadow-sm"
+              style={{
+                backgroundColor: published ? '#10b981' : fullBranding.colors.primary,
+                color: '#ffffff'
+              }}
+            >
+              {publishing ? (
+                <span className="flex items-center gap-2">
+                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Publishing...
+                </span>
+              ) : published ? (
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                  Published!
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  </svg>
+                  Post
+                </span>
+              )}
+            </button>
+          </div>
+        )}
 
         {/* Input Form - Voyager Style */}
         <form onSubmit={sendMessage} className="flex-shrink-0 p-8 bg-white">
@@ -664,6 +866,18 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           onStepChange={handleTutorialStepChange}
           accentColor={communityConfig.branding.colors.primary}
         />
+      )}
+
+      {/* Spotlight Transition Effect */}
+      {showSpotlight && (
+        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-300 flex items-center justify-center">
+          <div className="text-center">
+            <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4 mx-auto"></div>
+            <div className="text-white text-lg font-medium">
+              {published ? 'Published!' : 'Publishing...'}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
