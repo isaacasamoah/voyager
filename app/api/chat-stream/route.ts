@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, conversationId, communityId = 'careersy' } = await req.json()
+    const { message, conversationId, communityId = 'careersy', curateMode = false } = await req.json()
 
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -35,7 +35,11 @@ export async function POST(req: NextRequest) {
     }
 
     // Build system prompt from community config
-    let systemPrompt = getCommunitySystemPrompt(communityConfig)
+    // Use curator prompt if curateMode is enabled
+    let systemPrompt = getCommunitySystemPrompt(communityConfig, {
+      curateMode,
+      contentType: 'message'
+    })
 
     // Voyager: No auth required, no conversation history
     if (communityId === 'voyager') {
@@ -66,8 +70,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Not a member of this community' }, { status: 403 })
     }
 
-    // Add resume context if available
-    if (user?.resumeText) {
+    // Add resume context if available (but not in curator mode)
+    if (user?.resumeText && !curateMode) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
     }
 

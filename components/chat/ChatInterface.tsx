@@ -222,6 +222,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           message: userMessage,
           conversationId: conversationId,
           communityId,
+          curateMode: mode === 'public', // Enable curator when collaborate toggle is ON
         }),
       })
 
@@ -263,6 +264,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             conversationId,
             communityId,
             mode,
+            curateMode: mode === 'public', // Enable curator when collaborate toggle is ON
             title: mode === 'public' && publicTitle ? publicTitle : undefined,
           }),
         })
