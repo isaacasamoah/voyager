@@ -66,6 +66,9 @@ model Conversation {
   viewCount             Int       @default(0)
   collaborationPrompted Boolean   @default(false)
   collaborationDeclined Boolean   @default(false)
+  curateMode            Boolean   @default(false)
+  publishedPostId       String?
+  contentType           String    @default("message")
   user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   messages              Message[]
 
@@ -73,6 +76,7 @@ model Conversation {
   @@index([isPublic])
   @@index([communityId])
   @@index([communityId, isPublic])
+  @@index([publishedPostId])
 }
 
 model Message {
@@ -86,6 +90,7 @@ model Message {
   parentId                                             String?
   updatedAt                                            DateTime       @default(now()) @updatedAt
   userId                                               String?
+  isPost                                               Boolean        @default(false)
   conversation                                         Conversation   @relation(fields: [conversationId], references: [id], onDelete: Cascade)
   parent                                               Message?       @relation("MessageReplies", fields: [parentId], references: [id], onDelete: Cascade)
   replies                                              Message[]      @relation("MessageReplies")

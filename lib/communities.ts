@@ -43,6 +43,15 @@ export interface CommunityConfig {
     expertise: string
     context: string
   }
+  aiPrompts?: {
+    coach?: string
+    curator?: {
+      message?: string
+      file?: string
+      code?: string
+      whiteboard?: string
+    }
+  }
   experts: string[]
   public: boolean
   requiresAuth?: boolean  // If true, requires user to be logged in to access
@@ -120,7 +129,25 @@ export function getAllCommunityConfigs(): CommunityConfig[] {
 /**
  * Get community system prompt
  */
-export function getCommunitySystemPrompt(config: CommunityConfig): string {
+export function getCommunitySystemPrompt(config: CommunityConfig, options?: { curateMode?: boolean, contentType?: string }): string {
+  const curateMode = options?.curateMode || false
+  const contentType = options?.contentType || 'message'
+
+  // If curate mode is enabled, use curator prompt
+  if (curateMode && config.aiPrompts?.curator) {
+    const curatorPrompts = config.aiPrompts.curator
+    const curatorPrompt = curatorPrompts[contentType as keyof typeof curatorPrompts] || curatorPrompts.message
+    if (curatorPrompt) {
+      return curatorPrompt
+    }
+  }
+
+  // Use coach prompt if available (new structure)
+  if (config.aiPrompts?.coach) {
+    return config.aiPrompts.coach
+  }
+
+  // Fall back to legacy customPrompt
   if (config.systemPrompt === 'custom' && config.customPrompt) {
     return config.customPrompt
   }

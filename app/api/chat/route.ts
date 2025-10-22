@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
       email: session?.user?.email
     })
 
-    const { message, assistantMessage, conversationId: conversationId, mode = 'private', title, communityId = 'careersy' } = await req.json()
+    const { message, assistantMessage, conversationId: conversationId, mode = 'private', title, communityId = 'careersy', curateMode = false } = await req.json()
 
     logApi('POST /api/chat - params', {
       hasMessage: !!message,
@@ -28,7 +28,8 @@ export async function POST(req: NextRequest) {
       hasConversationId: !!conversationId,
       mode,
       hasTitle: !!title,
-      communityId
+      communityId,
+      curateMode
     })
 
     if (!message || typeof message !== 'string') {
@@ -107,6 +108,8 @@ export async function POST(req: NextRequest) {
           title: conversationTitle,
           isPublic: mode === 'public',
           communityId: communityId,
+          curateMode: curateMode,
+          contentType: 'message',
         },
         include: { messages: true }
       })
@@ -126,8 +129,13 @@ export async function POST(req: NextRequest) {
     const modelConfig = getModelConfig()
 
     // Build system prompt from community config with resume context
-    let systemPrompt = getCommunitySystemPrompt(communityConfig)
-    if (user?.resumeText) {
+    // Use curator prompt if conversation is in curate mode
+    let systemPrompt = getCommunitySystemPrompt(communityConfig, {
+      curateMode: conversation.curateMode,
+      contentType: conversation.contentType
+    })
+    if (user?.resumeText && !conversation.curateMode) {
+      // Only add resume context in coach mode, not curator mode
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
     }
 
