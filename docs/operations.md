@@ -68,11 +68,35 @@ vercel env add NEXTAUTH_SECRET production
 
 ### Database Migrations
 
+**Database:** Neon Postgres (external, not Vercel-hosted)
+
 **Automatic Migrations (Recommended):**
 
-Vercel runs migrations automatically via `prisma generate` in build step.
+Migrations run automatically on every Vercel deployment via the `postinstall` script:
+```json
+"postinstall": "prisma generate && prisma migrate deploy"
+```
 
-**Manual Migration:**
+This ensures:
+- TypeScript types are generated (`prisma generate`)
+- Pending migrations are applied to Neon database (`prisma migrate deploy`)
+- Database schema stays in sync with code on every deploy
+
+**Mobile/Browser Migration (No Bash Access):**
+
+Visit the migration API endpoint to run pending migrations:
+```
+https://your-app.vercel.app/api/migrate?key=voyager-migrate-2025
+```
+
+This is useful when:
+- Testing from mobile devices
+- Quick migration runs without local setup
+- Emergency migrations in production (use with caution!)
+
+**Security:** The migration endpoint requires a secret key in production. Set `MIGRATION_SECRET_KEY` in Vercel environment variables to override the default.
+
+**Manual Migration (Development):**
 
 ```bash
 # Connect to production database
@@ -84,6 +108,8 @@ npx prisma migrate deploy
 # Verify
 npx prisma studio
 ```
+
+**Important:** Previous migrations were run manually against Neon. Starting from 2025-10-22, migrations run automatically on every deploy.
 
 **Rollback Strategy:**
 
