@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
         data: {
           userId: session.user.id,
           title: conversationTitle,
-          isPublic: mode === 'public',
+          isPublic: mode === 'public' && !curateMode, // Curate mode drafts are private until published
           communityId: communityId,
           curateMode: curateMode,
           contentType: 'message',
@@ -171,6 +171,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       message: finalAssistantMessage,
       conversationId: conversation.id,
+      conversation: {
+        id: conversation.id,
+        title: conversation.title,
+        curateMode: conversation.curateMode,
+        isPublic: conversation.isPublic,
+        publishedPostId: conversation.publishedPostId,
+        createdAt: conversation.createdAt,
+        updatedAt: conversation.updatedAt,
+      }
     })
 
   } catch (error) {

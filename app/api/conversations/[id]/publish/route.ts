@@ -7,14 +7,36 @@ import { logApi, logError } from '@/lib/logger'
 export const dynamic = 'force-dynamic'
 
 /**
+ * Parse structured post format from curator AI
+ * Expected format:
+ * TITLE: [title text]
+ * POST: [post content]
+ * [READY_TO_POST]
+ */
+function parseStructuredPost(content: string): { title: string; post: string } | null {
+  const titleMatch = content.match(/TITLE:\s*(.+?)(?:\n|$)/i)
+  const postMatch = content.match(/POST:\s*([\s\S]+?)(?:\[READY_TO_POST\]|$)/i)
+
+  if (titleMatch && postMatch) {
+    return {
+      title: titleMatch[1].trim(),
+      post: postMatch[1].trim().replace(/\[READY_TO_POST\]/g, '').trim()
+    }
+  }
+
+  return null
+}
+
+/**
  * Publish a curated draft conversation as a public community post
  *
  * Flow:
  * 1. Verify draft belongs to user and is in curate mode
- * 2. Find the final polished message (last message or marked with isPost)
- * 3. Create NEW public conversation with just that message
- * 4. Link draft to published post via publishedPostId
- * 5. Return the published post
+ * 2. Find the final polished message (last AI message with structured format)
+ * 3. Parse TITLE and POST from structured format
+ * 4. Create NEW public conversation with clean title and post content
+ * 5. Link draft to published post via publishedPostId
+ * 6. Return the published post
  */
 export async function POST(
   req: NextRequest,
@@ -75,22 +97,38 @@ export async function POST(
       )
     }
 
-    // Find the final polished message
-    // Priority: 1) Message marked with isPost, 2) Last user message
-    const polishedMessage = draft.messages.find(m => m.isPost)
-      || draft.messages.filter(m => m.role === 'user').pop()
+    // Find the last assistant message (should contain structured post)
+    const lastAiMessage = draft.messages.filter(m => m.role === 'assistant').pop()
 
-    if (!polishedMessage) {
+    if (!lastAiMessage) {
       return NextResponse.json(
-        { error: 'No message to publish' },
+        { error: 'No AI message found to publish' },
         { status: 400 }
       )
     }
 
-    // Generate title from polished message content
-    const title = polishedMessage.content.length > 60
-      ? polishedMessage.content.substring(0, 60) + '...'
-      : polishedMessage.content
+    logApi('POST /api/conversations/:id/publish - parsing AI message', {
+      messageLength: lastAiMessage.content.length,
+      preview: lastAiMessage.content.substring(0, 200)
+    })
+
+    // Parse the structured format
+    const parsed = parseStructuredPost(lastAiMessage.content)
+
+    if (!parsed) {
+      logError('POST /api/conversations/:id/publish - parse failed', new Error('Parse failed'), {
+        contentPreview: lastAiMessage.content.substring(0, 500),
+        hasTitleMarker: lastAiMessage.content.includes('TITLE:'),
+        hasPostMarker: lastAiMessage.content.includes('POST:'),
+        hasReadyMarker: lastAiMessage.content.includes('[READY_TO_POST]')
+      })
+      return NextResponse.json(
+        { error: 'Could not parse post format. Expected TITLE: and POST: format.' },
+        { status: 400 }
+      )
+    }
+
+    const { title, post } = parsed
 
     // Create NEW public conversation with ONLY the polished message
     const publishedPost = await prisma.conversation.create({
@@ -104,7 +142,7 @@ export async function POST(
         messages: {
           create: {
             role: 'user',
-            content: polishedMessage.content,
+            content: post, // Clean post content without AI preamble
             isPost: true, // Mark as the post (vs comments)
             userId: session.user.id,
             isAiGenerated: false

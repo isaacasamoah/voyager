@@ -8,6 +8,9 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message }: ChatMessageProps) {
+  // Strip the [READY_TO_POST] marker from display
+  const displayContent = message.content.replace(/\[READY_TO_POST\]/g, '').trim()
+
   return (
     <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
       <div
@@ -18,10 +21,10 @@ export default function ChatMessage({ message }: ChatMessageProps) {
         }`}
       >
         {message.role === 'user' ? (
-          <p className="whitespace-pre-wrap">{message.content}</p>
+          <p className="whitespace-pre-wrap">{displayContent}</p>
         ) : (
           <div className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:text-careersy-black prose-strong:font-semibold">
-            <ReactMarkdown>{message.content}</ReactMarkdown>
+            <ReactMarkdown>{displayContent}</ReactMarkdown>
           </div>
         )}
       </div>
