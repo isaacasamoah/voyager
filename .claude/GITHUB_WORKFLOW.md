@@ -1,6 +1,21 @@
 # GitHub Workflow - Multi-Environment Development
 
-**Branch Strategy:** `develop` as single source of truth with ephemeral feature branches
+**Branch Strategy:** `develop` as single source of truth with environment-specific permissions
+
+---
+
+## Environment Permissions
+
+### **Claude Code Console/Desktop** (Full Access)
+- ✅ Can push to ANY branch (`develop`, `main`, feature branches)
+- ✅ Full git permissions
+- ✅ Recommended: Work directly on `develop`
+
+### **Claude Code Anywhere (Browser)** (Restricted)
+- ⚠️ Can ONLY push to `claude/*` branches
+- ❌ Cannot push to `develop`, `main`, or other branches (403 error)
+- 🔒 Security feature to prevent unintended changes
+- ✅ Use `claude/*` branches, merge to `develop` later from Console
 
 ---
 
@@ -13,78 +28,72 @@ main (production, protected)
 
 develop (source of truth for active development)
   ↑
-  ├─ claude/session-* (ephemeral, created by Claude Code)
+  ├─ claude/session-* (Anywhere sessions, merge manually from Console)
   ├─ feature/* (short-lived features)
   └─ fix/* (bug fixes)
 ```
 
 ---
 
-## Standard Session Workflow
+## Workflow by Environment
 
-### 1. **Start Session** (Mobile/Laptop/Any Environment)
+### **Console/Desktop Sessions** (Recommended Primary Workflow)
 
 ```bash
-# Switch to develop
+# Start Session
 git checkout develop
-
-# Get latest changes
 git pull origin develop
 
-# Verify you're on develop and up to date
-git status
-git log --oneline -5
-```
+# Work directly on develop
+# ... make changes ...
 
-**Claude Code will create a feature branch automatically** (e.g., `claude/session-xyz`)
-This is fine! Just remember to merge back to develop when done.
-
----
-
-### 2. **During Session**
-
-Work normally. Commit frequently:
-
-```bash
+# Commit frequently
 git add -A
-git commit -m "feat: description of what you built"
-```
+git commit -m "feat: description"
 
-Push to your feature branch to save work:
-```bash
-git push -u origin <your-feature-branch>
-```
-
----
-
-### 3. **End Session** (CRITICAL: Sync back to develop)
-
-```bash
-# Make sure all work is committed
-git status
-
-# Switch to develop
-git checkout develop
-
-# Get any updates that happened while you were working
-git pull origin develop
-
-# Merge your feature branch into develop
-git merge <your-feature-branch>
-
-# Resolve any conflicts if needed
-# Then:
-git add -A
-git commit -m "merge: <feature-branch> into develop"
-
-# Push to develop (source of truth)
+# Push to develop (you have permission)
 git push origin develop
 ```
 
-**Optional:** Keep feature branch as backup
+**Pros:**
+- Simple, direct
+- No merge needed
+- Always synced
+
+**Use this for:** Your primary development work
+
+---
+
+### **Anywhere/Browser Sessions** (Feature Branches)
+
+Claude Code Anywhere will automatically create `claude/*` branches:
+
 ```bash
-git push origin <your-feature-branch>
+# Start Session (Claude does this)
+git checkout develop
+git pull origin develop
+# Claude creates: claude/debug-local-sync-011CUMF99YapxHSFfjA4uAeS
+
+# Work happens on claude/* branch
+# ... changes ...
+
+# Push to claude/* branch (allowed)
+git push origin claude/debug-local-sync-011CUMF99YapxHSFfjA4uAeS  # ✅
+
+# Cannot push to develop (permission denied)
+git push origin develop  # ❌ 403 error
 ```
+
+**To sync this work to develop:**
+```bash
+# Later, from Console/Desktop:
+git checkout develop
+git pull origin develop
+git merge claude/debug-local-sync-011CUMF99YapxHSFfjA4uAeS
+git push origin develop
+```
+
+**Use this for:** Quick edits from mobile/browser, experimental work
 
 ---
 
