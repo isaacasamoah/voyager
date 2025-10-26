@@ -245,6 +245,140 @@ Ready to publish this? I can refine any section."
 
 ---
 
+### Knowledge Extraction Architecture
+
+**Design Decision (2025-10-26):**
+Cartographer extracts expert knowledge and automatically improves system prompts + builds RAG knowledge base.
+
+#### Output Structure
+
+Each cartographer interview produces a structured JSON file:
+
+```json
+{
+  "source": "eli@careersy.com",
+  "date": "2025-10-26",
+  "topic": "atlassian-placement-strategies",
+
+  "promptUpdate": {
+    "conditionalRules": [
+      {
+        "trigger": "User mentions company rejection",
+        "action": "Ask how long ago. If <6mo suggest wait, if >6mo suggest hiring manager outreach"
+      }
+    ],
+    "facts": [
+      "Strong referrals: 2x success vs cold outreach",
+      "Weak referrals: worse than no referral"
+    ],
+    "examples": [
+      {
+        "user": "Applied to Atlassian twice, no response",
+        "response": "How long ago? If recent, wait 6 months and build projects. Then DM hiring manager."
+      }
+    ]
+  },
+
+  "ragChunks": [
+    {
+      "content": "6-month reconsideration strategy: Wait 6 months after rejection, add 1-2 impressive projects, reach out to hiring manager on LinkedIn. 40% interview rate.",
+      "tags": ["atlassian", "rejection", "reconsideration"],
+      "retrievalTriggers": ["rejected", "reapply", "no response"],
+      "expertLevel": "verified-recruiter"
+    }
+  ],
+
+  "fineTuneExamples": [
+    {
+      "messages": [
+        {"role": "user", "content": "Applied to Atlassian twice, no response"},
+        {"role": "assistant", "content": "How long ago was your last application? What's your experience level and tech stack?"},
+        {"role": "user", "content": "3 months ago, 5 YOE Python/Django"},
+        {"role": "assistant", "content": "Wait 3 more months, build 1-2 projects, then DM hiring manager with your new work"}
+      ]
+    }
+  ]
+}
+```
+
+#### Interview Flow (4 Phases)
+
+**Phase 1: Story Extraction (3-5 messages)**
+- Expert shares experience naturally
+- AI asks follow-up questions for specifics (numbers, companies, what failed)
+- Conversational, not interrogative
+
+**Phase 2: Verification (1-2 messages)**
+- AI shows back what it heard in human-readable format (bullets, clear structure)
+- Expert confirms accuracy or corrects content
+- Expert validates CONTENT only (not prompt structure)
+
+**Phase 3: Structure Generation (behind the scenes)**
+- AI converts verified content to JSON structure
+- AI owns prompt engineering decisions (trigger format, rule structure, chunking)
+- Expert never sees this technical layer
+
+**Phase 4: Knowledge Testing (optional, expert-initiated)**
+- Expert asks AI challenging questions in their domain
+- AI responds using newly captured knowledge
+- Expert affirms understanding or corrects misinterpretations
+- Generates additional high-quality fine-tuning examples
+
+#### File Storage & Loading
+
+**Directory Structure:**
+```
+knowledge/
+  careersy/
+    2025-10-26-atlassian-placement.json
+    2025-10-27-linkedin-strategy.json
+  voyager/
+    2025-10-26-community-growth.json
+```
+
+**File Naming Convention:**
+- `knowledge/{communityId}/{YYYY-MM-DD}-{topic-slug}.json`
+- One file per interview
+- Date prefix for chronological sorting and easy rollback
+- Topic slug for human readability
+
+**Automatic Loading:**
+```javascript
+// In getCommunitySystemPrompt()
+const knowledgeFiles = loadAll(`knowledge/${communityId}/*.json`)
+const mergedKnowledge = {
+  conditionalRules: knowledgeFiles.flatMap(f => f.promptUpdate.conditionalRules),
+  facts: knowledgeFiles.flatMap(f => f.promptUpdate.facts),
+  examples: knowledgeFiles.flatMap(f => f.promptUpdate.examples)
+}
+// Append to system prompt after domain expertise section
+```
+
+**Benefits:**
+- Git tracked (see what knowledge was added when, by whom)
+- Easy rollback (revert specific file or whole directory)
+- Incremental improvement (new files don't touch existing)
+- Clear audit trail (source + date metadata)
+
+#### Role Separation
+
+**Domain Expert (e.g., Eli):**
+- ✅ Verifies content accuracy ("Yes, 6 months is the sweet spot")
+- ✅ Shares domain knowledge and experience
+- ❌ Does NOT evaluate prompt structure or format
+- ❌ Does NOT decide how AI uses the knowledge
+
+**AI (Cartographer Mode):**
+- ✅ Owns prompt engineering decisions (structure, format, conditionals)
+- ✅ Decides how to chunk knowledge for RAG retrieval
+- ✅ Structures fine-tuning examples
+- ✅ Determines optimal prompt composition
+- ❌ Does NOT fabricate or assume domain knowledge
+
+**Rationale:** The expert knows careers, the AI knows how to optimize LLM prompts. Clean separation of expertise.
+
+---
+
 ### Implementation Tasks
 
 #### 1. Mode System Foundation (Completed ✅)
