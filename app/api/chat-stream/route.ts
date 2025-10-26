@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, conversationId, communityId = 'careersy', curateMode = false } = await req.json()
+    const { message, conversationId, communityId = 'careersy', curateMode = false, incomingHistory } = await req.json()
 
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -75,10 +75,16 @@ export async function POST(req: NextRequest) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
     }
 
-    // Get conversation history if conversationId provided
+    // Get conversation history
+    // In curate mode with ephemeral messages, use passed messages from React state
+    // Otherwise, load from database
     let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
-    if (conversationId) {
+    if (incomingHistory && Array.isArray(incomingHistory)) {
+      // Use ephemeral messages passed from frontend (curate mode)
+      conversationHistory = incomingHistory
+    } else if (conversationId) {
+      // Load from database (normal mode)
       const conversation = await prisma.conversation.findUnique({
         where: { id: conversationId, userId: session.user.id },
         include: {
@@ -90,9 +96,9 @@ export async function POST(req: NextRequest) {
       })
 
       if (conversation && conversation.communityId === communityId) {
-        conversationHistory = conversation.messages.map(log => ({
-          role: log.role as 'user' | 'assistant',
-          content: log.content
+        conversationHistory = conversation.messages.map(msg => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content
         }))
       }
     }

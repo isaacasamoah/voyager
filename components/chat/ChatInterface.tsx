@@ -365,6 +365,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           conversationId: conversationId,
           communityId,
           curateMode: mode === 'public', // Enable curator when collaborate toggle is ON
+          // In curate mode, pass ephemeral messages from React state (not saved to DB yet)
+          incomingHistory: mode === 'public' ? messages : undefined,
         }),
       })
 
@@ -740,9 +742,31 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             </div>
           )}
 
-          {messages.map((msg, idx) => (
-            <ChatMessage key={idx} message={msg} />
-          ))}
+          {messages.map((msg, idx) => {
+            // Check if this is the last AI message with [READY_TO_POST]
+            const isLastAIMessage = msg.role === 'assistant' && idx === messages.length - 1
+            const hasReadyMarker = msg.content.includes('[READY_TO_POST]')
+
+            return (
+              <ChatMessage
+                key={idx}
+                message={msg}
+                onPost={isLastAIMessage && hasReadyMarker && mode === 'public' ? publishFromDraft : undefined}
+                onEdit={isLastAIMessage && hasReadyMarker && mode === 'public' ? () => {
+                  // Extract POST content and pre-fill input for editing
+                  const parsed = parseStructuredPost(msg.content)
+                  if (parsed?.post) {
+                    setInput(parsed.post)
+                    // Focus input field
+                    inputRef.current?.focus()
+                  }
+                } : undefined}
+                primaryColor={fullBranding.colors.primary}
+                publishing={publishing}
+                published={published}
+              />
+            )
+          })}
 
           {loading && (
             <div className="flex justify-start">
@@ -759,47 +783,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Post to Community Button - Always visible in collaborate mode when there are messages */}
-        {mode === 'public' && messages.length > 0 && !loading && (
-          <div className="flex justify-start px-8 pb-4">
-            <button
-              onClick={publishFromDraft}
-              disabled={publishing || published}
-              className="px-4 py-2 rounded-full text-sm font-medium transition-all disabled:opacity-50 hover:scale-105 shadow-sm"
-              style={{
-                backgroundColor: published ? '#10b981' : fullBranding.colors.primary,
-                color: '#ffffff'
-              }}
-            >
-              {publishing ? (
-                <span className="flex items-center gap-2">
-                  <div className="w-3 h-3 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Publishing...
-                </span>
-              ) : published ? (
-                <span className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                  </svg>
-                  Published!
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                  </svg>
-                  Post
-                </span>
-              )}
-            </button>
-          </div>
-        )}
 
         {/* Input Form - Voyager Style */}
         <form onSubmit={sendMessage} className="flex-shrink-0 p-8 bg-white">
           <div style={{ width: fullBranding.spacing.inputWidth }} className="mx-auto">
             {/* Message Input with Add Context + Submit */}
-            <div className="relative flex items-center gap-2">
+            <div className="flex items-center gap-2">
               {/* Add Files Button */}
               <button
                 type="button"
@@ -824,27 +813,36 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                 </div>
               </button>
 
-              {/* Input Field */}
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="What's your next career move?"
-                className={`flex-1 px-6 py-4 pr-14 ${fullBranding.components.input} transition-colors ${fullBranding.typography.input.size} placeholder:text-gray-400`}
-                disabled={loading}
-              />
+              {/* Input Field with Submit Button */}
+              <div className="flex-1 relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={mode === 'public' ? "Describe what you'd like to post about..." : "What's your next career move?"}
+                  className={`w-full px-6 py-4 pr-14 ${fullBranding.components.input} transition-colors ${fullBranding.typography.input.size} placeholder:text-gray-400`}
+                  disabled={loading}
+                />
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading || !input.trim()}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
-              >
-                <svg className="w-5 h-5" style={{ color: fullBranding.colors.userMessageText }} fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
+                {/* Submit Button - Inside input field */}
+                <button
+                  type="submit"
+                  disabled={loading || !input.trim()}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all group relative`}
+                  title={mode === 'public' ? 'Ask curator for help' : 'Send message'}
+                >
+                  <svg className="w-5 h-5" style={{ color: fullBranding.colors.userMessageText }} fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                  {/* Tooltip */}
+                  {mode === 'public' && (
+                    <div className="absolute bottom-full right-0 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
+                      Ask curator
+                    </div>
+                  )}
+                </button>
+              </div>
             </div>
           </div>
         </form>
