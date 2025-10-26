@@ -95,9 +95,76 @@ Career coach expert - extracting knowledge about placing candidates in high-payi
 - AI as force multiplier, not mystery box
 ```
 
-## Questions to explore with me
-1. How does this implement the simplest possible version of my dandelio vision?
-2. How do we design and implement this to feel seamless for the user?
-3. HOw do we create a tight feebdack loop that let's us iterate quickly and effectively?
-4. How do we create clean user flows for the user and clean architecure and code for us?
+## Implementation Plan
+
+### Phase 1: Polish Curator Mode with Modular Prompts (Current - Week 1)
+
+**Goal**: Complete curator mode with proper domain expertise retention
+
+**Why modular prompts in Phase 1?**
+- Curator mode feels "vague" because it loses domain expertise when switching from coach
+- Modular prompts are simple to implement (restructure JSON + update prompt builder)
+- Essential for curator mode to feel delightful
+- Sets foundation for all future modes
+
+**Tasks**:
+1. ✅ Understand curator architecture
+2. ✅ Refactor message naming
+3. ✅ Clean up dead code
+4. **🔄 Implement modular prompt architecture**
+   - Restructure community JSON: `domainExpertise` + `modes` sections
+   - Update prompt builder in API to compose modularly
+   - Test that curator retains career coach knowledge
+5. 🔄 Test end-to-end flow
+6. 🔄 Fix "post without assistance" UX
+7. 🔄 Document patterns
+
+**Modular Prompt Structure**:
+```
+[DOMAIN EXPERTISE] ← Career coach knowledge (always present)
+[MODE BEHAVIOR]    ← Coach/Curator instructions (variable)
+[HISTORY]          ← Conversation context
+[TASK]            ← Current message
+```
+
+**Community JSON redesign**:
+```json
+{
+  "domainExpertise": {
+    "role": "ANZ Tech Career Expert",
+    "knowledge": "Specializes in Australian tech market...",
+    "capabilities": [...]
+  },
+  "modes": {
+    "coach": {
+      "behavior": "Provide direct, helpful answers",
+      "style": "Concise and actionable"
+    },
+    "curator": {
+      "behavior": "Guide user to craft community posts",
+      "format": "TITLE:/POST:/[READY_TO_POST]",
+      "directive": "2-3 messages maximum"
+    }
+  }
+}
+```
+
+---
+
+### Phase 2: Add Simple Router (Week 2)
+**Goal**: Mode suggestion with user confirmation
+
+**Implementation**: Option B - AI suggests, user confirms/overrides
+**Data**: Log every routing decision for learning
+
+---
+
+### Phase 3: Expert Interview Mode (Week 4-6)
+**Goal**: Extract tacit knowledge from experts
+**Output**: RAG-ready insights to improve coach/curator
+
+---
+
+### Phase 4: Learned Routing (Week 8+)
+**Goal**: Analyze data, refine routing (rules or learned classifier)
   
