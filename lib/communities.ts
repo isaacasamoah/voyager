@@ -36,22 +36,45 @@ export interface CommunityConfig {
   id: string
   name: string
   description?: string
-  systemPrompt: 'default' | 'custom' | 'template'
-  customPrompt?: string
-  promptConfig?: {
-    domain: string
-    expertise: string
-    context: string
+
+  // Modular prompt structure
+  domainExpertise?: {
+    role: string
+    mission: string
+    coreCapabilities?: string[]
+    [key: string]: any  // Allow flexible domain-specific fields
   }
-  aiPrompts?: {
-    coach?: string
+  modes?: {
+    coach?: {
+      behavior: string
+      style: string
+      guidance?: string
+    }
     curator?: {
-      message?: string
-      file?: string
-      code?: string
-      whiteboard?: string
+      banner?: string
+      role?: string
+      behavior: string
+      criticalDirective?: string
+      expertiseUsage?: string
+      goodExpertiseUse?: string[]
+      badExpertiseUse?: string[]
+      approach?: {
+        message1: string
+        message2or3: string
+        timing: string
+      }
+      postFormat?: string
+      postStructure?: string
+      reminders?: string[]
+      exampleInteraction?: {
+        user: string
+        response1: string
+        user2: string
+        response2: string
+      }
     }
   }
+
   experts: string[]
   public: boolean
   requiresAuth?: boolean  // If true, requires user to be logged in to access
@@ -127,43 +150,131 @@ export function getAllCommunityConfigs(): CommunityConfig[] {
 }
 
 /**
- * Get community system prompt
+ * Get community system prompt - Modular composition
  */
 export function getCommunitySystemPrompt(config: CommunityConfig, options?: { curateMode?: boolean, contentType?: string }): string {
   const curateMode = options?.curateMode || false
-  const contentType = options?.contentType || 'message'
+  const mode = curateMode ? 'curator' : 'coach'
 
-  // If curate mode is enabled, use curator prompt
-  if (curateMode && config.aiPrompts?.curator) {
-    const curatorPrompts = config.aiPrompts.curator
-    const curatorPrompt = curatorPrompts[contentType as keyof typeof curatorPrompts] || curatorPrompts.message
-    if (curatorPrompt) {
-      return curatorPrompt
+  // If no modular structure, return fallback
+  if (!config.domainExpertise || !config.modes) {
+    return `You are a helpful AI assistant for the ${config.name} community.
+Provide thoughtful, accurate responses to help users learn and grow.`
+  }
+
+  const expertise = config.domainExpertise
+  const modeConfig = config.modes[mode]
+
+  if (!modeConfig) {
+    return `You are ${expertise.role}. ${expertise.mission}`
+  }
+
+  // Build modular prompt: Domain Expertise + Mode Behavior
+  const sections: string[] = []
+
+  // === DOMAIN EXPERTISE SECTION ===
+  sections.push(`You are ${expertise.role}.`)
+  sections.push(`\n${expertise.mission}`)
+
+  if (expertise.coreCapabilities && expertise.coreCapabilities.length > 0) {
+    sections.push(`\n\nCore capabilities:`)
+    expertise.coreCapabilities.forEach(cap => {
+      sections.push(`- ${cap}`)
+    })
+  }
+
+  // Add domain-specific fields dynamically (resumeRules, regionalContext, etc.)
+  Object.keys(expertise).forEach(key => {
+    // Skip the ones we already handled
+    if (['role', 'mission', 'coreCapabilities'].includes(key)) return
+
+    const value = expertise[key]
+
+    if (typeof value === 'string') {
+      // Simple string field: "resumeFormula: 'X + Y = Z'"
+      sections.push(`\n\n**${key}**: ${value}`)
+    } else if (Array.isArray(value)) {
+      // Array field: "resumeRewriteRules: [...]"
+      sections.push(`\n\n**${key}**:`)
+      value.forEach(item => sections.push(`- ${item}`))
+    } else if (typeof value === 'object') {
+      // Object field: "regionalContext: { cities: [...], companies: [...] }"
+      sections.push(`\n\n**${key}**: ${JSON.stringify(value, null, 2)}`)
+    }
+  })
+
+  // === MODE BEHAVIOR SECTION ===
+  sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━`)
+
+  if (mode === 'curator' && modeConfig.banner) {
+    sections.push(`\n${modeConfig.banner}`)
+  } else {
+    sections.push(`\n**MODE: ${mode.toUpperCase()}**`)
+  }
+
+  if (mode === 'curator' && (modeConfig as any).role) {
+    sections.push(`\nYou are the ${(modeConfig as any).role}.`)
+  }
+
+  sections.push(`\n${modeConfig.behavior}`)
+  sections.push(`\nStyle: ${modeConfig.style}`)
+
+  // === CURATOR-SPECIFIC SECTIONS ===
+  if (mode === 'curator') {
+    const curator = modeConfig as any
+
+    if (curator.criticalDirective) {
+      sections.push(`\n\n**CRITICAL:** ${curator.criticalDirective}`)
+    }
+
+    if (curator.expertiseUsage) {
+      sections.push(`\n\n**How to use your expertise:** ${curator.expertiseUsage}`)
+    }
+
+    if (curator.goodExpertiseUse && curator.goodExpertiseUse.length > 0) {
+      sections.push(`\n\n**Good uses of expertise:**`)
+      curator.goodExpertiseUse.forEach((use: string) => sections.push(`- ${use}`))
+    }
+
+    if (curator.badExpertiseUse && curator.badExpertiseUse.length > 0) {
+      sections.push(`\n\n**Bad uses of expertise (avoid):**`)
+      curator.badExpertiseUse.forEach((use: string) => sections.push(`- ${use}`))
+    }
+
+    if (curator.approach) {
+      sections.push(`\n\n**YOUR APPROACH:**`)
+      sections.push(`- Message 1: ${curator.approach.message1}`)
+      sections.push(`- Message 2-3: ${curator.approach.message2or3}`)
+      sections.push(`- Timing: ${curator.approach.timing}`)
+    }
+
+    if (curator.postFormat) {
+      sections.push(`\n\nPost format: ${curator.postFormat}`)
+    }
+
+    if (curator.postStructure) {
+      sections.push(`\nPost structure:\n${curator.postStructure}`)
+    }
+
+    if (curator.reminders && curator.reminders.length > 0) {
+      sections.push(`\n\n**REMINDERS:**`)
+      curator.reminders.forEach((reminder: string) => sections.push(reminder))
+    }
+
+    if (curator.exampleInteraction) {
+      sections.push(`\n\n**EXAMPLE INTERACTION:**`)
+      sections.push(`\nUser: "${curator.exampleInteraction.user}"`)
+      sections.push(`\nYou: "${curator.exampleInteraction.response1}"`)
+      sections.push(`\nUser: "${curator.exampleInteraction.user2}"`)
+      sections.push(`\nYou: "${curator.exampleInteraction.response2}"`)
     }
   }
-
-  // Use coach prompt if available (new structure)
-  if (config.aiPrompts?.coach) {
-    return config.aiPrompts.coach
+  // === COACH-SPECIFIC SECTIONS ===
+  else if (mode === 'coach' && modeConfig.guidance) {
+    sections.push(`\n\n**Guidance:** ${modeConfig.guidance}`)
   }
 
-  // Fall back to legacy customPrompt
-  if (config.systemPrompt === 'custom' && config.customPrompt) {
-    return config.customPrompt
-  }
-
-  if (config.systemPrompt === 'template' && config.promptConfig) {
-    const { domain, expertise, context } = config.promptConfig
-    return `You are an expert in ${domain}, helping ${context} with ${expertise}.
-Provide helpful, accurate, and practical advice. Be conversational and supportive.
-When you don't know something, say so honestly. Focus on actionable guidance.`
-  }
-
-  // Default Voyager prompt
-  return `You are a helpful AI assistant for the Voyager community platform.
-Provide thoughtful, accurate responses to help users learn and grow.
-Be conversational, supportive, and honest. When uncertain, acknowledge it.
-Focus on helping users ask better questions and connect with others in the community.`
+  return sections.join('')
 }
 
 /**
