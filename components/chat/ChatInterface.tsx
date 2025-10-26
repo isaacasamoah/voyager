@@ -21,12 +21,7 @@ interface Conversation {
   title: string
   createdAt: string
   updatedAt: string
-  curateMode?: boolean
-  isPublic?: boolean
-  publishedPostId?: string
 }
-
-type ConversationMode = 'private' | 'public'
 
 interface ChatInterfaceProps {
   communityId: string
@@ -47,16 +42,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [loadingConversations, setLoadingConversations] = useState(false)
   const [showResumeModal, setShowResumeModal] = useState(false)
   const [hasResume, setHasResume] = useState(false)
-  const [mode, setMode] = useState<ConversationMode>('private')
-  const [publicTitle, setPublicTitle] = useState('')
-  const [showNewConversation, setShowNewConversation] = useState(false)
-  const [showSearch, setShowSearch] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const [showTutorial, setShowTutorial] = useState(false)
-  const [publishing, setPublishing] = useState(false)
-  const [published, setPublished] = useState(false)
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
-  const [showSpotlight, setShowSpotlight] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -107,34 +94,17 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     setShowTutorial(false)
     const tutorialKey = `${communityId}_tutorial_completed`
     localStorage.setItem(tutorialKey, 'true')
-    // Restore private mode after tutorial
-    setMode('private')
   }
 
   const handleTutorialSkip = () => {
     setShowTutorial(false)
     const tutorialKey = `${communityId}_tutorial_completed`
     localStorage.setItem(tutorialKey, 'true')
-    // Restore private mode after tutorial
-    setMode('private')
   }
 
   const restartTutorial = () => {
     setShowTutorial(true)
   }
-
-  const handleTutorialStepChange = (stepId: string) => {
-    // When tutorial reaches collaborate toggle, enable public mode
-    if (stepId === 'collaborate-toggle') {
-      setMode('public')
-    }
-  }
-
-  // Reload conversations when mode changes
-  useEffect(() => {
-    loadConversations()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode])
 
   const checkResume = async () => {
     try {
@@ -170,18 +140,15 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
       if (communityConfig.showsCommunities) {
         // Voyager: show communities in sidebar
         endpoint = `/api/communities`
-      } else if (mode === 'public') {
-        // Public mode: show threads
-        endpoint = `/api/community/threads?communityId=${communityId}`
       } else {
-        // Private mode: show user's conversations
+        // Show user's conversations
         endpoint = `/api/conversations?communityId=${communityId}`
       }
 
       const response = await fetch(endpoint)
       if (response.ok) {
         const data = await response.json()
-        setConversations(data.communities || data.threads || data.conversations || [])
+        setConversations(data.communities || data.conversations || [])
       }
     } catch (error) {
       console.error('Error loading conversations:', error)
@@ -213,139 +180,6 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     setInput('')
   }
 
-  const startNewPost = () => {
-    // Smart confirmation: only ask if there's content to lose
-    const hasContent = messages.length > 0 || input.trim().length > 0
-
-    if (hasContent) {
-      if (confirm('Start new draft? Your current draft will be discarded.')) {
-        setMessages([])
-        setInput('')
-      }
-    } else {
-      // No content, just clear
-      setMessages([])
-      setInput('')
-    }
-  }
-
-  /**
-   * Parse structured post format from curator AI
-   * Expected format:
-   * TITLE: [title text]
-   * POST: [post content]
-   * [READY_TO_POST]
-   */
-  const parseStructuredPost = (content: string): { title: string; post: string } | null => {
-    const titleMatch = content.match(/TITLE:\s*(.+?)(?:\n|$)/i)
-    const postMatch = content.match(/POST:\s*([\s\S]+?)(?:\[READY_TO_POST\]|$)/i)
-
-    if (titleMatch && postMatch) {
-      return {
-        title: titleMatch[1].trim(),
-        post: postMatch[1].trim().replace(/\[READY_TO_POST\]/g, '').trim()
-      }
-    }
-
-    return null
-  }
-
-  /**
-   * Smart publish from ephemeral draft
-   * Priority 1: If last AI message has [READY_TO_POST], use AI's polished version
-   * Priority 2: Otherwise, offer to post user's last message directly
-   */
-  const publishFromDraft = async () => {
-    if (!session || messages.length === 0) return
-
-    setPublishing(true)
-    setShowSpotlight(true) // Start transition effect
-    try {
-      let title = ''
-      let content = ''
-
-      // Check if last AI message has [READY_TO_POST]
-      const lastAiMessage = messages.filter(m => m.role === 'assistant').pop()
-      const hasReadyMarker = lastAiMessage?.content.includes('[READY_TO_POST]')
-
-      if (hasReadyMarker && lastAiMessage) {
-        // Priority 1: Use AI's polished version
-        const parsed = parseStructuredPost(lastAiMessage.content)
-
-        if (parsed) {
-          title = parsed.title
-          content = parsed.post
-        } else {
-          throw new Error('Could not parse AI post format. Expected TITLE: and POST: format.')
-        }
-      } else {
-        // Priority 2: Offer to post user's last message
-        const lastUserMessage = messages.filter(m => m.role === 'user').pop()
-
-        if (!lastUserMessage) {
-          throw new Error('No message to post')
-        }
-
-        // Ask for confirmation and title
-        const userTitle = prompt('Enter a title for your post:')
-
-        if (!userTitle) {
-          // User cancelled
-          setPublishing(false)
-          return
-        }
-
-        title = userTitle.trim()
-        content = lastUserMessage.content
-      }
-
-      // Create the public post via new endpoint
-      const res = await fetch('/api/conversations/create-public', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title,
-          content,
-          communityId
-        })
-      })
-
-      if (!res.ok) {
-        const error = await res.json()
-        throw new Error(error.error || 'Failed to publish')
-      }
-
-      const data = await res.json()
-      const publishedPostId = data.conversation?.id
-
-      setPublished(true)
-
-      // Show "Published!" briefly, then load the published post in current view
-      setTimeout(() => {
-        if (publishedPostId) {
-          // Load the published post in the current chat interface
-          loadConversation(publishedPostId)
-          // Reload conversations list to show the new post
-          loadConversations()
-          // Clear ephemeral draft
-          setMessages([])
-        } else {
-          // Fallback: reload conversations and start fresh
-          loadConversations()
-          startNewChat()
-        }
-        setPublished(false)
-        setShowSpotlight(false) // End transition effect
-      }, 800)
-    } catch (error) {
-      console.error('Publish error:', error)
-      alert(error instanceof Error ? error.message : 'Failed to publish post')
-      setShowSpotlight(false) // End transition on error
-    } finally {
-      setPublishing(false)
-    }
-  }
-
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!input.trim() || loading) return
@@ -364,9 +198,6 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           message: userMessage,
           conversationId: conversationId,
           communityId,
-          curateMode: mode === 'public', // Enable curator when collaborate toggle is ON
-          // In curate mode, pass ephemeral messages from React state (not saved to DB yet)
-          incomingHistory: mode === 'public' ? messages : undefined,
         }),
       })
 
@@ -397,12 +228,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         })
       }
 
-      // Save to database after streaming completes
-      // Skip saving for voyager and collaborate mode (ephemeral drafting)
-      const isCollaborateMode = mode === 'public'
-      const shouldSave = communityId !== 'voyager' && !isCollaborateMode
-
-      if (shouldSave) {
+      // Save to database after streaming completes (skip voyager)
+      if (communityId !== 'voyager') {
         const saveResponse = await fetch('/api/chat', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -411,9 +238,6 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             assistantMessage: fullResponse,
             conversationId,
             communityId,
-            mode,
-            curateMode: false, // No longer using curateMode
-            title: publicTitle || undefined,
           }),
         })
 
@@ -424,15 +248,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             setCurrentConversation(data.conversation)
           }
         }
-      }
 
-      // Clear public title after sending
-      if (mode === 'public') {
-        setPublicTitle('')
-      }
-
-      // Reload conversations to show the new one
-      if (communityId !== 'voyager') {
+        // Reload conversations to show the new one
         loadConversations()
       }
     } catch (error) {
@@ -450,13 +267,6 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     signOut({ callbackUrl: '/login' })
   }
 
-  // Filter conversations based on search query (only in collaborate mode)
-  const filteredConversations = mode === 'public' && searchQuery.trim()
-    ? conversations.filter(conv =>
-        conv.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : conversations
-
   return (
     <div className="flex h-screen" style={{ backgroundColor: fullBranding.colors.background }}>
       {/* Sidebar - Minimal Space Style */}
@@ -465,23 +275,16 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
-              {mode === 'public' ? (
-                searchQuery ? `Results (${filteredConversations.length})` : (communityConfig.showsCommunities ? 'Communities' : 'Community')
-              ) : (
-                'History'
-              )}
+              {communityConfig.showsCommunities ? 'Communities' : 'History'}
             </div>
             {loadingConversations ? (
               <div className="text-center text-gray-400 py-4 text-sm">...</div>
-            ) : filteredConversations.length === 0 ? (
+            ) : conversations.length === 0 ? (
               <div className="text-center text-gray-400 py-4 text-xs">
-                {searchQuery
-                  ? 'No matches found'
-                  : mode === 'public' ? `No ${terms.course}s yet` : 'No history yet'
-                }
+                No history yet
               </div>
             ) : (
-              filteredConversations.map((conv) => (
+              conversations.map((conv) => (
                 <button
                   key={conv.id}
                   onClick={() => {
@@ -553,171 +356,16 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             </button>
           </div>
 
-          {/* Right: Collaborate Tools + Toggle */}
-          <div className="flex items-center gap-0.5">
-            {/* Collaborate Mode Tools */}
-            {mode === 'public' && (
-              <div className="flex items-center gap-0.5 animate-in fade-in slide-in-from-right-5 duration-300">
-                {/* New Post (in collaborate mode) */}
-                <div className="relative group">
-                  <button
-                    type="button"
-                    onClick={startNewPost}
-                    className="w-5 h-5 border rounded-full flex items-center justify-center transition-colors"
-                    style={{ borderColor: '#d1d5db' }}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = fullBranding.colors.primary}
-                    onMouseLeave={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
-                  >
-                    <svg className="w-3 h-3 transition-colors" style={{ color: fullBranding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                  {/* Tooltip - Below Icon */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
-                    New Post
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
-                  </div>
-                </div>
-
-                {/* New Conversation Title Field */}
-                <div className={`relative transition-all ${showNewConversation ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'}`}>
-                  <input
-                    type="text"
-                    value={publicTitle}
-                    onChange={(e) => setPublicTitle(e.target.value)}
-                    placeholder="Course title..."
-                    className={`w-full px-3 py-1 pr-8 ${fullBranding.components.input} transition-colors text-xs`}
-                  />
-                  {publicTitle && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2" style={{ color: fullBranding.colors.primary }}>
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-
-                {/* Search */}
-                <div className="relative group">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowSearch(!showSearch)
-                      setShowNewConversation(false)
-                    }}
-                    className="w-5 h-5 flex items-center justify-center transition-colors"
-                  >
-                    <svg className="w-4 h-4 transition-colors" style={{ color: fullBranding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </button>
-                  {/* Tooltip - Below Icon */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
-                    {communityConfig.showsCommunities ? 'Search communities' : 'Search conversations'}
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
-                  </div>
-                </div>
-
-                {/* Search Field with Dropdown */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    className={`px-3 py-1 ${fullBranding.components.input} transition-all text-xs ${
-                      showSearch ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'
-                    }`}
-                  />
-
-                  {/* Search Results Dropdown */}
-                  {showSearch && searchQuery.trim() && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 max-h-64 overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                      {/* Results Count */}
-                      <div className="px-3 py-2 text-xs text-gray-400 border-b border-gray-100">
-                        {filteredConversations.length} {filteredConversations.length === 1 ? 'result' : 'results'}
-                      </div>
-
-                      {/* Results List */}
-                      {filteredConversations.length === 0 ? (
-                        <div className="px-3 py-4 text-xs text-gray-400 text-center">
-                          No matches found
-                        </div>
-                      ) : (
-                        filteredConversations.map((conv) => (
-                          <button
-                            key={conv.id}
-                            onClick={() => {
-                              loadConversation(conv.id)
-                              setSearchQuery('')
-                              setShowSearch(false)
-                            }}
-                            className="w-full text-left px-3 py-2 transition-colors border-b border-gray-50 last:border-b-0"
-                            style={{ backgroundColor: 'transparent' }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = fullBranding.colors.background}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                          >
-                            <div className="text-xs font-medium truncate" style={{ color: fullBranding.colors.text }}>
-                              {conv.title}
-                            </div>
-                            <div className="text-xs mt-0.5" style={{ color: fullBranding.colors.textSecondary }}>
-                              {new Date(conv.updatedAt).toLocaleDateString()}
-                            </div>
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Collaborate Toggle with Draft Indicator */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium" style={{ color: fullBranding.colors.text }}>Collaborate</span>
-              <div className="relative">
-                <button
-                  onClick={() => {
-                    // Smart confirmation: only ask if switching away from collaborate mode with unsaved draft
-                    const hasUnsavedDraft = mode === 'public' && messages.length > 0
-
-                    if (hasUnsavedDraft) {
-                      if (!confirm('Discard draft? Your messages will be lost.')) {
-                        return // User cancelled
-                      }
-                    }
-
-                    // Smooth transition: clear screen before mode switch
-                    setMessages([])
-                    setConversationId(null)
-                    // Small delay so the fade feels natural
-                    setTimeout(() => {
-                      setMode(mode === 'private' ? 'public' : 'private')
-                      setShowNewConversation(false)
-                      setShowSearch(false)
-                    }, 100)
-                  }}
-                  className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-                  style={{ backgroundColor: mode === 'public' ? fullBranding.colors.primary : '#d1d5db' }}
-                >
-                  <span
-                    className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                      mode === 'public' ? 'translate-x-5' : 'translate-x-1'
-                    }`}
-                  />
-                </button>
-                {/* Draft indicator badge */}
-                {mode === 'public' && messages.length > 0 && (
-                  <div
-                    className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full flex items-center justify-center text-white text-[10px] font-medium shadow-sm animate-in fade-in zoom-in duration-200"
-                    style={{ backgroundColor: fullBranding.colors.primary }}
-                  >
-                    {messages.length}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          {/* Right: New Chat Button */}
+          <button
+            onClick={startNewChat}
+            className="p-2 hover:bg-gray-50 rounded transition-colors"
+            title="New conversation"
+          >
+            <svg className="w-4 h-4" style={{ color: fullBranding.colors.text }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
         </div>
 
         {/* Messages Container */}
@@ -742,31 +390,13 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             </div>
           )}
 
-          {messages.map((msg, idx) => {
-            // Check if this is the last AI message with [READY_TO_POST]
-            const isLastAIMessage = msg.role === 'assistant' && idx === messages.length - 1
-            const hasReadyMarker = msg.content.includes('[READY_TO_POST]')
-
-            return (
-              <ChatMessage
-                key={idx}
-                message={msg}
-                onPost={isLastAIMessage && hasReadyMarker && mode === 'public' ? publishFromDraft : undefined}
-                onEdit={isLastAIMessage && hasReadyMarker && mode === 'public' ? () => {
-                  // Extract POST content and pre-fill input for editing
-                  const parsed = parseStructuredPost(msg.content)
-                  if (parsed?.post) {
-                    setInput(parsed.post)
-                    // Focus input field
-                    inputRef.current?.focus()
-                  }
-                } : undefined}
-                primaryColor={fullBranding.colors.primary}
-                publishing={publishing}
-                published={published}
-              />
-            )
-          })}
+          {messages.map((msg, idx) => (
+            <ChatMessage
+              key={idx}
+              message={msg}
+              primaryColor={fullBranding.colors.primary}
+            />
+          ))}
 
           {loading && (
             <div className="flex justify-start">
@@ -820,7 +450,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   type="text"
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={mode === 'public' ? "Describe what you'd like to post about..." : "What's your next career move?"}
+                  placeholder="What's your next career move?"
                   className={`w-full px-6 py-4 pr-14 ${fullBranding.components.input} transition-colors ${fullBranding.typography.input.size} placeholder:text-gray-400`}
                   disabled={loading}
                 />
@@ -829,18 +459,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all group relative`}
-                  title={mode === 'public' ? 'Ask curator for help' : 'Send message'}
+                  className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+                  title="Send message"
                 >
                   <svg className="w-5 h-5" style={{ color: fullBranding.colors.userMessageText }} fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
-                  {/* Tooltip */}
-                  {mode === 'public' && (
-                    <div className="absolute bottom-full right-0 mb-2 px-2 py-1 text-xs text-white bg-gray-900 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none">
-                      Ask curator
-                    </div>
-                  )}
                 </button>
               </div>
             </div>
@@ -861,21 +485,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           steps={getTutorialSteps(communityId)}
           onComplete={handleTutorialComplete}
           onSkip={handleTutorialSkip}
-          onStepChange={handleTutorialStepChange}
           accentColor={communityConfig.branding.colors.primary}
         />
-      )}
-
-      {/* Spotlight Transition Effect */}
-      {showSpotlight && (
-        <div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 animate-in fade-in duration-300 flex items-center justify-center">
-          <div className="text-center">
-            <div className="w-16 h-16 border-4 border-white/30 border-t-white rounded-full animate-spin mb-4 mx-auto"></div>
-            <div className="text-white text-lg font-medium">
-              {published ? 'Published!' : 'Publishing...'}
-            </div>
-          </div>
-        </div>
       )}
     </div>
   )
