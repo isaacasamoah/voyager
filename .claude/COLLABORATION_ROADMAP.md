@@ -13,13 +13,14 @@
 ## Table of Contents
 
 1. [Architecture Overview](#architecture-overview)
-2. [Phase 1: Split-View Collaborate (Draft Posts)](#phase-1-split-view-collaborate-draft-posts)
-3. [Phase 2: File Upload & Context Extraction](#phase-2-file-upload--context-extraction)
-4. [Phase 3: User Context System](#phase-3-user-context-system)
-5. [Phase 4: Community Knowledge RAG](#phase-4-community-knowledge-rag)
-6. [Phase 5: Collaboards](#phase-5-collaboards)
-7. [Risk Mitigation](#risk-mitigation)
-8. [Success Metrics](#success-metrics)
+2. [Phase 0: Cartographer Mode (Expert Knowledge Extraction)](#phase-0-cartographer-mode-expert-knowledge-extraction)
+3. [Phase 1: Split-View Collaborate (Draft Posts)](#phase-1-split-view-collaborate-draft-posts)
+4. [Phase 2: File Upload & Context Extraction](#phase-2-file-upload--context-extraction)
+5. [Phase 3: User Context System](#phase-3-user-context-system)
+6. [Phase 4: Community Knowledge RAG](#phase-4-community-knowledge-rag)
+7. [Phase 5: Collaboards](#phase-5-collaboards)
+8. [Risk Mitigation](#risk-mitigation)
+9. [Success Metrics](#success-metrics)
 
 ---
 
@@ -72,6 +73,369 @@ All collaboration modes follow the same fundamental pattern:
 - Compression: ~88% reduction (50 posts → 3k tokens vs 25k)
 - Prompt caching: ~90% cost reduction for repeat users
 - RAG on-demand: Deep search only when user requests (`/history`)
+
+---
+
+## Phase 0: Cartographer Mode (Expert Knowledge Extraction)
+
+**Goal:** Enable verified experts to contribute knowledge to the community through AI-guided interview conversations
+
+**Timeline:** 2-3 days
+
+**Why Phase 0:**
+- Simpler than shipwright mode (no split-view UI needed)
+- Provides immediate value to community owners (Eli can improve Careersy content)
+- Tests the mode system before building complex collaborate UI
+- Starts building RAG knowledge base for Phase 4
+- Validates expert verification pathways
+
+---
+
+### Design Principles
+
+**Core Concept:**
+Cartographer mode transforms expert conversations into structured community knowledge. The AI acts as an intelligent interviewer, extracting expertise through targeted questions and documenting it for future learners.
+
+**Key Differences from Navigator & Shipwright:**
+- **Navigator**: AI answers user questions directly
+- **Shipwright**: AI helps craft posts users will publish
+- **Cartographer**: AI extracts knowledge from experts through interview
+
+---
+
+### Expert Verification Pathways
+
+Experts cannot self-nominate. Three pathways to expert status:
+
+1. **Community-Verified**
+   - Platform detects through upvotes + engagement metrics
+   - High-quality answers, consistent helpfulness
+   - Automatic promotion after threshold
+
+2. **Navigator-Identified**
+   - AI detects expertise during conversations
+   - Flags to voyage owner: "User X showed deep knowledge in Y"
+   - Owner reviews and approves
+
+3. **Manually Invited**
+   - Voyage owner directly adds email to `experts: []` array
+   - For known industry experts, community leaders, etc.
+
+**Implementation:**
+```typescript
+// In community config
+{
+  "experts": [
+    "expert@example.com",
+    "industry-leader@company.com"
+  ]
+}
+
+// Check in code
+export function isExpert(userEmail: string, communityId: string): boolean {
+  const config = getCommunityConfig(communityId)
+  if (!config) return false
+  return config.experts.includes(userEmail)
+}
+```
+
+---
+
+### UI/UX Design
+
+**Mode Selection (Header Toggle - Experts Only):**
+
+```
+┌─────────────────────────────────────┐
+│ [🧭 Navigator ▼]  [New Chat]  [☰]  │
+│      ↓                              │
+│  ┌───────────────────────────┐     │
+│  │ 🧭 Navigator (private)    │     │
+│  │ 🗺️  Cartographer (share)  │     │
+│  └───────────────────────────┘     │
+└─────────────────────────────────────┘
+```
+
+**Toggle Behavior:**
+- Only visible to verified experts
+- Defaults to Navigator (private coaching)
+- Switch to Cartographer when ready to share knowledge
+- Clean, unobtrusive dropdown (similar to Google Docs editing modes)
+
+**First-Time Expert Onboarding:**
+- Small tooltip on toggle: "✨ You're an expert! Use Cartographer mode to share knowledge with the community"
+- Auto-dismisses after 5 seconds or first click
+- Never shown again (localStorage)
+
+---
+
+### Trigger Logic (Hybrid Approach)
+
+**Automatic Suggestion:**
+If expert is in Navigator mode and conversation reaches depth 4+ exchanges:
+- Navigator prompts ONCE: "💡 This conversation has valuable insights. Want to switch to Cartographer mode to share with the community?"
+- Inline buttons: `[Yes, switch] [No, keep private]`
+- If "keep private", never ask again for this conversation
+
+**Respects Expert Intent:**
+- Default = private coaching (Navigator mode)
+- Opt-in to share = explicit toggle choice
+- One gentle prompt if deep conversation emerges = helpful suggestion, not nagging
+
+---
+
+### Cartographer Prompt Behavior
+
+**Role:** Intelligent interviewer extracting structured knowledge
+
+**Approach:**
+1. **Deep Questions:** Ask follow-up questions to uncover nuance
+   - "What challenges did you face when implementing that?"
+   - "How did you decide between X and Y approach?"
+   - "What would you do differently knowing what you know now?"
+
+2. **Context Extraction:** Pull out practical details
+   - Specific tools, frameworks, versions
+   - Timeline and team size
+   - Measurable outcomes
+   - Mistakes made and lessons learned
+
+3. **Structured Documentation:** Format knowledge for future readers
+   - Clear problem statement
+   - Step-by-step approach
+   - Concrete examples
+   - Actionable takeaways
+
+**Example Interaction:**
+
+```
+User: "I've been optimizing our Django app performance"
+
+Cartographer: "That's valuable experience! Let me help document this for
+others tackling similar challenges.
+
+A few questions:
+- What were the main performance bottlenecks you discovered?
+- What was the scale you were working at (users, requests, data size)?
+- Which optimization had the biggest impact?"
+
+User: [Provides detailed answers]
+
+Cartographer: "Excellent! Here's how I'd structure this knowledge for the
+community:
+
+**Title:** Cutting Django P95 Latency by 38% at Scale
+
+**Context:** 50k DAU, 2M+ database rows, checkout flow bottleneck
+
+**Key Optimizations:**
+1. ORM N+1 query elimination (select_related/prefetch_related)
+2. Redis caching for session data
+3. Database index optimization on foreign keys
+
+**Impact:** P95 latency dropped from 2.1s → 1.3s, checkout conversion +3.2%
+
+**Lessons Learned:**
+- Profile first, optimize second (used Django Debug Toolbar)
+- Cache invalidation strategy matters more than cache hits
+- Index on foreign keys often overlooked
+
+Ready to publish this? I can refine any section."
+```
+
+---
+
+### Implementation Tasks
+
+#### 1. Mode System Foundation (Completed ✅)
+
+**API Updates:**
+- ✅ Refactor `curateMode` → `mode: 'navigator' | 'shipwright' | 'cartographer'`
+- ✅ Update `/api/chat-stream` to accept mode parameter
+- ✅ Update `/api/chat` to accept mode parameter
+- ✅ Remove all `curateMode` references
+- ✅ Keep `isPublic` field (default false)
+
+**Community Config Updates:**
+- ✅ Rename `coach` → `navigator` in community JSON files
+- ✅ Rename `curator` → `shipwright` in community JSON files
+- ✅ Update `getCommunitySystemPrompt()` function signature
+- ✅ Add resume/artifact context to all modes
+
+**Files Modified:**
+- `/app/api/chat-stream/route.ts`
+- `/app/api/chat/route.ts`
+- `/lib/communities.ts`
+- `/communities/careersy.json`
+- `/communities/voyager.json`
+
+#### 2. Cartographer Prompts (Next)
+
+**Add to Community Configs:**
+```json
+{
+  "modes": {
+    "navigator": { ... },
+    "shipwright": { ... },
+    "cartographer": {
+      "banner": "🗺️ **CARTOGRAPHER MODE ACTIVE** 🗺️",
+      "role": "Knowledge Cartographer",
+      "behavior": "Extract and document expert knowledge through intelligent interviewing. Ask deep questions, uncover nuance, structure insights for future learners.",
+      "style": "Curious, thorough, and structured",
+
+      "approach": {
+        "message1": "Acknowledge their expertise, ask 2-3 deep questions (challenges faced, decisions made, outcomes achieved)",
+        "message2-3": "Follow up on interesting points, extract specific details (tools, timeline, metrics, mistakes)",
+        "message4-5": "Propose structured documentation in clear format with context, approach, impact, lessons learned"
+      },
+
+      "extractionFocus": [
+        "Specific tools, frameworks, versions used",
+        "Timeline and team size",
+        "Measurable outcomes and metrics",
+        "Mistakes made and lessons learned",
+        "Decisions made and why",
+        "What they'd do differently"
+      ],
+
+      "documentationFormat": "**Title:** [Clear, specific title]\n\n**Context:** [Scale, constraints, problem]\n\n**Approach:** [What they did, step-by-step]\n\n**Impact:** [Measurable results]\n\n**Lessons Learned:** [Key takeaways]",
+
+      "reminders": [
+        "✅ Ask deep follow-up questions",
+        "✅ Extract specific, concrete details",
+        "✅ Structure knowledge for future learners",
+        "✅ Focus on practical, actionable insights",
+        "❌ Don't just transcribe - synthesize and structure"
+      ]
+    }
+  }
+}
+```
+
+#### 3. Expert-Only UI Toggle
+
+**Add to ChatInterface.tsx:**
+```typescript
+// Check if user is expert
+const [isExpert, setIsExpert] = useState(false)
+const [currentMode, setCurrentMode] = useState<'navigator' | 'shipwright' | 'cartographer'>('navigator')
+
+useEffect(() => {
+  if (session?.user?.email) {
+    const expert = isExpertUser(session.user.email, communityId)
+    setIsExpert(expert)
+
+    // Show onboarding tooltip for first-time experts
+    if (expert && !localStorage.getItem(`${communityId}_expert_onboarded`)) {
+      showExpertOnboarding()
+    }
+  }
+}, [session, communityId])
+
+// Mode toggle dropdown (only shown to experts)
+{isExpert && (
+  <div className="relative">
+    <button onClick={() => setShowModeMenu(!showModeMenu)}>
+      {getModeIcon(currentMode)} {getModeLabel(currentMode)} ▼
+    </button>
+
+    {showModeMenu && (
+      <div className="absolute dropdown-menu">
+        <button onClick={() => switchMode('navigator')}>
+          🧭 Navigator (private)
+        </button>
+        <button onClick={() => switchMode('cartographer')}>
+          🗺️ Cartographer (share)
+        </button>
+      </div>
+    )}
+  </div>
+)}
+```
+
+#### 4. Depth-Based Suggestion
+
+**Add to sendMessage() in ChatInterface.tsx:**
+```typescript
+// After receiving AI response
+if (isExpert && currentMode === 'navigator' && messages.length >= 8) {
+  // Depth 4+ (8 messages = 4 exchanges)
+  const hasAskedBefore = sessionStorage.getItem(`${conversationId}_asked_cartographer`)
+
+  if (!hasAskedBefore) {
+    // Add suggestion to AI response
+    const suggestion = "\n\n💡 This conversation has valuable insights. Want to switch to Cartographer mode to share with the community?"
+    // Show inline buttons: [Yes, switch] [No, keep private]
+    sessionStorage.setItem(`${conversationId}_asked_cartographer`, 'true')
+  }
+}
+```
+
+#### 5. Testing & Iteration
+
+**Test Cases:**
+- ✅ Non-expert users: No toggle visible, Navigator mode only
+- Expert users: Toggle visible, both modes accessible
+- Mode switch: Conversation continues smoothly with new prompt
+- Depth suggestion: Appears once at depth 4+, respects "keep private"
+- Onboarding: Tooltip shows once, never again
+
+---
+
+### Phase 3 Enhancement: Mode Terminology Override
+
+**Deferred to Phase 3** - Allow communities to customize mode names while keeping platform consistency.
+
+```json
+{
+  "id": "careersy",
+  "modeTerminology": {
+    "navigator": {
+      "name": "Career Coach",
+      "description": "Get personalized career advice",
+      "icon": "💼"
+    },
+    "cartographer": {
+      "name": "Knowledge Contributor",
+      "description": "Share your expertise with the community",
+      "icon": "🎓"
+    }
+  },
+  "modes": {
+    "navigator": { ... },
+    "shipwright": { ... },
+    "cartographer": { ... }
+  }
+}
+```
+
+**Implementation:**
+```typescript
+export function getModeTerminology(
+  communityId: string,
+  mode: 'navigator' | 'shipwright' | 'cartographer'
+) {
+  const config = getCommunityConfig(communityId)
+  return config?.modeTerminology?.[mode] || DEFAULT_MODE_TERMINOLOGY[mode]
+}
+```
+
+---
+
+### Success Metrics
+
+**Launch Criteria:**
+- ✅ Mode system refactored (navigator/shipwright/cartographer)
+- ✅ API endpoints updated and tested
+- Expert toggle UI functional
+- Cartographer prompts live in both communities
+- At least 1 expert conversation documented
+
+**Growth Metrics:**
+- Number of expert conversations per week
+- Quality of documented knowledge (readability, actionability)
+- Usage by non-experts (views, references to expert knowledge)
+- Expert retention (do they keep contributing?)
 
 ---
 

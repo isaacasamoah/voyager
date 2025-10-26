@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, conversationId, communityId = 'careersy', curateMode = false, incomingHistory } = await req.json()
+    const { message, conversationId, communityId = 'careersy', mode = 'navigator', incomingHistory } = await req.json()
 
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -35,11 +35,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Build system prompt from community config
-    // Use curator prompt if curateMode is enabled
-    let systemPrompt = getCommunitySystemPrompt(communityConfig, {
-      curateMode,
-      contentType: 'message'
-    })
+    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode })
 
     // Voyager: No auth required, no conversation history
     if (communityId === 'voyager') {
@@ -70,21 +66,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Not a member of this community' }, { status: 403 })
     }
 
-    // Add resume context if available (but not in curator mode)
-    if (user?.resumeText && !curateMode) {
-      systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
+    // Add resume context if available (all modes benefit from context)
+    if (user?.resumeText) {
+      systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized advice based on their actual experience, skills, and background.`
     }
 
     // Get conversation history
-    // In curate mode with ephemeral messages, use passed messages from React state
+    // If incoming history provided (e.g., ephemeral draft mode), use it
     // Otherwise, load from database
     let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
     if (incomingHistory && Array.isArray(incomingHistory)) {
-      // Use ephemeral messages passed from frontend (curate mode)
+      // Use ephemeral messages passed from frontend
       conversationHistory = incomingHistory
     } else if (conversationId) {
-      // Load from database (normal mode)
+      // Load from database
       const conversation = await prisma.conversation.findUnique({
         where: { id: conversationId, userId: session.user.id },
         include: {

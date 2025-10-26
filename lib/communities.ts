@@ -152,9 +152,8 @@ export function getAllCommunityConfigs(): CommunityConfig[] {
 /**
  * Get community system prompt - Modular composition
  */
-export function getCommunitySystemPrompt(config: CommunityConfig, options?: { curateMode?: boolean, contentType?: string }): string {
-  const curateMode = options?.curateMode || false
-  const mode = curateMode ? 'curator' : 'coach'
+export function getCommunitySystemPrompt(config: CommunityConfig, options?: { mode?: 'navigator' | 'shipwright' | 'cartographer' }): string {
+  const mode = options?.mode || 'navigator'
 
   // If no modular structure, return fallback
   if (!config.domainExpertise || !config.modes) {
@@ -206,71 +205,71 @@ Provide thoughtful, accurate responses to help users learn and grow.`
   // === MODE BEHAVIOR SECTION ===
   sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━`)
 
-  if (mode === 'curator' && modeConfig.banner) {
+  if (mode === 'shipwright' && modeConfig.banner) {
     sections.push(`\n${modeConfig.banner}`)
   } else {
     sections.push(`\n**MODE: ${mode.toUpperCase()}**`)
   }
 
-  if (mode === 'curator' && (modeConfig as any).role) {
+  if (mode === 'shipwright' && (modeConfig as any).role) {
     sections.push(`\nYou are the ${(modeConfig as any).role}.`)
   }
 
   sections.push(`\n${modeConfig.behavior}`)
   sections.push(`\nStyle: ${modeConfig.style}`)
 
-  // === CURATOR-SPECIFIC SECTIONS ===
-  if (mode === 'curator') {
-    const curator = modeConfig as any
+  // === SHIPWRIGHT-SPECIFIC SECTIONS ===
+  if (mode === 'shipwright') {
+    const shipwright = modeConfig as any
 
-    if (curator.criticalDirective) {
-      sections.push(`\n\n**CRITICAL:** ${curator.criticalDirective}`)
+    if (shipwright.criticalDirective) {
+      sections.push(`\n\n**CRITICAL:** ${shipwright.criticalDirective}`)
     }
 
-    if (curator.expertiseUsage) {
-      sections.push(`\n\n**How to use your expertise:** ${curator.expertiseUsage}`)
+    if (shipwright.expertiseUsage) {
+      sections.push(`\n\n**How to use your expertise:** ${shipwright.expertiseUsage}`)
     }
 
-    if (curator.goodExpertiseUse && curator.goodExpertiseUse.length > 0) {
+    if (shipwright.goodExpertiseUse && shipwright.goodExpertiseUse.length > 0) {
       sections.push(`\n\n**Good uses of expertise:**`)
-      curator.goodExpertiseUse.forEach((use: string) => sections.push(`- ${use}`))
+      shipwright.goodExpertiseUse.forEach((use: string) => sections.push(`- ${use}`))
     }
 
-    if (curator.badExpertiseUse && curator.badExpertiseUse.length > 0) {
+    if (shipwright.badExpertiseUse && shipwright.badExpertiseUse.length > 0) {
       sections.push(`\n\n**Bad uses of expertise (avoid):**`)
-      curator.badExpertiseUse.forEach((use: string) => sections.push(`- ${use}`))
+      shipwright.badExpertiseUse.forEach((use: string) => sections.push(`- ${use}`))
     }
 
-    if (curator.approach) {
+    if (shipwright.approach) {
       sections.push(`\n\n**YOUR APPROACH:**`)
-      sections.push(`- Message 1: ${curator.approach.message1}`)
-      sections.push(`- Message 2-3: ${curator.approach.message2or3}`)
-      sections.push(`- Timing: ${curator.approach.timing}`)
+      sections.push(`- Message 1: ${shipwright.approach.message1}`)
+      sections.push(`- Message 2-3: ${shipwright.approach.message2or3}`)
+      sections.push(`- Timing: ${shipwright.approach.timing}`)
     }
 
-    if (curator.postFormat) {
-      sections.push(`\n\nPost format: ${curator.postFormat}`)
+    if (shipwright.postFormat) {
+      sections.push(`\n\nPost format: ${shipwright.postFormat}`)
     }
 
-    if (curator.postStructure) {
-      sections.push(`\nPost structure:\n${curator.postStructure}`)
+    if (shipwright.postStructure) {
+      sections.push(`\nPost structure:\n${shipwright.postStructure}`)
     }
 
-    if (curator.reminders && curator.reminders.length > 0) {
+    if (shipwright.reminders && shipwright.reminders.length > 0) {
       sections.push(`\n\n**REMINDERS:**`)
-      curator.reminders.forEach((reminder: string) => sections.push(reminder))
+      shipwright.reminders.forEach((reminder: string) => sections.push(reminder))
     }
 
-    if (curator.exampleInteraction) {
+    if (shipwright.exampleInteraction) {
       sections.push(`\n\n**EXAMPLE INTERACTION:**`)
-      sections.push(`\nUser: "${curator.exampleInteraction.user}"`)
-      sections.push(`\nYou: "${curator.exampleInteraction.response1}"`)
-      sections.push(`\nUser: "${curator.exampleInteraction.user2}"`)
-      sections.push(`\nYou: "${curator.exampleInteraction.response2}"`)
+      sections.push(`\nUser: "${shipwright.exampleInteraction.user}"`)
+      sections.push(`\nYou: "${shipwright.exampleInteraction.response1}"`)
+      sections.push(`\nUser: "${shipwright.exampleInteraction.user2}"`)
+      sections.push(`\nYou: "${shipwright.exampleInteraction.response2}"`)
     }
   }
-  // === COACH-SPECIFIC SECTIONS ===
-  else if (mode === 'coach' && modeConfig.guidance) {
+  // === NAVIGATOR-SPECIFIC SECTIONS ===
+  else if (mode === 'navigator' && modeConfig.guidance) {
     sections.push(`\n\n**Guidance:** ${modeConfig.guidance}`)
   }
 
