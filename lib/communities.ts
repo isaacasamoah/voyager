@@ -227,13 +227,17 @@ Provide thoughtful, accurate responses to help users learn and grow.`
   // === MODE BEHAVIOR SECTION ===
   sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━`)
 
-  if (mode === 'shipwright' && modeConfig.banner) {
-    sections.push(`\n${modeConfig.banner}`)
+  if (mode === 'shipwright' && (modeConfig as any).banner) {
+    sections.push(`\n${(modeConfig as any).banner}`)
+  } else if (mode === 'cartographer' && (modeConfig as any).banner) {
+    sections.push(`\n${(modeConfig as any).banner}`)
   } else {
     sections.push(`\n**MODE: ${mode.toUpperCase()}**`)
   }
 
   if (mode === 'shipwright' && (modeConfig as any).role) {
+    sections.push(`\nYou are the ${(modeConfig as any).role}.`)
+  } else if (mode === 'cartographer' && (modeConfig as any).role) {
     sections.push(`\nYou are the ${(modeConfig as any).role}.`)
   }
 
