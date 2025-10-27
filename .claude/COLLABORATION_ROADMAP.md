@@ -379,6 +379,64 @@ const mergedKnowledge = {
 
 ---
 
+### Voyager Developer Community
+
+**Design Decision (2025-10-26):**
+Convert Voyager from meta-navigation to a full developer community about the platform itself.
+
+#### Purpose
+
+**Before:** Voyager was just a community switcher (showsCommunities: true)
+**After:** Voyager becomes a real community for platform developers, contributors, and users learning the platform
+
+**Domain Expertise:** Platform architecture, features, best practices, recent changes
+**Expert:** isaacasamoah@gmail.com (platform creator)
+
+#### Knowledge Sources
+
+**Runtime Loading Approach:**
+
+Instead of build-time indexing, load platform knowledge at runtime from `.claude/*.md` files:
+
+```typescript
+// In getCommunitySystemPrompt() for voyager
+if (communityId === 'voyager') {
+  const designDocs = loadClaudeMarkdownFiles('.claude/')
+  // Append to domain expertise:
+  // - COLLABORATION_ROADMAP.md
+  // - DYNAMIC_PROMPTS_LEARNED_ROUTING.md
+  // - CONTEXT.md
+  // etc.
+}
+```
+
+**Benefits:**
+- ✅ Always current (edit .md file → immediately available)
+- ✅ Simple implementation (just read files)
+- ✅ Git-tracked (docs already version controlled)
+- ✅ Motivates keeping docs up to date
+- ✅ Cache-able for performance
+
+**Drawbacks:**
+- Slower than pre-indexed (mitigated by caching)
+- Requires file system access (fine for server-side)
+
+**Implementation:**
+1. Update `voyager.json` with full modular structure (domainExpertise + modes)
+2. Add isaacasamoah@gmail.com to experts array
+3. Modify `getCommunitySystemPrompt()` to load `.claude/*.md` for voyager
+4. Cache loaded docs per request (avoid re-reading)
+
+**Knowledge Categories:**
+- **Architecture:** How modes work, prompt composition, knowledge extraction
+- **Features:** Communities, modes (navigator/shipwright/cartographer), RAG
+- **Design Decisions:** Why certain choices were made (from roadmap docs)
+- **Recent Changes:** What's been added (from git commits, later phase)
+
+This enables Voyager to become a self-documenting platform where the AI knows its own architecture and can help developers understand, extend, and contribute to it.
+
+---
+
 ### Implementation Tasks
 
 #### 1. Mode System Foundation (Completed ✅)
