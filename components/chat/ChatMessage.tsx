@@ -35,7 +35,7 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
         }}
       >
         {message.role === 'user' ? (
-          <p className="whitespace-pre-wrap" style={{ color: '#000000' }}>{message.content}</p>
+          <p className="whitespace-pre-wrap" style={{ color: '#000000 !important' } as React.CSSProperties}>{message.content}</p>
         ) : (
           <div
             className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:font-semibold"
