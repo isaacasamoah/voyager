@@ -48,6 +48,7 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
             onChange={(e) => setResumeText(e.target.value)}
             placeholder="Paste any of the following:&#10;&#10;• Resume/CV&#10;• Job description&#10;• LinkedIn profile&#10;• Cover letter&#10;• Interview questions&#10;• Career goals"
             className="w-full h-full min-h-[300px] p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-careersy-yellow focus:border-transparent resize-none"
+            style={{ color: '#000000' }}
           />
         </div>
 
@@ -57,6 +58,7 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
             onClick={onClose}
             disabled={saving}
             className="px-6 py-3 border-2 border-gray-300 rounded-[30px] font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50"
+            style={{ color: '#000000' }}
           >
             Cancel
           </button>
