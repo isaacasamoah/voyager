@@ -30,7 +30,7 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
         className="max-w-[80%] rounded-xl p-4 shadow-lg border-2"
         style={{
           backgroundColor: message.role === 'user' ? colors.primary : '#ffffff',
-          color: colors.text,
+          color: message.role === 'user' ? '#000000' : colors.text,
           borderColor: message.role === 'user' ? colors.primary : `${colors.primary}33` // 33 = 20% opacity in hex
         }}
       >
