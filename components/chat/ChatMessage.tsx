@@ -40,13 +40,14 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
           <div
             className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:font-semibold"
             style={{
-              color: colors.text,
-              // Override prose default colors to use community branding
-              ['--tw-prose-body' as any]: colors.text,
-              ['--tw-prose-headings' as any]: colors.text,
-              ['--tw-prose-links' as any]: colors.primary,
-              ['--tw-prose-bold' as any]: colors.text,
-              ['--tw-prose-bullets' as any]: colors.text,
+              color: '#000000', // Hardcoded black for testing
+              // Override prose default colors - hardcoded for testing
+              ['--tw-prose-body' as any]: '#000000',
+              ['--tw-prose-headings' as any]: '#000000',
+              ['--tw-prose-links' as any]: '#000000',
+              ['--tw-prose-bold' as any]: '#000000',
+              ['--tw-prose-bullets' as any]: '#000000',
+              ['--tw-prose-code' as any]: '#000000',
             }}
           >
             <ReactMarkdown>{message.content}</ReactMarkdown>
