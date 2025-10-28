@@ -332,7 +332,7 @@ Provide thoughtful, accurate responses to help users learn and grow.`
     }
   }
   // === NAVIGATOR-SPECIFIC SECTIONS ===
-  else if (mode === 'navigator' && modeConfig.guidance) {
+  else if (mode === 'navigator' && 'guidance' in modeConfig && modeConfig.guidance) {
     sections.push(`\n\n**Guidance:** ${modeConfig.guidance}`)
   }
 
