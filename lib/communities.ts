@@ -45,15 +45,16 @@ export interface CommunityConfig {
     [key: string]: any  // Allow flexible domain-specific fields
   }
   modes?: {
-    coach?: {
+    navigator?: {
       behavior: string
       style: string
       guidance?: string
     }
-    curator?: {
+    shipwright?: {
       banner?: string
       role?: string
       behavior: string
+      style: string
       criticalDirective?: string
       expertiseUsage?: string
       goodExpertiseUse?: string[]
@@ -65,6 +66,27 @@ export interface CommunityConfig {
       }
       postFormat?: string
       postStructure?: string
+      reminders?: string[]
+      exampleInteraction?: {
+        user: string
+        response1: string
+        user2: string
+        response2: string
+      }
+    }
+    cartographer?: {
+      banner?: string
+      role?: string
+      behavior: string
+      style: string
+      criticalDirective?: string
+      approach?: {
+        message1: string
+        "message2-3": string
+        "message4-5": string
+      }
+      extractionFocus?: string[]
+      documentationFormat?: string
       reminders?: string[]
       exampleInteraction?: {
         user: string
@@ -205,13 +227,17 @@ Provide thoughtful, accurate responses to help users learn and grow.`
   // === MODE BEHAVIOR SECTION ===
   sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━`)
 
-  if (mode === 'shipwright' && modeConfig.banner) {
-    sections.push(`\n${modeConfig.banner}`)
+  if (mode === 'shipwright' && (modeConfig as any).banner) {
+    sections.push(`\n${(modeConfig as any).banner}`)
+  } else if (mode === 'cartographer' && (modeConfig as any).banner) {
+    sections.push(`\n${(modeConfig as any).banner}`)
   } else {
     sections.push(`\n**MODE: ${mode.toUpperCase()}**`)
   }
 
   if (mode === 'shipwright' && (modeConfig as any).role) {
+    sections.push(`\nYou are the ${(modeConfig as any).role}.`)
+  } else if (mode === 'cartographer' && (modeConfig as any).role) {
     sections.push(`\nYou are the ${(modeConfig as any).role}.`)
   }
 
@@ -266,6 +292,43 @@ Provide thoughtful, accurate responses to help users learn and grow.`
       sections.push(`\nYou: "${shipwright.exampleInteraction.response1}"`)
       sections.push(`\nUser: "${shipwright.exampleInteraction.user2}"`)
       sections.push(`\nYou: "${shipwright.exampleInteraction.response2}"`)
+    }
+  }
+  // === CARTOGRAPHER-SPECIFIC SECTIONS ===
+  else if (mode === 'cartographer') {
+    const cartographer = modeConfig as any
+
+    if (cartographer.criticalDirective) {
+      sections.push(`\n\n**CRITICAL:** ${cartographer.criticalDirective}`)
+    }
+
+    if (cartographer.approach) {
+      sections.push(`\n\n**YOUR APPROACH:**`)
+      sections.push(`- Message 1: ${cartographer.approach.message1}`)
+      sections.push(`- Messages 2-3: ${cartographer.approach["message2-3"]}`)
+      sections.push(`- Messages 4-5: ${cartographer.approach["message4-5"]}`)
+    }
+
+    if (cartographer.extractionFocus && cartographer.extractionFocus.length > 0) {
+      sections.push(`\n\n**What to extract:**`)
+      cartographer.extractionFocus.forEach((focus: string) => sections.push(`- ${focus}`))
+    }
+
+    if (cartographer.documentationFormat) {
+      sections.push(`\n\n**Documentation format:**\n${cartographer.documentationFormat}`)
+    }
+
+    if (cartographer.reminders && cartographer.reminders.length > 0) {
+      sections.push(`\n\n**REMINDERS:**`)
+      cartographer.reminders.forEach((reminder: string) => sections.push(reminder))
+    }
+
+    if (cartographer.exampleInteraction) {
+      sections.push(`\n\n**EXAMPLE INTERACTION:**`)
+      sections.push(`\nUser: "${cartographer.exampleInteraction.user}"`)
+      sections.push(`\nYou: "${cartographer.exampleInteraction.response1}"`)
+      sections.push(`\nUser: "${cartographer.exampleInteraction.user2}"`)
+      sections.push(`\nYou: "${cartographer.exampleInteraction.response2}"`)
     }
   }
   // === NAVIGATOR-SPECIFIC SECTIONS ===
