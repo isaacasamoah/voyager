@@ -76,9 +76,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Auto-focus input when tutorial starts or ends
+  // Auto-focus input when tutorial starts or ends (but not on mobile to prevent zoom)
   useEffect(() => {
-    inputRef.current?.focus()
+    // Only auto-focus on desktop (viewport width >= 768px)
+    if (window.innerWidth >= 768) {
+      inputRef.current?.focus()
+    }
   }, [showTutorial])
 
   // Check if user needs tutorial (first time only)
@@ -407,7 +410,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             <ChatMessage
               key={idx}
               message={msg}
-              primaryColor={fullBranding.colors.primary}
+              branding={fullBranding}
             />
           ))}
 
@@ -464,7 +467,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="What's your next career move?"
-                  className={`w-full px-4 py-3 md:px-6 md:py-4 pr-12 md:pr-14 ${fullBranding.components.input} transition-colors text-sm md:${fullBranding.typography.input.size} placeholder:text-gray-400`}
+                  className={`w-full px-4 py-3 md:px-6 md:py-4 pr-12 md:pr-14 ${fullBranding.components.input} transition-colors text-base placeholder:text-gray-400`}
                   disabled={loading}
                 />
 

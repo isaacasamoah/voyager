@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import { Inter, Lexend_Deca } from 'next/font/google'
 import './globals.css'
 import { SessionProvider } from '@/components/SessionProvider'
@@ -9,6 +9,13 @@ const lexend = Lexend_Deca({ subsets: ['latin'], variable: '--font-lexend' })
 export const metadata: Metadata = {
   title: 'Voyager - AI Co-Learning Communities',
   description: 'A co-learning AI ecosystem where you connect, learn, and collaborate on what you\'re passionate about',
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1, // Prevents zoom on iOS
+  userScalable: false, // Prevents pinch-to-zoom (optional, can remove if you want zoom capability)
 }
 
 export default function RootLayout({
