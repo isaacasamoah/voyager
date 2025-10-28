@@ -268,10 +268,23 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   }
 
   return (
-    <div className="flex h-screen" style={{ backgroundColor: fullBranding.colors.background }}>
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: fullBranding.colors.background, height: '100dvh' }}>
       {/* Sidebar - Mobile-first: full screen overlay on mobile, fixed width on desktop */}
       {showSidebar && (
         <div className={`fixed md:relative inset-0 md:inset-auto z-50 md:z-auto w-full md:w-64 ${fullBranding.components.sidebar} flex flex-col`}>
+          {/* Mobile Close Button (top-right) */}
+          <div className="md:hidden flex justify-end px-4 pt-4 pb-2">
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Close sidebar"
+            >
+              <svg className="w-5 h-5" style={{ color: fullBranding.colors.text }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
