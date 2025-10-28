@@ -269,9 +269,9 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
 
   return (
     <div className="flex h-screen" style={{ backgroundColor: fullBranding.colors.background }}>
-      {/* Sidebar - Minimal Space Style */}
+      {/* Sidebar - Mobile-first: full screen overlay on mobile, fixed width on desktop */}
       {showSidebar && (
-        <div className={`w-64 ${fullBranding.components.sidebar} flex flex-col`}>
+        <div className={`fixed md:relative inset-0 md:inset-auto z-50 md:z-auto w-full md:w-64 ${fullBranding.components.sidebar} flex flex-col`}>
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
@@ -332,8 +332,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header - Voyager Style with Collaborate Mode */}
-        <div className="flex-shrink-0 px-6 py-4 bg-white flex items-center justify-between border-b border-gray-100">
+        {/* Header - Mobile-first: smaller padding on mobile */}
+        <div className="flex-shrink-0 px-4 py-3 md:px-6 md:py-4 bg-white flex items-center justify-between border-b border-gray-100">
           {/* Left: Hamburger + Replay Tutorial */}
           <div className="flex items-center gap-2">
             <button
@@ -368,8 +368,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           </button>
         </div>
 
-        {/* Messages Container */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6">
+        {/* Messages Container - Mobile-first: less padding on mobile */}
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -377,12 +377,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   <Image
                     src={fullBranding.logo}
                     alt={communityConfig.name}
-                    width={120}
-                    height={120}
-                    className="object-contain mx-auto mb-6 opacity-90"
+                    width={80}
+                    height={80}
+                    className="object-contain mx-auto mb-4 md:mb-6 opacity-90 w-16 h-16 md:w-24 md:h-24 lg:w-30 lg:h-30"
                   />
                 )}
-                <h1 className={`${fullBranding.typography.title.font} ${fullBranding.typography.title.size} ${fullBranding.typography.title.weight} ${fullBranding.typography.title.tracking} mb-2`} style={{ color: fullBranding.colors.text }}>
+                <h1 className={`${fullBranding.typography.title.font} text-4xl md:text-5xl lg:${fullBranding.typography.title.size} ${fullBranding.typography.title.weight} ${fullBranding.typography.title.tracking} mb-2`} style={{ color: fullBranding.colors.text }}>
                   {fullBranding.title}
                 </h1>
                 <div className="w-48 h-[1px] bg-gray-200 mx-auto mt-6"></div>
@@ -414,16 +414,16 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         </div>
 
 
-        {/* Input Form - Voyager Style */}
-        <form onSubmit={sendMessage} className="flex-shrink-0 p-8 bg-white">
-          <div style={{ width: fullBranding.spacing.inputWidth }} className="mx-auto">
+        {/* Input Form - Mobile-first: less padding, full width on mobile */}
+        <form onSubmit={sendMessage} className="flex-shrink-0 p-4 md:p-6 lg:p-8 bg-white">
+          <div className="w-full max-w-2xl mx-auto px-2 md:px-0">
             {/* Message Input with Add Context + Submit */}
             <div className="flex items-center gap-2">
-              {/* Add Files Button */}
+              {/* Add Files Button - Mobile-first: slightly smaller on mobile */}
               <button
                 type="button"
                 onClick={() => setShowResumeModal(true)}
-                className="flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center transition-colors group relative"
+                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 border rounded-full flex items-center justify-center transition-colors group relative"
                 style={{ borderColor: fullBranding.colors.border }}
                 onMouseEnter={(e) => e.currentTarget.style.borderColor = fullBranding.colors.borderHover}
                 onMouseLeave={(e) => e.currentTarget.style.borderColor = fullBranding.colors.border}
@@ -443,7 +443,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                 </div>
               </button>
 
-              {/* Input Field with Submit Button */}
+              {/* Input Field with Submit Button - Mobile-first: less padding on mobile */}
               <div className="flex-1 relative">
                 <input
                   ref={inputRef}
@@ -451,15 +451,15 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   placeholder="What's your next career move?"
-                  className={`w-full px-6 py-4 pr-14 ${fullBranding.components.input} transition-colors ${fullBranding.typography.input.size} placeholder:text-gray-400`}
+                  className={`w-full px-4 py-3 md:px-6 md:py-4 pr-12 md:pr-14 ${fullBranding.components.input} transition-colors text-sm md:${fullBranding.typography.input.size} placeholder:text-gray-400`}
                   disabled={loading}
                 />
 
-                {/* Submit Button - Inside input field */}
+                {/* Submit Button - Inside input field, smaller on mobile */}
                 <button
                   type="submit"
                   disabled={loading || !input.trim()}
-                  className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+                  className={`absolute right-1.5 md:right-2 top-1/2 -translate-y-1/2 w-9 h-9 md:w-10 md:h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
                   title="Send message"
                 >
                   <svg className="w-5 h-5" style={{ color: fullBranding.colors.userMessageText }} fill="currentColor" viewBox="0 0 24 24">
