@@ -539,9 +539,10 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   type="submit"
                   disabled={loading || !input.trim()}
                   className={`absolute right-1.5 md:right-2 top-1/2 -translate-y-1/2 w-9 h-9 md:w-10 md:h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+                  style={{ backgroundColor: fullBranding.colors.primary }}
                   title="Send message"
                 >
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M8 5v14l11-7z" />
                   </svg>
                 </button>

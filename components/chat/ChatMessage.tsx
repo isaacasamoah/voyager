@@ -27,9 +27,9 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
   }
 
   return (
-    <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}>
+    <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} w-full px-2`}>
       <div
-        className="max-w-[80%] rounded-xl p-4 shadow-lg border-2 break-words overflow-hidden"
+        className="max-w-[80%] min-w-0 rounded-xl p-4 shadow-lg border-2 break-words overflow-hidden"
         style={{
           backgroundColor: message.role === 'user' ? colors.primary : '#ffffff',
           color: message.role === 'user' ? (colors.userMessageText || '#ffffff') : colors.text,

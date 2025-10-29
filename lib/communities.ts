@@ -130,8 +130,19 @@ const COMMUNITIES_DIR = join(process.cwd(), 'communities')
    */
   export function getFullBranding(communityBranding:
   CommunityConfig['branding']) {
+    // Determine button text color based on primary background
+    // For Careersy yellow (#fad02c), use black text for contrast
+    // For dark backgrounds, use white text
+    const primaryColor = communityBranding.colors.primary
+    const isLightPrimary = primaryColor === '#fad02c' || primaryColor.toLowerCase().includes('yellow')
+    const buttonTextColor = isLightPrimary ? 'text-black' : 'text-white'
+
     return {
       ...VOYAGER_BASE_THEME,
+      components: {
+        ...VOYAGER_BASE_THEME.components,
+        button: `rounded-full hover:scale-105 ${buttonTextColor}`,
+      },
       colors: {
         ...communityBranding.colors,
         textSecondary: communityBranding.colors.textSecondary ||
@@ -227,6 +238,19 @@ Provide thoughtful, accurate responses to help users learn and grow.`
   })
 
   // === MODE BEHAVIOR SECTION ===
+  sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━`)
+
+  // === MODE CONTROL - MUST COME FIRST ===
+  // Critical: Tell AI what mode it's in BEFORE mode-specific instructions
+  sections.push(`\n\n**IMPORTANT - MODE CONTROL:**
+You are currently in **${mode}** mode. You MUST stay in this mode for the entire conversation.
+- DO NOT switch to other modes based on user intent
+- DO NOT suggest switching modes
+- If a task would benefit from a different mode, handle it within your current mode's capabilities
+- The user controls mode switching via UI buttons - you do not have this ability
+
+Stay in **${mode}** mode regardless of what the user asks.`)
+
   sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━`)
 
   if (mode === 'shipwright' && (modeConfig as any).banner) {
@@ -337,17 +361,6 @@ Provide thoughtful, accurate responses to help users learn and grow.`
   else if (mode === 'navigator' && 'guidance' in modeConfig && modeConfig.guidance) {
     sections.push(`\n\n**Guidance:** ${modeConfig.guidance}`)
   }
-
-  // === MODE CONTROL ===
-  // Critical: Prevent AI from switching modes on its own
-  sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━\n\n**IMPORTANT - MODE CONTROL:**
-You are currently in **${mode}** mode. You MUST stay in this mode for the entire conversation.
-- DO NOT switch to other modes based on user intent
-- DO NOT suggest switching modes
-- If a task would benefit from a different mode, handle it within your current mode's capabilities
-- The user controls mode switching via UI buttons - you do not have this ability
-
-Stay in **${mode}** mode regardless of what the user asks.`)
 
   // === CONSTITUTIONAL LAYER ===
   // Prepend Voyager constitution if feature flag is enabled
