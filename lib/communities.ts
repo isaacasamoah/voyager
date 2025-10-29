@@ -187,9 +187,10 @@ export function getAllCommunityConfigs(): CommunityConfig[] {
 /**
  * Get community system prompt - Modular composition
  */
-export function getCommunitySystemPrompt(config: CommunityConfig, options?: { mode?: 'navigator' | 'shipwright' | 'cartographer', communityId?: string }): string {
+export function getCommunitySystemPrompt(config: CommunityConfig, options?: { mode?: 'navigator' | 'shipwright' | 'cartographer', communityId?: string, abTestMode?: 'basic' | 'full' }): string {
   const mode = options?.mode || 'navigator'
   const communityId = options?.communityId || config.id
+  const abTestMode = options?.abTestMode
 
   // If no modular structure, return fallback
   if (!config.domainExpertise || !config.modes) {
@@ -369,15 +370,18 @@ Stay in **${mode}** mode regardless of what the user asks.`)
 
   // === CONSTITUTIONAL LAYER ===
   // Prepend Voyager constitution if:
-  // 1. Feature flag is enabled AND
+  // 1. Constitutional flag is enabled AND
   // 2. NOT in Careersy basic mode (A/B test control group)
-  const isBasicMode = communityId === 'careersy' && FEATURE_FLAGS.CAREERSY_MODE === 'basic'
+  // Use runtime abTestMode if provided, otherwise fall back to static flag
+  const effectiveMode = abTestMode || (communityId === 'careersy' ? FEATURE_FLAGS.CAREERSY_MODE : 'full')
+  const isBasicMode = communityId === 'careersy' && effectiveMode === 'basic'
   const constitutionalPrefix = (FEATURE_FLAGS.USE_CONSTITUTIONAL_LAYER && !isBasicMode)
     ? `${VOYAGER_CONSTITUTION}\n\n━━━━━━━━━━━━━━━━━━━━━\n\n`
     : '';
 
-  // Debug: Log to verify mode and flag
+  // Debug: Log to verify mode (runtime or static)
   console.log('[Careersy A/B Test]', isBasicMode ? 'BASIC MODE (GPT + domain only)' : 'FULL VOYAGER (Claude + constitutional)');
+  console.log('[Mode Source]', abTestMode ? `Runtime: ${abTestMode}` : `Static: ${FEATURE_FLAGS.CAREERSY_MODE}`);
   console.log('[Voyager Constitution]', (FEATURE_FLAGS.USE_CONSTITUTIONAL_LAYER && !isBasicMode) ? 'ENABLED' : 'DISABLED');
 
   return `${constitutionalPrefix}${sections.join('')}`

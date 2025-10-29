@@ -23,7 +23,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, conversationId, communityId = 'careersy', mode = 'navigator', previousMode, incomingHistory } = await req.json()
+    const { message, conversationId, communityId = 'careersy', mode = 'navigator', previousMode, incomingHistory, abTestMode } = await req.json()
 
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -36,14 +36,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Community not found' }, { status: 404 })
     }
 
-    // Build system prompt from community config
-    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode, communityId })
-
-    // Select model based on community and A/B test mode
-    const isBasicMode = communityId === 'careersy' && FEATURE_FLAGS.CAREERSY_MODE === 'basic'
+    // Select model based on community and A/B test mode (runtime toggle)
+    // Use runtime abTestMode from request, fallback to static flag if not provided
+    const effectiveMode = abTestMode || (communityId === 'careersy' ? FEATURE_FLAGS.CAREERSY_MODE : 'full')
+    const isBasicMode = communityId === 'careersy' && effectiveMode === 'basic'
     const model = isBasicMode
       ? openai('gpt-4o')  // Basic mode: GPT + domain expertise only
       : anthropic('claude-sonnet-4-20250514')  // Full Voyager mode
+
+    // Build system prompt from community config (pass abTestMode for constitutional layer control)
+    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode, communityId, abTestMode: effectiveMode })
 
     // Voyager: No auth required, no conversation history
     if (communityId === 'voyager') {

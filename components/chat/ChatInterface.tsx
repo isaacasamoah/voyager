@@ -48,6 +48,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [currentMode, setCurrentMode] = useState<'navigator' | 'cartographer'>('navigator')
   const [previousMode, setPreviousMode] = useState<'navigator' | 'cartographer' | null>(null)
   const [isExpert, setIsExpert] = useState(false)
+  const [abTestMode, setAbTestMode] = useState<'basic' | 'full'>('basic') // A/B test mode for Careersy
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -222,6 +223,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           communityId,
           mode: currentMode, // Pass current mode to API
           previousMode: previousMode, // Signal mode switch if it just happened
+          abTestMode: communityId === 'careersy' ? abTestMode : undefined, // A/B test mode for Careersy
         }),
       })
 
@@ -399,7 +401,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           </div>
 
           {/* Center: Mode Switcher (Expert Only, Full Voyager Mode) */}
-          {isExpert && !(communityId === 'careersy' && FEATURE_FLAGS.CAREERSY_MODE === 'basic') && (
+          {isExpert && !(communityId === 'careersy' && abTestMode === 'basic') && (
             <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
               <button
                 onClick={() => {
@@ -448,16 +450,33 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           </button>
         </div>
 
-        {/* A/B Test Mode Indicator (Careersy experts only) */}
+        {/* A/B Test Mode Toggle (Careersy experts only) */}
         {communityId === 'careersy' && isExpert && (
-          <div className={`flex-shrink-0 px-4 py-2 text-xs font-medium text-center ${
-            FEATURE_FLAGS.CAREERSY_MODE === 'basic'
-              ? 'bg-blue-50 text-blue-700 border-b border-blue-100'
-              : 'bg-purple-50 text-purple-700 border-b border-purple-100'
+          <div className={`flex-shrink-0 px-4 py-3 border-b ${
+            abTestMode === 'basic'
+              ? 'bg-blue-50 border-blue-100'
+              : 'bg-purple-50 border-purple-100'
           }`}>
-            {FEATURE_FLAGS.CAREERSY_MODE === 'basic'
-              ? '🔵 A/B TEST: Basic Mode (GPT + Domain Expertise)'
-              : '🟣 A/B TEST: Full Voyager (Claude + Constitutional + Cartographer)'}
+            <div className="flex items-center justify-center gap-3">
+              <span className={`text-xs font-medium ${
+                abTestMode === 'basic' ? 'text-blue-700' : 'text-purple-700'
+              }`}>
+                {abTestMode === 'basic'
+                  ? '🔵 A/B TEST: Basic Mode (GPT + Domain)'
+                  : '🟣 A/B TEST: Full Voyager (Claude + Constitutional + Cartographer)'}
+              </span>
+              <button
+                onClick={() => setAbTestMode(abTestMode === 'basic' ? 'full' : 'basic')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  abTestMode === 'basic'
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-purple-600 hover:bg-purple-700 text-white'
+                }`}
+                title="Toggle between Basic and Full Voyager mode"
+              >
+                Switch to {abTestMode === 'basic' ? 'Full Voyager' : 'Basic Mode'}
+              </button>
+            </div>
           </div>
         )}
 
