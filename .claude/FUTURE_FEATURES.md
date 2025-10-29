@@ -1,5 +1,14 @@
 # Future Features - Voyager Platform
 
+**Purpose:** Conceptual exploration and long-term vision features. Not immediate roadmap.
+
+**How this differs from other docs:**
+- **VOYAGER_VISION.md** - Current sprint focus + parking lot (next 2-3 weeks)
+- **COLLABORATION_ROADMAP.md** - Technical implementation phases (3-6 months)
+- **FUTURE_FEATURES.md** (this doc) - Conceptual ideas and marketing language (6+ months)
+
+---
+
 ## 1. Expert Interview (Prompt Generation)
 
 **Purpose:** Collaborative AI-expert prompt building to create accurate, domain-specific system prompts for each community.

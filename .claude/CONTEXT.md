@@ -1,5 +1,22 @@
 # Voyager Platform - Context & Vision
 
+**⚠️ DEPRECATION NOTICE (2025-10-29):**
+This document contains outdated implementation details. For current architecture and vision, see:
+- **[VOYAGER_VISION.md](./VOYAGER_VISION.md)** - Current focus and learnings
+- **[COLLABORATION_ROADMAP.md](./COLLABORATION_ROADMAP.md)** - Architecture and phases
+- **[README.md](../README.md)** - Up-to-date overview
+
+**What's outdated here:**
+- References `curateMode` (now called `mode: 'navigator' | 'shipwright' | 'cartographer'`)
+- Old schema and code examples
+- Tech stack (we use Anthropic Claude, not OpenAI GPT-4)
+
+**What's still relevant:**
+- Isaac's INFP personality and collaboration preferences
+- Project philosophy and values
+
+---
+
 ## About Isaac (The Creator)
 
 **Personality**: INFP - The Mediator/Healer

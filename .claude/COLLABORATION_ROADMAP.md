@@ -78,16 +78,24 @@ All collaboration modes follow the same fundamental pattern:
 
 ## Phase 0: Cartographer Mode (Expert Knowledge Extraction)
 
+**Status:** ✅ SHIPPED (2025-10-29)
+
 **Goal:** Enable verified experts to contribute knowledge to the community through AI-guided interview conversations
 
-**Timeline:** 2-3 days
+**What We Built:**
+- Mode toggle UI (visible to experts only)
+- Cartographer system prompts in both communities
+- Mode control enforcement (prevents conversational mode switching)
+- Banner display system
+- Expert verification via `experts: []` array in community config
 
-**Why Phase 0:**
-- Simpler than shipwright mode (no split-view UI needed)
-- Provides immediate value to community owners (Eli can improve Careersy content)
-- Tests the mode system before building complex collaborate UI
-- Starts building RAG knowledge base for Phase 4
-- Validates expert verification pathways
+**Key Learning:**
+Constitutional framework + mode constraints created emergent meta-reasoning behavior. Cartographer refused to replace thinking and generated novel "reverse knowledge extraction" approach - learning how modes improve by seeking feedback.
+
+**What's Next (Phase 0.5):**
+- Structured knowledge output (JSON format for prompts/RAG/fine-tuning)
+- File-based knowledge storage (`knowledge/{communityId}/*.json`)
+- Automatic prompt enhancement from expert interviews
 
 ---
 
