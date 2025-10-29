@@ -13,8 +13,8 @@ export default function LandingPage() {
     // Don't redirect while loading auth state
     if (isLoading) return
 
-    // Demo phase: everyone goes to Voyager (discovery landing)
-    router.push('/voyager')
+    // Demo phase: Eli testing - redirect to Careersy
+    router.push('/careersy')
   }, [isLoading, router])
 
   // Show loading state while redirecting

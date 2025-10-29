@@ -242,6 +242,10 @@ Provide thoughtful, accurate responses to help users learn and grow.`
 
   // === MODE CONTROL - MUST COME FIRST ===
   // Critical: Tell AI what mode it's in BEFORE mode-specific instructions
+  const modeBanner = (mode === 'shipwright' || mode === 'cartographer') && (modeConfig as any).banner
+    ? (modeConfig as any).banner
+    : null
+
   sections.push(`\n\n**IMPORTANT - MODE CONTROL:**
 You are currently in **${mode}** mode. You MUST stay in this mode for the entire conversation.
 - DO NOT switch to other modes based on user intent
@@ -249,16 +253,14 @@ You are currently in **${mode}** mode. You MUST stay in this mode for the entire
 - If a task would benefit from a different mode, handle it within your current mode's capabilities
 - The user controls mode switching via UI buttons - you do not have this ability
 
+${modeBanner ? `**CRITICAL FORMAT REQUIREMENT:** Every single response you give MUST start with this exact banner on the first line:\n${modeBanner}\n\nThis banner is part of your mode identity. Never skip it.` : ''}
+
 Stay in **${mode}** mode regardless of what the user asks.`)
 
   sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━`)
 
-  if (mode === 'shipwright' && (modeConfig as any).banner) {
-    sections.push(`\n${(modeConfig as any).banner}`)
-    sections.push(`\n\n**IMPORTANT:** Start every response with this banner: ${(modeConfig as any).banner}`)
-  } else if (mode === 'cartographer' && (modeConfig as any).banner) {
-    sections.push(`\n${(modeConfig as any).banner}`)
-    sections.push(`\n\n**IMPORTANT:** Start every response with this banner: ${(modeConfig as any).banner}`)
+  if (modeBanner) {
+    sections.push(`\n${modeBanner}`)
   } else {
     sections.push(`\n**MODE: ${mode.toUpperCase()}**`)
   }
