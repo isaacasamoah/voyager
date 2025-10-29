@@ -45,6 +45,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [showTutorial, setShowTutorial] = useState(false)
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
   const [currentMode, setCurrentMode] = useState<'navigator' | 'cartographer'>('navigator')
+  const [previousMode, setPreviousMode] = useState<'navigator' | 'cartographer' | null>(null)
   const [isExpert, setIsExpert] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -219,8 +220,14 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           conversationId: conversationId,
           communityId,
           mode: currentMode, // Pass current mode to API
+          previousMode: previousMode, // Signal mode switch if it just happened
         }),
       })
+
+      // Clear previousMode after first message in new mode
+      if (previousMode) {
+        setPreviousMode(null)
+      }
 
       if (!response.ok) {
         throw new Error('Failed to send message')
@@ -394,7 +401,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           {isExpert && (
             <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
               <button
-                onClick={() => setCurrentMode('navigator')}
+                onClick={() => {
+                  if (currentMode !== 'navigator') {
+                    setPreviousMode(currentMode)
+                    setCurrentMode('navigator')
+                  }
+                }}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   currentMode === 'navigator'
                     ? 'bg-gray-900 text-white'
@@ -405,7 +417,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                 🧭 Navigator
               </button>
               <button
-                onClick={() => setCurrentMode('cartographer')}
+                onClick={() => {
+                  if (currentMode !== 'cartographer') {
+                    setPreviousMode(currentMode)
+                    setCurrentMode('cartographer')
+                  }
+                }}
                 className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
                   currentMode === 'cartographer'
                     ? 'bg-gray-900 text-white'

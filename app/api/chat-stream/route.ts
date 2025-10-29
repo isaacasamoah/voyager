@@ -21,7 +21,7 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, conversationId, communityId = 'careersy', mode = 'navigator', incomingHistory } = await req.json()
+    const { message, conversationId, communityId = 'careersy', mode = 'navigator', previousMode, incomingHistory } = await req.json()
 
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -97,6 +97,15 @@ export async function POST(req: NextRequest) {
           content: msg.content
         }))
       }
+    }
+
+    // Handle mode switching - add transition context if mode just changed
+    if (previousMode && previousMode !== mode) {
+      // Add a system message explaining the mode transition
+      conversationHistory.push({
+        role: 'assistant',
+        content: `[Mode Switch: You just switched from ${previousMode} mode to ${mode} mode. Continue the conversation naturally while maintaining awareness of everything we've discussed. Adapt to your new role in ${mode} mode while preserving context from our previous conversation.]`
+      })
     }
 
     // Stream response using Vercel AI SDK

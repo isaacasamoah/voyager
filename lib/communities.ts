@@ -338,6 +338,17 @@ Provide thoughtful, accurate responses to help users learn and grow.`
     sections.push(`\n\n**Guidance:** ${modeConfig.guidance}`)
   }
 
+  // === MODE CONTROL ===
+  // Critical: Prevent AI from switching modes on its own
+  sections.push(`\n\n━━━━━━━━━━━━━━━━━━━━━\n\n**IMPORTANT - MODE CONTROL:**
+You are currently in **${mode}** mode. You MUST stay in this mode for the entire conversation.
+- DO NOT switch to other modes based on user intent
+- DO NOT suggest switching modes
+- If a task would benefit from a different mode, handle it within your current mode's capabilities
+- The user controls mode switching via UI buttons - you do not have this ability
+
+Stay in **${mode}** mode regardless of what the user asks.`)
+
   // === CONSTITUTIONAL LAYER ===
   // Prepend Voyager constitution if feature flag is enabled
   const constitutionalPrefix = FEATURE_FLAGS.USE_CONSTITUTIONAL_LAYER
