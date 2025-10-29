@@ -11,6 +11,7 @@ interface ChatMessageProps {
       background: string
       text: string
       textSecondary: string
+      userMessageText?: string
     }
   }
 }
@@ -21,7 +22,8 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
     primary: '#fad02c',
     background: '#fff9f2',
     text: '#000000',
-    textSecondary: '#6b7280'
+    textSecondary: '#6b7280',
+    userMessageText: '#000000'
   }
 
   return (
@@ -30,7 +32,7 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
         className="max-w-[80%] rounded-xl p-4 shadow-lg border-2"
         style={{
           backgroundColor: message.role === 'user' ? colors.primary : '#ffffff',
-          color: colors.text,
+          color: message.role === 'user' ? (colors.userMessageText || '#ffffff') : colors.text,
           borderColor: message.role === 'user' ? colors.primary : `${colors.primary}33` // 33 = 20% opacity in hex
         }}
       >
