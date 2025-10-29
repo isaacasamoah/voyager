@@ -2,9 +2,9 @@
 
 ## Version: 0.1.0-beta
 **Started:** 2025-10-28
-**Status:** In Progress - Text Color Debug Phase
+**Status:** Ready for Mobile Testing ✅
 **Branch:** develop
-**Latest Commit:** 5c78f2c
+**Latest Commit:** 01c64b0 (merged `/claude` branch with fixes)
 
 ---
 
@@ -64,98 +64,143 @@ Implementing mobile-first responsive design for the Careersy community page, ens
 
 ---
 
-## 🔄 In Progress
+## 🎉 NEW: Merged from `/claude` Branch
 
-### Text Color Visibility Issue (Mobile Chrome & Safari)
-**Problem:** User message text in yellow bubble appears light/pale on mobile browsers only (both Chrome and Safari)
+### 8. Text Color Fix - `userMessageText` Property ✅
+**Files:** `communities/careersy.json`, `communities/voyager.json`, `ChatMessage.tsx`
 
-**What Works:**
-- ✅ AI response text is black and visible
-- ✅ Modal textarea text is black and visible
-- ✅ Modal Cancel button text is black and visible
-- ✅ Desktop view shows all text correctly
+**Solution:** Added dedicated `userMessageText` color property to community branding config
 
-**What Doesn't Work:**
-- ❌ User's own message text in yellow bubble appears light on mobile
-
-**Attempted Fixes:**
-1. Added `style={{ color: '#000000' }}` to `<p>` tag - didn't work
-2. Added `!important` flag: `style={{ color: '#000000 !important' }}` - didn't work
-3. Set parent `div` color to black for user messages - **testing now**
-
-**Current Code State:**
-```typescript
-// ChatMessage.tsx lines 29-38
-<div
-  className="max-w-[80%] rounded-xl p-4 shadow-lg border-2"
-  style={{
-    backgroundColor: message.role === 'user' ? colors.primary : '#ffffff',
-    color: message.role === 'user' ? '#000000' : colors.text,  // Black for user
-    borderColor: message.role === 'user' ? colors.primary : `${colors.primary}33`
-  }}
->
-  {message.role === 'user' ? (
-    <p className="whitespace-pre-wrap" style={{ color: '#000000 !important' } as React.CSSProperties}>
-      {message.content}
-    </p>
-  ) : (
-    // ... assistant message
-  )}
-</div>
+**Changes:**
+```json
+// careersy.json line 181
+"branding": {
+  "colors": {
+    "primary": "#fad02c",
+    "background": "#fff9f2",
+    "text": "#000000",
+    "textSecondary": "#6b7280",
+    "userMessageText": "#000000"  // NEW: Explicit user message text color
+  }
+}
 ```
 
-**Latest Commit:** `5c78f2c` - Awaiting mobile test results
+```typescript
+// ChatMessage.tsx - Now uses userMessageText for user bubbles
+color: message.role === 'user' ? (colors.userMessageText || '#ffffff') : colors.text
+```
+
+**Status:** Ready for mobile testing to confirm fix
+
+### 9. Mode Switcher UI (Expert Only) ✅
+**File:** `components/chat/ChatInterface.tsx` (lines 393-419)
+
+**Feature:** Toggle between Navigator (private coaching) and Cartographer (knowledge extraction) modes
+
+**UI Location:** Center of header bar (only visible to verified experts)
+
+**Implementation:**
+```typescript
+{isExpert && (
+  <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+    <button onClick={() => setCurrentMode('navigator')} ...>
+      🧭 Navigator
+    </button>
+    <button onClick={() => setCurrentMode('cartographer')} ...>
+      🗺️ Cartographer
+    </button>
+  </div>
+)}
+```
+
+**Styling:** Rounded pill buttons, active mode has black background
+
+### 10. Voyager Constitutional Framework ✅
+**Files:** `.claude/VOYAGER_CONSTITUTIONAL_FRAMEWORK.md`, `lib/prompts/constitution.ts`
+
+**Purpose:** Core principles and values that guide all AI interactions in Voyager communities
+
+**Feature Flag:** `lib/features.ts` - `USE_CONSTITUTIONAL_LAYER: false` (currently disabled for A/B testing)
+
+**Implementation:** When enabled, constitutional principles are prepended to all mode prompts
+
+### 11. Modal Text Color Fixes ✅
+**File:** `components/chat/ResumeModal.tsx`
+
+**Changes:**
+- Header title: `text-gray-900` instead of `text-careersy-black`
+- Textarea: Added `text-gray-900` class
+- Cancel button: Added `text-gray-900` class
+- Save button: `text-gray-900` instead of `text-careersy-black`
+- Focus ring: `ring-yellow-400` instead of `ring-careersy-yellow`
+
+**Status:** Ready for testing
+
+### 12. Debug Slash Command ✅
+**File:** `.claude/commands/debug.md`
+
+**Purpose:** Pair debugging command for troubleshooting issues
+
+**Usage:** `/debug` - Activates debugging mode
 
 ---
 
 ## 📋 Next Steps
 
-### Immediate (Debug Phase)
-1. **Test latest commit on mobile** - Verify if parent div color fix resolves issue
-2. **If still light:** Investigate potential causes:
-   - CSS specificity conflicts with global styles
-   - Browser-specific rendering differences
-   - Potential opacity/alpha channel issues with yellow background
-   - Check if `colors.text` value is correct in community config
-3. **Consider alternative approaches:**
-   - Use `filter: contrast(100%)` or similar CSS filters
-   - Wrap text in `<span>` with explicit styling
-   - Check computed styles in mobile browser dev tools
+### Immediate Priority
+1. ✅ **Pull `/claude` branch changes** - DONE (commit 01c64b0)
+2. **Test on mobile** - Verify `userMessageText` fix resolves text visibility issue
+   - Test on mobile Chrome
+   - Test on mobile Safari
+   - Verify all text is readable in user message bubbles
+   - Verify modal text is readable
 
-### Once Text Color Fixed
-4. **Implement dynamic color solution** - Replace hardcoded `#000000` with `colors.text` from branding config
-5. **Test across all mobile browsers** - Chrome, Safari, Firefox, Edge
-6. **Verify community branding** - Ensure all colors respect `communities/careersy.json` config
+### If Text Color Fixed ✅
+3. **Verify Mode Switcher** - Test expert-only mode toggle on mobile and desktop
+4. **Test Mobile Responsiveness** - Ensure mode switcher works on small screens
+5. **Update Ship Document** - Mark mobile-first v0.1.0 as complete
 
-### Future Enhancements (Deferred)
-7. **Mode Switcher UI** - Add toggle between Navigator and Cartographer modes
-8. **Landing/Orientation Info** - Add onboarding for invited users
-9. **Loading Time Optimization** - Test and optimize initial page load on mobile
-10. **Additional Mobile Testing** - Test on various screen sizes and devices
+### Future Enhancements (v0.2.0+)
+6. **Landing/Orientation Info** - Add onboarding for invited users
+7. **Loading Time Optimization** - Test and optimize initial page load on mobile
+8. **Constitutional Framework Testing** - A/B test with `USE_CONSTITUTIONAL_LAYER: true`
+9. **Additional Mobile Testing** - Test on various screen sizes and devices
+10. **Shipwright Mode UI** - Add post creation workflow
 
 ---
 
 ## 🐛 Known Issues
 
 ### Critical
-- **User message text visibility on mobile** - Light/pale text in yellow bubble on mobile Chrome & Safari (in progress)
+- **User message text visibility on mobile** - Light/pale text in yellow bubble on mobile Chrome & Safari
+  - **Status:** Fix implemented via `userMessageText` property - awaiting mobile test confirmation
+  - **Commit:** 01c64b0 (merged from `/claude` branch)
 
 ### Minor
-- None currently
+- API route `/api/migrate` has dynamic server usage warning (non-critical build warning)
 
 ---
 
 ## 📁 Key Files Modified
 
 ### Core Components
-- `components/chat/ChatInterface.tsx` - Mobile-first responsive layout, viewport fix, scroll behavior
-- `components/chat/ChatMessage.tsx` - Dynamic branding, text color fixes
+- `components/chat/ChatInterface.tsx` - Mobile-first responsive layout, viewport fix, scroll behavior, mode switcher UI
+- `components/chat/ChatMessage.tsx` - Dynamic branding, `userMessageText` color support
 - `components/chat/ResumeModal.tsx` - Text color fixes for modal
 
-### Configuration
+### Configuration & Infrastructure
 - `app/layout.tsx` - Viewport meta tags for mobile
-- `lib/communities.ts` - Type guard fix
-- `communities/careersy.json` - Community branding and config (unchanged, used as reference)
+- `lib/communities.ts` - Type guard fix, mode-based prompt building
+- `lib/features.ts` - Feature flags for A/B testing (NEW)
+- `lib/prompts/constitution.ts` - Constitutional framework integration (NEW)
+- `communities/careersy.json` - Added `userMessageText` color, expert list updated
+- `communities/voyager.json` - Added `userMessageText` color
+
+### Documentation
+- `.claude/VOYAGER_CONSTITUTIONAL_FRAMEWORK.md` - Core principles (NEW)
+- `.claude/VOYAGER_VISION.md` - Updated with Week 1 completion status
+- `.claude/commands/debug.md` - Pair debugging slash command (NEW)
+- `.claude/SHIP_v0.1.0_MOBILE_FIRST.md` - This document
 
 ---
 
@@ -170,10 +215,12 @@ Implementing mobile-first responsive design for the Careersy community page, ens
 - [ ] Community branding colors applied dynamically
 
 ### Nice to Have (v0.2.0+)
-- [ ] Mode switcher UI
+- [x] Mode switcher UI ✅ (merged from `/claude`)
+- [ ] Shipwright mode post creation workflow
 - [ ] Onboarding/orientation flow
 - [ ] Performance optimizations
 - [ ] Additional mobile gestures (swipe to close sidebar, etc.)
+- [ ] Constitutional framework A/B testing
 
 ---
 
@@ -230,5 +277,5 @@ Implementing mobile-first responsive design for the Careersy community page, ens
 
 ---
 
-**Last Updated:** 2025-10-28
-**Next Review:** After text color issue resolution
+**Last Updated:** 2025-10-29 (merged `/claude` branch)
+**Next Review:** After mobile testing confirms text color fix
