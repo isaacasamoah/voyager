@@ -40,7 +40,7 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
           <p className="whitespace-pre-wrap break-words">{message.content}</p>
         ) : (
           <div
-            className="prose prose-sm max-w-full prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:font-semibold break-words"
+            className="prose prose-sm max-w-full prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:font-semibold break-words prose-pre:overflow-x-auto prose-pre:max-w-full prose-code:break-words"
             style={{
               color: colors.text,
               // Override prose default colors with community branding
