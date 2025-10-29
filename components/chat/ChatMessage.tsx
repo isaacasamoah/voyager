@@ -27,9 +27,9 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
   }
 
   return (
-    <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+    <div className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}>
       <div
-        className="max-w-[80%] rounded-xl p-4 shadow-lg border-2"
+        className="max-w-[80%] rounded-xl p-4 shadow-lg border-2 break-words overflow-hidden"
         style={{
           backgroundColor: message.role === 'user' ? colors.primary : '#ffffff',
           color: message.role === 'user' ? (colors.userMessageText || '#ffffff') : colors.text,
@@ -37,10 +37,10 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
         }}
       >
         {message.role === 'user' ? (
-          <p className="whitespace-pre-wrap">{message.content}</p>
+          <p className="whitespace-pre-wrap break-words">{message.content}</p>
         ) : (
           <div
-            className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:font-semibold"
+            className="prose prose-sm max-w-full prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:font-semibold break-words"
             style={{
               color: colors.text,
               // Override prose default colors with community branding
