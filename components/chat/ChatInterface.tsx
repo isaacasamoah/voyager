@@ -44,6 +44,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [hasResume, setHasResume] = useState(false)
   const [showTutorial, setShowTutorial] = useState(false)
   const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
+  const [currentMode, setCurrentMode] = useState<'navigator' | 'cartographer'>('navigator')
+  const [isExpert, setIsExpert] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -73,8 +75,15 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     loadConversations()
     checkResume()
     checkTutorialStatus()
+    checkExpertStatus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Check expert status when session changes
+  useEffect(() => {
+    checkExpertStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session])
 
   // Auto-focus input when tutorial starts or ends (but not on mobile to prevent zoom)
   useEffect(() => {
@@ -118,6 +127,14 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
       }
     } catch (error) {
       console.error('Error checking resume:', error)
+    }
+  }
+
+  const checkExpertStatus = () => {
+    // Check if user email is in community experts list
+    if (session?.user?.email) {
+      const expertEmails = communityConfig.experts || []
+      setIsExpert(expertEmails.includes(session.user.email))
     }
   }
 
@@ -201,6 +218,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           message: userMessage,
           conversationId: conversationId,
           communityId,
+          mode: currentMode, // Pass current mode to API
         }),
       })
 
@@ -371,6 +389,34 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
               </svg>
             </button>
           </div>
+
+          {/* Center: Mode Switcher (Expert Only) */}
+          {isExpert && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
+              <button
+                onClick={() => setCurrentMode('navigator')}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  currentMode === 'navigator'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Navigator mode - Private coaching"
+              >
+                🧭 Navigator
+              </button>
+              <button
+                onClick={() => setCurrentMode('cartographer')}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  currentMode === 'cartographer'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Cartographer mode - Share knowledge"
+              >
+                🗺️ Cartographer
+              </button>
+            </div>
+          )}
 
           {/* Right: New Chat Button */}
           <button
