@@ -1,6 +1,8 @@
 import { readFileSync, readdirSync } from 'fs'
 import { join } from 'path'
 import type { VoyageTerminology } from './terminology'
+import { VOYAGER_CONSTITUTION } from './prompts/constitution'
+import { FEATURE_FLAGS } from './features'
 export type { VoyageTerminology } from './terminology'
 
 const VOYAGER_BASE_THEME = {
@@ -336,7 +338,13 @@ Provide thoughtful, accurate responses to help users learn and grow.`
     sections.push(`\n\n**Guidance:** ${modeConfig.guidance}`)
   }
 
-  return sections.join('')
+  // === CONSTITUTIONAL LAYER ===
+  // Prepend Voyager constitution if feature flag is enabled
+  const constitutionalPrefix = FEATURE_FLAGS.USE_CONSTITUTIONAL_LAYER
+    ? `${VOYAGER_CONSTITUTION}\n\n━━━━━━━━━━━━━━━━━━━━━\n\n`
+    : '';
+
+  return `${constitutionalPrefix}${sections.join('')}`
 }
 
 /**
