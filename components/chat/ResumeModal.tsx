@@ -35,7 +35,7 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
       <div className="bg-white rounded-xl shadow-2xl max-w-2xl w-full max-h-[80vh] flex flex-col">
         {/* Header */}
         <div className="p-6 border-b border-gray-200">
-          <h2 className="text-2xl font-lexend font-bold text-careersy-black">Add Context</h2>
+          <h2 className="text-2xl font-lexend font-bold text-gray-900">Add Context</h2>
           <p className="text-sm text-gray-600 mt-1">
             Add information to get personalized career advice
           </p>
@@ -47,8 +47,7 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
             value={resumeText}
             onChange={(e) => setResumeText(e.target.value)}
             placeholder="Paste any of the following:&#10;&#10;• Resume/CV&#10;• Job description&#10;• LinkedIn profile&#10;• Cover letter&#10;• Interview questions&#10;• Career goals"
-            className="w-full h-full min-h-[300px] p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-careersy-yellow focus:border-transparent resize-none"
-            style={{ color: '#000000' }}
+            className="w-full h-full min-h-[300px] p-4 border-2 border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-transparent resize-none text-gray-900"
           />
         </div>
 
@@ -57,15 +56,14 @@ export default function ResumeModal({ isOpen, onClose, onSave, initialResume = '
           <button
             onClick={onClose}
             disabled={saving}
-            className="px-6 py-3 border-2 border-gray-300 rounded-[30px] font-semibold hover:bg-gray-50 transition-colors disabled:opacity-50"
-            style={{ color: '#000000' }}
+            className="px-6 py-3 border-2 border-gray-300 rounded-[30px] font-semibold text-gray-900 hover:bg-gray-50 transition-colors disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSave}
             disabled={saving || !resumeText.trim()}
-            className="px-6 py-3 bg-careersy-yellow text-careersy-black rounded-[30px] font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100 shadow-lg"
+            className="px-6 py-3 bg-yellow-400 text-gray-900 rounded-[30px] font-semibold hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100 shadow-lg"
           >
             {saving ? 'Saving...' : 'Add Context'}
           </button>

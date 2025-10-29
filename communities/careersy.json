@@ -159,7 +159,7 @@
     }
   },
 
-  "experts": ["eli@careersy.com"],
+  "experts": ["eli@careersy.com", "isaacasamoah@gmail.com"],
   "public": true,
   "requiresAuth": true,
   "persistent": true,
@@ -177,7 +177,8 @@
       "primary": "#fad02c",
       "background": "#fff9f2",
       "text": "#000000",
-      "textSecondary": "#6b7280"
+      "textSecondary": "#6b7280",
+      "userMessageText": "#000000"
     },
     "logo": "/careersy-logo.webp",
     "title": "CAREERSY"

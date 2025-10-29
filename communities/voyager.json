@@ -132,7 +132,7 @@
     }
   },
 
-  "experts": [],
+  "experts": ["isaacasamoah@gmail.com"],
   "public": true,
   "requiresAuth": false,
   "persistent": false,
@@ -151,7 +151,8 @@
       "primary": "#000000",
       "background": "#ffffff",
       "text": "#000000",
-      "textSecondary": "#9ca3af"
+      "textSecondary": "#9ca3af",
+      "userMessageText": "#ffffff"
     },
     "logo": null,
     "title": "VOYAGER"
