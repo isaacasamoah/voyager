@@ -10,6 +10,7 @@ import TutorialOverlay from '../tutorial/TutorialOverlay'
 import { getTutorialSteps } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
 import { getVoyageTerminology } from '@/lib/terminology'
+import { FEATURE_FLAGS } from '@/lib/features'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -397,8 +398,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             </button>
           </div>
 
-          {/* Center: Mode Switcher (Expert Only) */}
-          {isExpert && (
+          {/* Center: Mode Switcher (Expert Only, Full Voyager Mode) */}
+          {isExpert && !(communityId === 'careersy' && FEATURE_FLAGS.CAREERSY_MODE === 'basic') && (
             <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
               <button
                 onClick={() => {
@@ -446,6 +447,19 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             </svg>
           </button>
         </div>
+
+        {/* A/B Test Mode Indicator (Careersy experts only) */}
+        {communityId === 'careersy' && isExpert && (
+          <div className={`flex-shrink-0 px-4 py-2 text-xs font-medium text-center ${
+            FEATURE_FLAGS.CAREERSY_MODE === 'basic'
+              ? 'bg-blue-50 text-blue-700 border-b border-blue-100'
+              : 'bg-purple-50 text-purple-700 border-b border-purple-100'
+          }`}>
+            {FEATURE_FLAGS.CAREERSY_MODE === 'basic'
+              ? '🔵 A/B TEST: Basic Mode (GPT + Domain Expertise)'
+              : '🟣 A/B TEST: Full Voyager (Claude + Constitutional + Cartographer)'}
+          </div>
+        )}
 
         {/* Messages Container - Mobile-first: less padding on mobile */}
         <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">

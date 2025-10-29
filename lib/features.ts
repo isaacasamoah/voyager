@@ -15,4 +15,14 @@ export const FEATURE_FLAGS = {
    * on user experience and alignment with principles.
    */
   USE_CONSTITUTIONAL_LAYER: true, // Enabled: Voyager constitutional framework active
+
+  /**
+   * Careersy A/B Test Mode
+   *
+   * 'basic': ChatGPT + domain expertise only (what Eli originally asked for)
+   * 'full': Claude + constitutional framework + cartographer mode (full Voyager)
+   *
+   * Tests whether Voyager features add value over simple GPT wrapper
+   */
+  CAREERSY_MODE: 'basic' as 'basic' | 'full',
 } as const;

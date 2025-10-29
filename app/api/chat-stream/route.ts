@@ -12,10 +12,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { streamText } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
+import { openai } from '@ai-sdk/openai'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getCommunityConfig, getCommunitySystemPrompt } from '@/lib/communities'
+import { FEATURE_FLAGS } from '@/lib/features'
 
 export const dynamic = 'force-dynamic'
 
@@ -35,12 +37,18 @@ export async function POST(req: NextRequest) {
     }
 
     // Build system prompt from community config
-    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode })
+    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode, communityId })
+
+    // Select model based on community and A/B test mode
+    const isBasicMode = communityId === 'careersy' && FEATURE_FLAGS.CAREERSY_MODE === 'basic'
+    const model = isBasicMode
+      ? openai('gpt-4o')  // Basic mode: GPT + domain expertise only
+      : anthropic('claude-sonnet-4-20250514')  // Full Voyager mode
 
     // Voyager: No auth required, no conversation history
     if (communityId === 'voyager') {
       const result = streamText({
-        model: anthropic('claude-sonnet-4-20250514'),
+        model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -110,7 +118,7 @@ export async function POST(req: NextRequest) {
 
     // Stream response using Vercel AI SDK
     const result = streamText({
-      model: anthropic('claude-sonnet-4-20250514'),
+      model, // Uses model selected earlier (GPT for basic mode, Claude for full Voyager)
       messages: [
         { role: 'system', content: systemPrompt },
         ...conversationHistory,
