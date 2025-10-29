@@ -132,7 +132,7 @@
     }
   },
 
-  "experts": [],
+  "experts": ["isaacasamoah@gmail.com"],
   "public": true,
   "requiresAuth": false,
   "persistent": false,

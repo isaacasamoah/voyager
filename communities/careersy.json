@@ -159,7 +159,7 @@
     }
   },
 
-  "experts": ["eli@careersy.com"],
+  "experts": ["eli@careersy.com", "isaacasamoah@gmail.com"],
   "public": true,
   "requiresAuth": true,
   "persistent": true,
