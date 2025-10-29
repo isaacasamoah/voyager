@@ -255,8 +255,10 @@ Stay in **${mode}** mode regardless of what the user asks.`)
 
   if (mode === 'shipwright' && (modeConfig as any).banner) {
     sections.push(`\n${(modeConfig as any).banner}`)
+    sections.push(`\n\n**IMPORTANT:** Start every response with this banner: ${(modeConfig as any).banner}`)
   } else if (mode === 'cartographer' && (modeConfig as any).banner) {
     sections.push(`\n${(modeConfig as any).banner}`)
+    sections.push(`\n\n**IMPORTANT:** Start every response with this banner: ${(modeConfig as any).banner}`)
   } else {
     sections.push(`\n**MODE: ${mode.toUpperCase()}**`)
   }
