@@ -344,6 +344,9 @@ Provide thoughtful, accurate responses to help users learn and grow.`
     ? `${VOYAGER_CONSTITUTION}\n\n━━━━━━━━━━━━━━━━━━━━━\n\n`
     : '';
 
+  // Debug: Log to verify flag is working (remove after A/B test)
+  console.log('[Voyager Constitution]', FEATURE_FLAGS.USE_CONSTITUTIONAL_LAYER ? 'ENABLED' : 'DISABLED');
+
   return `${constitutionalPrefix}${sections.join('')}`
 }
 
