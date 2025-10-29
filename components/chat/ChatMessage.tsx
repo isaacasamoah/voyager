@@ -30,24 +30,24 @@ export default function ChatMessage({ message, branding }: ChatMessageProps) {
         className="max-w-[80%] rounded-xl p-4 shadow-lg border-2"
         style={{
           backgroundColor: message.role === 'user' ? colors.primary : '#ffffff',
-          color: message.role === 'user' ? '#000000' : colors.text,
+          color: colors.text,
           borderColor: message.role === 'user' ? colors.primary : `${colors.primary}33` // 33 = 20% opacity in hex
         }}
       >
         {message.role === 'user' ? (
-          <p className="whitespace-pre-wrap" style={{ color: '#000000 !important' } as React.CSSProperties}>{message.content}</p>
+          <p className="whitespace-pre-wrap">{message.content}</p>
         ) : (
           <div
             className="prose prose-sm max-w-none prose-p:my-2 prose-ul:my-2 prose-li:my-1 prose-strong:font-semibold"
             style={{
-              color: '#000000', // Hardcoded black for testing
-              // Override prose default colors - hardcoded for testing
-              ['--tw-prose-body' as any]: '#000000',
-              ['--tw-prose-headings' as any]: '#000000',
-              ['--tw-prose-links' as any]: '#000000',
-              ['--tw-prose-bold' as any]: '#000000',
-              ['--tw-prose-bullets' as any]: '#000000',
-              ['--tw-prose-code' as any]: '#000000',
+              color: colors.text,
+              // Override prose default colors with community branding
+              ['--tw-prose-body' as any]: colors.text,
+              ['--tw-prose-headings' as any]: colors.text,
+              ['--tw-prose-links' as any]: colors.primary,
+              ['--tw-prose-bold' as any]: colors.text,
+              ['--tw-prose-bullets' as any]: colors.text,
+              ['--tw-prose-code' as any]: colors.text,
             }}
           >
             <ReactMarkdown>{message.content}</ReactMarkdown>
