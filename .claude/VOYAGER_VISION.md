@@ -95,10 +95,10 @@ USER REQUEST ──> FILTER ──> DECISION
 *Goal: Eli successfully uses Voyager to improve 3 client outcomes*
 
 ### Week 1: Build Core Experience
-- [ ] Voyager constitutional prompt (integrate into all modes)
-- [ ] Careersy community page (simple, mobile-first)
+- [x] Voyager constitutional prompt (integrate into all modes)
+- [x] Careersy community page (simple, mobile-first)
 - [x] Navigator mode (chat works, mobile responsive)
-- [ ] Cartographer mode (expert interview end-to-end)
+- [ ] Cartographer mode (expert interview end-to-end) ← Testing blocked by OAuth setup
 - [x] Mobile responsive (text visibility fixed)
 
 ### Week 2: Real User Testing
