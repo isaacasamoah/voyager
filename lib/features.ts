@@ -14,5 +14,5 @@ export const FEATURE_FLAGS = {
    * Use for A/B testing the constitutional framework's impact
    * on user experience and alignment with principles.
    */
-  USE_CONSTITUTIONAL_LAYER: true,
+  USE_CONSTITUTIONAL_LAYER: false, // Set to false for A/B testing control group
 } as const;
