@@ -1,30 +1,71 @@
-# Voyager Platform
+# Voyager
 
-> Multi-community AI platform with custom domains and white-label support
+> AI that elevates human thinking, preserves expert knowledge, and empowers collaboration
 
 **Production:** https://voyager-platform.vercel.app
 **Staging:** https://voyager-git-develop-isaac-asamoahs-projects.vercel.app
 
 ---
 
-## Overview
+## Vision
 
-Voyager is a platform for deploying AI-powered communities with zero code. Each community has its own branding, AI prompt, and user base - deployed via simple JSON configuration.
+**Core Belief:**
+AI can help humans elevate each other's thinking and preserve expert knowledge, but only if it's designed to empower collaboration, not replace it.
 
-**Current Communities:**
-- **Careersy** - Australian tech career coaching
-- **Voyager** - Platform navigator
+**The World We're Building:**
+Where expert knowledge isn't locked in individual minds but flows freely to elevate others. Where AI helps people think better, not think less. Where learning is collaborative elevation, not passive consumption.
+
+### Immutable Principles
+
+1. **Elevation Over Replacement** - AI elevates human thinking, never replaces it
+2. **Knowledge Preservation** - Expert knowledge is preserved and accessible, not locked away
+3. **Human-Centered Collaboration** - AI facilitates human-to-human connection and learning
+
+---
+
+## Current Focus
+
+**Careersy** - Career coaching community for ANZ tech professionals
+
+Testing hypothesis: *"Career coaches will use Voyager to extract their tacit knowledge if the interview flow takes <15 minutes and produces immediately useful outputs"*
+
+---
+
+## What Makes Voyager Different
+
+### Three AI Modes
+
+**Navigator** - Private coaching for immediate answers
+- 1-on-1 conversations with AI coach
+- Personalized guidance based on your context
+- Instant answers to career questions
+
+**Cartographer** - Expert knowledge extraction (experts only)
+- AI interviews experts to capture tacit knowledge
+- Structures insights for future learners
+- Builds community knowledge base
+
+**Shipwright** - Craft quality community posts
+- AI helps draft well-structured questions
+- Ensures posts are answerable and specific
+- Preserves genuine curiosity and vulnerability
+
+### Constitutional AI Framework
+
+Every interaction is governed by core principles:
+- Elevate thinking, don't replace it
+- Build capability, don't create dependence
+- Be honest about uncertainty
+- Every sentence adds value
 
 ---
 
 ## Quick Start
 
-### For Developers
-
 ```bash
 # Clone and install
 git clone [repository]
-cd careersy_wingman
+cd voyager
 npm install
 
 # Setup environment
@@ -38,50 +79,17 @@ npx prisma migrate dev
 npm run dev
 ```
 
-**→ Full setup guide:** [docs/getting-started.md](./docs/getting-started.md)
-
-### For Community Creators
-
-Create a new community in 3 steps:
-
-1. **Create config:** `communities/my-community.json`
-2. **Define community:**
-   ```json
-   {
-     "id": "my-community",
-     "name": "My Community",
-     "customPrompt": "You are an expert in...",
-     "public": true,
-     "branding": {
-       "colors": { "primary": "#3B82F6", "background": "#FFFFFF", "text": "#000000" }
-     }
-   }
-   ```
-3. **Deploy:** `git push` - that's it!
-
-**→ Full guide:** [docs/communities.md](./docs/communities.md)
-
 ---
 
 ## Documentation
 
-### 🚀 Getting Started
-- **[Setup Guide](./docs/getting-started.md)** - Local development (5 minutes)
-- **[Architecture Overview](./docs/architecture.md)** - System design & decisions
+### Core Documents
+- **[VOYAGER_VISION.md](./.claude/VOYAGER_VISION.md)** - Living document with current focus and learnings
+- **[VOYAGER_CONSTITUTIONAL_FRAMEWORK.md](./.claude/VOYAGER_CONSTITUTIONAL_FRAMEWORK.md)** - AI principles implementation
+- **[COLLABORATION_ROADMAP.md](./.claude/COLLABORATION_ROADMAP.md)** - Future features and phases
 
-### 🏗️ Core Features
-- **[Communities System](./docs/communities.md)** - Creating and managing communities
-- **[Custom Domains](./docs/custom-domains.md)** - White-label domain setup
-- **[AI Models](./docs/ai-models.md)** - Provider configuration
-
-### 🔧 Operations
-- **[Deployment](./docs/operations.md)** - Production deployment
-- **[Monitoring](./docs/logging.md)** - Logging & observability
-- **[Troubleshooting](./docs/operations.md#troubleshooting)** - Common issues
-
-### 📊 Development
+### Development
 - **[Git Workflow](./docs/git-workflow.md)** - Branching strategy
-- **[Stripe Setup](./docs/stripe-setup.md)** - Payment integration
 
 ---
 
@@ -90,93 +98,108 @@ Create a new community in 3 steps:
 - **Framework:** Next.js 14 (App Router)
 - **Language:** TypeScript (strict mode)
 - **Database:** PostgreSQL + Prisma
-- **Auth:** NextAuth.js (OAuth)
-- **AI:** OpenAI + Anthropic
+- **Auth:** NextAuth.js (Google OAuth)
+- **AI:** Anthropic Claude (Sonnet 4.5)
 - **Hosting:** Vercel + Neon
 
 ---
 
-## Key Features
+## Architecture Highlights
 
-✅ **Community discovery platform** - Browse and join public communities
-✅ **Interactive tutorials** - Community-specific onboarding with dynamic branding
-✅ **Zero-code community deployment** - JSON configs only
-✅ **Dynamic branding system** - Colors, logos, typography per community
-✅ **Custom domains** - White-label support
-✅ **Multi-provider AI** - OpenAI + Anthropic
-✅ **OAuth authentication** - Google + LinkedIn
-✅ **Public & private communities** - Flexible permissions
-✅ **Production-ready** - Deployed on Vercel
+### Modular Prompt System
+Communities defined by JSON configuration with three layers:
+1. **Domain Expertise** - Core knowledge and capabilities
+2. **Mode Behavior** - Navigator, Cartographer, or Shipwright
+3. **Constitutional Layer** - Immutable principles governing all interactions
+
+### JSON-Based Communities
+No database migrations needed - just create a JSON file and deploy:
+```json
+{
+  "id": "my-community",
+  "name": "My Community",
+  "domainExpertise": {
+    "role": "Expert Coach",
+    "mission": "Help users achieve their goals",
+    "coreCapabilities": ["skill 1", "skill 2"]
+  },
+  "modes": {
+    "navigator": { "behavior": "...", "style": "..." },
+    "cartographer": { "behavior": "...", "style": "..." },
+    "shipwright": { "behavior": "...", "style": "..." }
+  },
+  "branding": {
+    "colors": { "primary": "#color", "background": "#color", "text": "#color" }
+  }
+}
+```
+
+### Mobile-First Design
+- Dynamic viewport height (dvh) for mobile browsers
+- Responsive mode switcher
+- Touch-optimized interactions
+- Text visibility fixes for all screen sizes
 
 ---
 
 ## Project Structure
 
 ```
-careersy_wingman/
-├── app/                    # Next.js routes (App Router)
-│   ├── page.tsx           # Voyager landing
-│   ├── [communityId]/     # Dynamic community pages
-│   └── api/               # API routes
-├── components/            # React components
-│   ├── chat/             # Chat interface
-│   └── ui/               # Reusable UI
-├── lib/                   # Business logic
-│   ├── communities.ts    # Community loader
-│   ├── auth.ts           # Authentication
-│   └── ai-providers.ts   # AI integration
-├── communities/           # Community configs (JSON)
-│   ├── careersy.json
-│   └── voyager.json
-├── prisma/               # Database
-│   └── schema.prisma
-├── middleware.ts         # Custom domain routing
-└── docs/                 # Documentation
+voyager/
+├── app/                      # Next.js routes
+│   ├── page.tsx             # Root (redirects to /careersy for demo)
+│   ├── [communityId]/       # Dynamic community routes
+│   └── api/
+│       ├── chat-stream/     # Streaming chat endpoint
+│       └── chat/            # Non-streaming chat
+├── components/
+│   └── chat/
+│       ├── ChatInterface.tsx   # Main chat UI with mode switcher
+│       └── ChatMessage.tsx     # Message bubbles
+├── lib/
+│   ├── communities.ts       # Core: Community config loader & prompt builder
+│   ├── prompts/
+│   │   └── constitution.ts  # Constitutional AI framework
+│   ├── terminology.ts       # Custom terminology per community
+│   └── features.ts          # Feature flags
+├── communities/             # Community configs (git-tracked)
+│   ├── careersy.json       # ANZ tech career coaching
+│   └── voyager.json        # Platform navigator
+├── .claude/                # Documentation & context
+│   ├── VOYAGER_VISION.md
+│   ├── VOYAGER_CONSTITUTIONAL_FRAMEWORK.md
+│   └── COLLABORATION_ROADMAP.md
+└── prisma/
+    └── schema.prisma
 ```
 
 ---
 
-## Development
+## Current State (2025-10-29)
 
-### Common Commands
+### ✅ Shipped
+- Three-mode system (Navigator, Cartographer, Shipwright)
+- Constitutional AI framework with emergent meta-reasoning
+- Mobile-responsive design (dvh, proper text scaling)
+- Mode control with banner enforcement
+- Dynamic community branding
+- Default redirect to Careersy for demo
 
-```bash
-# Development
-npm run dev              # Start dev server
-npm run build            # Production build
-npx tsc --noEmit         # Type check
+### 🚧 In Progress
+- Testing with Eli (Week 1-3)
+- Gathering real user feedback
+- Validating expert knowledge extraction
 
-# Database
-npx prisma studio        # Database GUI
-npx prisma migrate dev   # Create migration
-npx prisma generate      # Generate client
-
-# Deployment
-git push origin develop  # Deploy to staging
-git push origin main     # Deploy to production
-```
-
-### Adding a New Community
-
-```bash
-# 1. Create config
-touch communities/my-community.json
-
-# 2. Define community (see docs/communities.md)
-
-# 3. Deploy
-git add communities/my-community.json
-git commit -m "feat: add my-community"
-git push
-```
-
-Community is live at: `voyager.ai/my-community`
+### 📦 Parked (See VOYAGER_VISION.md)
+- Shipwright collaboration UI (split-view drafting)
+- File upload and parsing
+- Community RAG knowledge base
+- Advanced mode routing
+- Voyager developer community
 
 ---
 
 ## Environment Variables
-
-Required variables (see `.env.local.example`):
 
 ```bash
 # Database
@@ -189,93 +212,56 @@ NEXTAUTH_SECRET="[generate with: openssl rand -base64 32]"
 # OAuth
 GOOGLE_CLIENT_ID="..."
 GOOGLE_CLIENT_SECRET="..."
-LINKEDIN_CLIENT_ID="..."
-LINKEDIN_CLIENT_SECRET="..."
 
 # AI
 ANTHROPIC_API_KEY="sk-ant-..."
-OPENAI_API_KEY="sk-..."
 ```
-
-**→ Full setup:** [docs/getting-started.md](./docs/getting-started.md)
 
 ---
 
-## Contributing
+## Key Learnings (Week 1)
 
-1. Follow [Git Workflow](./docs/git-workflow.md)
-2. Create feature branch from `develop`
-3. Open PR to `develop` (auto-deploys preview)
-4. Keep documentation updated
+### Constitutional Framework Creates Emergent Behavior
 
----
+During Careersy testing, Cartographer mode demonstrated meta-level reasoning that we didn't explicitly design. When tested with "structure this for prompts/RAG/fine-tuning", it refused to do both sides of the conversation and instead proposed "reverse knowledge extraction" - learning how modes work best by seeking feedback.
 
-## Architecture Highlights
+**The Insight:**
+Constitutional constraints don't just limit behavior - they create emergent capabilities. By refusing to replace thinking (constitutional principle), the AI was forced to reason about its own reasoning, which generated novel approaches.
 
-### JSON-Based Communities
-Communities defined by configuration files, not database records.
-
-**Benefits:**
-- Instant deployment (no migrations)
-- Git version control
-- Zero database queries for metadata
-- Developer-friendly
-
-### Custom Domain Routing
-Next.js middleware maps domains to communities.
-
-```
-community.acme.com  → /acme-corp
-careersy.voyager.ai → /careersy
-voyager.ai/careersy → /careersy
-```
-
-**Benefits:**
-- Zero-config on Vercel
-- Auto SSL certificates
-- White-label ready
-
-### Multi-Provider AI
-Unified interface for OpenAI + Anthropic.
-
-**Benefits:**
-- Cost optimization
-- Redundancy
-- Switch providers without code changes
-
-**→ Full architecture:** [docs/architecture.md](./docs/architecture.md)
+**Why This Matters:**
+1. Strong principles create better AI, not worse
+2. Mode constraints + constitutional framework = emergent meta-reasoning
+3. Evidence of "here's what surprised me" - designed for one thing, got something better
+4. Potential feature - AI systems that learn how to improve their own modes
 
 ---
 
-## Deployment
+## Git Workflow
 
-### Staging
-- Branch: `develop`
-- URL: https://careersy-wingman-git-develop.vercel.app
-- Auto-deploy: ✅
+**Branches:**
+- `main` - Production (https://voyager-platform.vercel.app)
+- `develop` - Staging (auto-deploy on push)
+- Feature branches - Create from `develop`, merge back via PR
 
-### Production
-- Branch: `main`
-- URL: https://careersy-wingman.vercel.app
-- Auto-deploy: ✅
+**Commits:**
+```bash
+git add .
+git commit -m "feat: description
 
-**→ Full guide:** [docs/operations.md](./docs/operations.md)
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+git push origin develop
+```
 
 ---
 
 ## Support
 
-- **Documentation:** See sections above
 - **Issues:** GitHub Issues
-- **Contact:** [Your email/contact]
+- **Vision Doc:** [.claude/VOYAGER_VISION.md](./.claude/VOYAGER_VISION.md)
 
 ---
 
-## License
-
-MIT License
-
----
-
-**Built with ❤️ for multi-community platforms**
-**Last Updated:** 2025-10-19
+**Built to elevate human thinking**
+**Last Updated:** 2025-10-29

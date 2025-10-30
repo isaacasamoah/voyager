@@ -11,7 +11,7 @@
     "test:ui": "vitest --ui",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",
-    "postinstall": "prisma generate",
+    "postinstall": "prisma generate && prisma migrate deploy",
     "db:migrate": "prisma migrate dev",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^2.0.33",
+    "@ai-sdk/openai": "^2.0.57",
     "@anthropic-ai/sdk": "^0.67.0",
     "@auth/prisma-adapter": "^2.4.0",
     "@prisma/client": "^5.16.1",

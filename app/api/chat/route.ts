@@ -20,15 +20,15 @@ export async function POST(req: NextRequest) {
       email: session?.user?.email
     })
 
-    const { message, assistantMessage, conversationId: conversationId, mode = 'private', title, communityId = 'careersy' } = await req.json()
+    const { message, assistantMessage, conversationId: conversationId, title, communityId = 'careersy', mode = 'navigator' } = await req.json()
 
     logApi('POST /api/chat - params', {
       hasMessage: !!message,
       hasAssistantMessage: !!assistantMessage,
       hasConversationId: !!conversationId,
-      mode,
       hasTitle: !!title,
-      communityId
+      communityId,
+      mode
     })
 
     if (!message || typeof message !== 'string') {
@@ -105,8 +105,9 @@ export async function POST(req: NextRequest) {
         data: {
           userId: session.user.id,
           title: conversationTitle,
-          isPublic: mode === 'public',
+          isPublic: false, // All conversations private until Phase 1 (public sharing)
           communityId: communityId,
+          contentType: 'message',
         },
         include: { messages: true }
       })
@@ -126,9 +127,14 @@ export async function POST(req: NextRequest) {
     const modelConfig = getModelConfig()
 
     // Build system prompt from community config with resume context
-    let systemPrompt = getCommunitySystemPrompt(communityConfig)
+    // Mode: navigator (coaching), shipwright (post drafting), or cartographer (expert knowledge extraction)
+    const conversationMode: 'navigator' | 'shipwright' | 'cartographer' = mode
+
+    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode: conversationMode })
+
+    // Add resume/artifact context in all modes (all modes benefit from user context)
     if (user?.resumeText) {
-      systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
+      systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized advice based on their actual experience, skills, and background.`
     }
 
     const messages: ChatMessage[] = [
@@ -163,6 +169,14 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({
       message: finalAssistantMessage,
       conversationId: conversation.id,
+      conversation: {
+        id: conversation.id,
+        title: conversation.title,
+        isPublic: conversation.isPublic,
+        publishedPostId: conversation.publishedPostId,
+        createdAt: conversation.createdAt,
+        updatedAt: conversation.updatedAt,
+      }
     })
 
   } catch (error) {

@@ -1,7 +1,42 @@
-# AI Career Coach - Implementation Specification
+# Voyager Platform - Context & Vision
+
+**⚠️ DEPRECATION NOTICE (2025-10-29):**
+This document contains outdated implementation details. For current architecture and vision, see:
+- **[VOYAGER_VISION.md](./VOYAGER_VISION.md)** - Current focus and learnings
+- **[COLLABORATION_ROADMAP.md](./COLLABORATION_ROADMAP.md)** - Architecture and phases
+- **[README.md](../README.md)** - Up-to-date overview
+
+**What's outdated here:**
+- References `curateMode` (now called `mode: 'navigator' | 'shipwright' | 'cartographer'`)
+- Old schema and code examples
+- Tech stack (we use Anthropic Claude, not OpenAI GPT-4)
+
+**What's still relevant:**
+- Isaac's INFP personality and collaboration preferences
+- Project philosophy and values
+
+---
+
+## About Isaac (The Creator)
+
+**Personality**: INFP - The Mediator/Healer
+- Values authenticity, meaning, and human potential
+- Thinks in possibilities and big-picture patterns
+- Driven by deeply held values and vision
+- Prefers gentle, empathetic collaboration
+- Best interactions flow naturally, feel meaningful, respect autonomy
+
+**When working with Isaac:**
+- Lead with "why" and meaning, not just "how"
+- Explore possibilities before constraints
+- Give space for reflection and discovery
+- Be authentic and warm, not transactional
+- Help connect ideas to deeper purpose
+
+---
 
 ## Project Overview
-Build a minimal viable product (MVP) for an AI-powered career coach focused on the Australian tech market. This is a Next.js web application with authentication, database persistence, and GPT API integration.
+Build a conversational co-learning platform (Voyager) with intelligent mode routing - transforming how people learn, get help, and share expertise.
 
 ## Tech Stack
 - **Framework**: Next.js 14 (App Router)

@@ -10,6 +10,7 @@ import TutorialOverlay from '../tutorial/TutorialOverlay'
 import { getTutorialSteps } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
 import { getVoyageTerminology } from '@/lib/terminology'
+import { FEATURE_FLAGS } from '@/lib/features'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -22,8 +23,6 @@ interface Conversation {
   createdAt: string
   updatedAt: string
 }
-
-type ConversationMode = 'private' | 'public'
 
 interface ChatInterfaceProps {
   communityId: string
@@ -44,12 +43,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [loadingConversations, setLoadingConversations] = useState(false)
   const [showResumeModal, setShowResumeModal] = useState(false)
   const [hasResume, setHasResume] = useState(false)
-  const [mode, setMode] = useState<ConversationMode>('private')
-  const [publicTitle, setPublicTitle] = useState('')
-  const [showNewConversation, setShowNewConversation] = useState(false)
-  const [showSearch, setShowSearch] = useState(false)
-  const [searchQuery, setSearchQuery] = useState('')
   const [showTutorial, setShowTutorial] = useState(false)
+  const [currentConversation, setCurrentConversation] = useState<Conversation | null>(null)
+  const [currentMode, setCurrentMode] = useState<'navigator' | 'cartographer'>('navigator')
+  const [previousMode, setPreviousMode] = useState<'navigator' | 'cartographer' | null>(null)
+  const [isExpert, setIsExpert] = useState(false)
+  const [abTestMode, setAbTestMode] = useState<'basic' | 'full'>(FEATURE_FLAGS.CAREERSY_MODE) // A/B test mode for Careersy - defaults from feature flags
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -79,55 +78,53 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     loadConversations()
     checkResume()
     checkTutorialStatus()
+    checkExpertStatus()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Auto-focus input when tutorial starts or ends
+  // Check expert status when session changes
   useEffect(() => {
-    inputRef.current?.focus()
+    checkExpertStatus()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session])
+
+  // Auto-focus input when tutorial starts or ends (but not on mobile to prevent zoom)
+  useEffect(() => {
+    // Only auto-focus on desktop (viewport width >= 768px)
+    if (window.innerWidth >= 768) {
+      inputRef.current?.focus()
+    }
   }, [showTutorial])
 
   // Check if user needs tutorial (first time only)
   const checkTutorialStatus = () => {
-    const tutorialKey = `${communityId}_tutorial_completed`
-    const hasSeenTutorial = localStorage.getItem(tutorialKey)
-    if (!hasSeenTutorial && getTutorialSteps(communityId).length > 0) {
-      setTimeout(() => setShowTutorial(true), 500) // Small delay for smooth entrance
-    }
+    // Tutorial disabled for alpha - using email + guide-based onboarding
+    // Will re-enable after updating tutorial steps to match shipped features
+    return
+
+    // Original code (commented out):
+    // const tutorialKey = `${communityId}_tutorial_completed`
+    // const hasSeenTutorial = localStorage.getItem(tutorialKey)
+    // if (!hasSeenTutorial && getTutorialSteps(communityId).length > 0) {
+    //   setTimeout(() => setShowTutorial(true), 500) // Small delay for smooth entrance
+    // }
   }
 
   const handleTutorialComplete = () => {
     setShowTutorial(false)
     const tutorialKey = `${communityId}_tutorial_completed`
     localStorage.setItem(tutorialKey, 'true')
-    // Restore private mode after tutorial
-    setMode('private')
   }
 
   const handleTutorialSkip = () => {
     setShowTutorial(false)
     const tutorialKey = `${communityId}_tutorial_completed`
     localStorage.setItem(tutorialKey, 'true')
-    // Restore private mode after tutorial
-    setMode('private')
   }
 
   const restartTutorial = () => {
     setShowTutorial(true)
   }
-
-  const handleTutorialStepChange = (stepId: string) => {
-    // When tutorial reaches collaborate toggle, enable public mode
-    if (stepId === 'collaborate-toggle') {
-      setMode('public')
-    }
-  }
-
-  // Reload conversations when mode changes
-  useEffect(() => {
-    loadConversations()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode])
 
   const checkResume = async () => {
     try {
@@ -138,6 +135,14 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
       }
     } catch (error) {
       console.error('Error checking resume:', error)
+    }
+  }
+
+  const checkExpertStatus = () => {
+    // Check if user email is in community experts list
+    if (session?.user?.email) {
+      const expertEmails = communityConfig.experts || []
+      setIsExpert(expertEmails.includes(session.user.email))
     }
   }
 
@@ -163,18 +168,15 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
       if (communityConfig.showsCommunities) {
         // Voyager: show communities in sidebar
         endpoint = `/api/communities`
-      } else if (mode === 'public') {
-        // Public mode: show threads
-        endpoint = `/api/community/threads?communityId=${communityId}`
       } else {
-        // Private mode: show user's conversations
+        // Show user's conversations
         endpoint = `/api/conversations?communityId=${communityId}`
       }
 
       const response = await fetch(endpoint)
       if (response.ok) {
         const data = await response.json()
-        setConversations(data.communities || data.threads || data.conversations || [])
+        setConversations(data.communities || data.conversations || [])
       }
     } catch (error) {
       console.error('Error loading conversations:', error)
@@ -191,6 +193,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         const data = await response.json()
         setMessages(data.messages || [])
         setConversationId(id)
+        setCurrentConversation(data.conversation || null)
       }
     } catch (error) {
       console.error('Error loading conversation:', error)
@@ -201,6 +204,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const startNewChat = () => {
     setMessages([])
     setConversationId(null)
+    setCurrentConversation(null)
     setInput('')
   }
 
@@ -222,8 +226,16 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           message: userMessage,
           conversationId: conversationId,
           communityId,
+          mode: currentMode, // Pass current mode to API
+          previousMode: previousMode, // Signal mode switch if it just happened
+          abTestMode: communityId === 'careersy' ? abTestMode : undefined, // A/B test mode for Careersy
         }),
       })
+
+      // Clear previousMode after first message in new mode
+      if (previousMode) {
+        setPreviousMode(null)
+      }
 
       if (!response.ok) {
         throw new Error('Failed to send message')
@@ -252,7 +264,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         })
       }
 
-      // Save to database after streaming completes (only for authenticated communities)
+      // Save to database after streaming completes (skip voyager)
       if (communityId !== 'voyager') {
         const saveResponse = await fetch('/api/chat', {
           method: 'POST',
@@ -262,24 +274,18 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             assistantMessage: fullResponse,
             conversationId,
             communityId,
-            mode,
-            title: mode === 'public' && publicTitle ? publicTitle : undefined,
           }),
         })
 
         if (saveResponse.ok) {
           const data = await saveResponse.json()
           setConversationId(data.conversationId)
+          if (data.conversation) {
+            setCurrentConversation(data.conversation)
+          }
         }
-      }
 
-      // Clear public title after sending
-      if (mode === 'public') {
-        setPublicTitle('')
-      }
-
-      // Reload conversations to show the new one
-      if (communityId !== 'voyager') {
+        // Reload conversations to show the new one
         loadConversations()
       }
     } catch (error) {
@@ -297,38 +303,37 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     signOut({ callbackUrl: '/login' })
   }
 
-  // Filter conversations based on search query (only in collaborate mode)
-  const filteredConversations = mode === 'public' && searchQuery.trim()
-    ? conversations.filter(conv =>
-        conv.title.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-    : conversations
-
   return (
-    <div className="flex h-screen" style={{ backgroundColor: fullBranding.colors.background }}>
-      {/* Sidebar - Minimal Space Style */}
+    <div className="flex h-screen overflow-hidden" style={{ backgroundColor: fullBranding.colors.background, height: '100dvh' }}>
+      {/* Sidebar - Mobile-first: full screen overlay on mobile, fixed width on desktop */}
       {showSidebar && (
-        <div className={`w-64 ${fullBranding.components.sidebar} flex flex-col`}>
+        <div className={`fixed md:relative inset-0 md:inset-auto z-50 md:z-auto w-full md:w-64 ${fullBranding.components.sidebar} flex flex-col`}>
+          {/* Mobile Close Button (top-right) */}
+          <div className="md:hidden flex justify-end px-4 pt-4 pb-2">
+            <button
+              onClick={() => setShowSidebar(false)}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              aria-label="Close sidebar"
+            >
+              <svg className="w-5 h-5" style={{ color: fullBranding.colors.text }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
           {/* Conversations List */}
           <div className="flex-1 overflow-y-auto px-3 py-4">
             <div className="text-xs text-gray-400 uppercase tracking-wider mb-3 px-2">
-              {mode === 'public' ? (
-                searchQuery ? `Results (${filteredConversations.length})` : (communityConfig.showsCommunities ? 'Communities' : 'Community')
-              ) : (
-                'History'
-              )}
+              {communityConfig.showsCommunities ? 'Communities' : 'History'}
             </div>
             {loadingConversations ? (
               <div className="text-center text-gray-400 py-4 text-sm">...</div>
-            ) : filteredConversations.length === 0 ? (
+            ) : conversations.length === 0 ? (
               <div className="text-center text-gray-400 py-4 text-xs">
-                {searchQuery
-                  ? 'No matches found'
-                  : mode === 'public' ? `No ${terms.course}s yet` : 'No history yet'
-                }
+                No history yet
               </div>
             ) : (
-              filteredConversations.map((conv) => (
+              conversations.map((conv) => (
                 <button
                   key={conv.id}
                   onClick={() => {
@@ -376,8 +381,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
 
       {/* Main Chat Area */}
       <div className="flex-1 flex flex-col">
-        {/* Header - Voyager Style with Collaborate Mode */}
-        <div className="flex-shrink-0 px-6 py-4 bg-white flex items-center justify-between border-b border-gray-100">
+        {/* Header - Mobile-first: smaller padding on mobile */}
+        <div className="flex-shrink-0 px-4 py-3 md:px-6 md:py-4 bg-white flex items-center justify-between border-b border-gray-100">
           {/* Left: Hamburger + Replay Tutorial */}
           <div className="flex items-center gap-2">
             <button
@@ -400,158 +405,88 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             </button>
           </div>
 
-          {/* Right: Collaborate Tools + Toggle */}
-          <div className="flex items-center gap-0.5">
-            {/* Collaborate Mode Tools */}
-            {mode === 'public' && (
-              <div className="flex items-center gap-0.5 animate-in fade-in slide-in-from-right-5 duration-300">
-                {/* New Conversation */}
-                <div className="relative group">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowNewConversation(!showNewConversation)
-                      setShowSearch(false)
-                    }}
-                    className="w-5 h-5 border rounded-full flex items-center justify-center transition-colors"
-                    style={{ borderColor: '#d1d5db' }}
-                    onMouseEnter={(e) => e.currentTarget.style.borderColor = fullBranding.colors.primary}
-                    onMouseLeave={(e) => e.currentTarget.style.borderColor = '#d1d5db'}
-                  >
-                    <svg className="w-3 h-3 transition-colors" style={{ color: fullBranding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
-                    </svg>
-                  </button>
-                  {/* Tooltip - Below Icon */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
-                    {communityConfig.showsCommunities ? 'Add community' : 'Start new conversation'}
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
-                  </div>
-                </div>
-
-                {/* New Conversation Title Field */}
-                <div className={`relative transition-all ${showNewConversation ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'}`}>
-                  <input
-                    type="text"
-                    value={publicTitle}
-                    onChange={(e) => setPublicTitle(e.target.value)}
-                    placeholder="Course title..."
-                    className={`w-full px-3 py-1 pr-8 ${fullBranding.components.input} transition-colors text-xs`}
-                  />
-                  {publicTitle && (
-                    <div className="absolute right-2 top-1/2 -translate-y-1/2" style={{ color: fullBranding.colors.primary }}>
-                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                  )}
-                </div>
-
-                {/* Search */}
-                <div className="relative group">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowSearch(!showSearch)
-                      setShowNewConversation(false)
-                    }}
-                    className="w-5 h-5 flex items-center justify-center transition-colors"
-                  >
-                    <svg className="w-4 h-4 transition-colors" style={{ color: fullBranding.colors.textSecondary }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                    </svg>
-                  </button>
-                  {/* Tooltip - Below Icon */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-2 text-white text-xs rounded-lg opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap shadow-lg z-50" style={{ backgroundColor: fullBranding.colors.text }}>
-                    {communityConfig.showsCommunities ? 'Search communities' : 'Search conversations'}
-                    <div className="absolute -top-1 left-1/2 -translate-x-1/2 -translate-y-full w-0 h-0 border-l-4 border-r-4 border-b-4 border-transparent" style={{ borderBottomColor: fullBranding.colors.text }}></div>
-                  </div>
-                </div>
-
-                {/* Search Field with Dropdown */}
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search..."
-                    className={`px-3 py-1 ${fullBranding.components.input} transition-all text-xs ${
-                      showSearch ? 'w-48 opacity-100' : 'w-0 opacity-0 pointer-events-none'
-                    }`}
-                  />
-
-                  {/* Search Results Dropdown */}
-                  {showSearch && searchQuery.trim() && (
-                    <div className="absolute top-full left-0 right-0 mt-2 bg-white rounded-lg shadow-lg border border-gray-100 max-h-64 overflow-y-auto z-50 animate-in fade-in slide-in-from-top-2 duration-200">
-                      {/* Results Count */}
-                      <div className="px-3 py-2 text-xs text-gray-400 border-b border-gray-100">
-                        {filteredConversations.length} {filteredConversations.length === 1 ? 'result' : 'results'}
-                      </div>
-
-                      {/* Results List */}
-                      {filteredConversations.length === 0 ? (
-                        <div className="px-3 py-4 text-xs text-gray-400 text-center">
-                          No matches found
-                        </div>
-                      ) : (
-                        filteredConversations.map((conv) => (
-                          <button
-                            key={conv.id}
-                            onClick={() => {
-                              loadConversation(conv.id)
-                              setSearchQuery('')
-                              setShowSearch(false)
-                            }}
-                            className="w-full text-left px-3 py-2 transition-colors border-b border-gray-50 last:border-b-0"
-                            style={{ backgroundColor: 'transparent' }}
-                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = fullBranding.colors.background}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
-                          >
-                            <div className="text-xs font-medium truncate" style={{ color: fullBranding.colors.text }}>
-                              {conv.title}
-                            </div>
-                            <div className="text-xs mt-0.5" style={{ color: fullBranding.colors.textSecondary }}>
-                              {new Date(conv.updatedAt).toLocaleDateString()}
-                            </div>
-                          </button>
-                        ))
-                      )}
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-
-            {/* Collaborate Toggle */}
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium" style={{ color: fullBranding.colors.text }}>Collaborate</span>
+          {/* Center: Mode Switcher (Expert Only, Full Voyager Mode) */}
+          {isExpert && !(communityId === 'careersy' && abTestMode === 'basic') && (
+            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
               <button
                 onClick={() => {
-                  // Smooth transition: clear screen before mode switch
-                  setMessages([])
-                  setConversationId(null)
-                  // Small delay so the fade feels natural
-                  setTimeout(() => {
-                    setMode(mode === 'private' ? 'public' : 'private')
-                    setShowNewConversation(false)
-                    setShowSearch(false)
-                  }, 100)
+                  if (currentMode !== 'navigator') {
+                    setPreviousMode(currentMode)
+                    setCurrentMode('navigator')
+                  }
                 }}
-                className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors"
-                style={{ backgroundColor: mode === 'public' ? fullBranding.colors.primary : '#d1d5db' }}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  currentMode === 'navigator'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Navigator mode - Private coaching"
               >
-                <span
-                  className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                    mode === 'public' ? 'translate-x-5' : 'translate-x-1'
-                  }`}
-                />
+                🧭 Navigator
+              </button>
+              <button
+                onClick={() => {
+                  if (currentMode !== 'cartographer') {
+                    setPreviousMode(currentMode)
+                    setCurrentMode('cartographer')
+                  }
+                }}
+                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                  currentMode === 'cartographer'
+                    ? 'bg-gray-900 text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                }`}
+                title="Cartographer mode - Share knowledge"
+              >
+                🗺️ Cartographer
+              </button>
+            </div>
+          )}
+
+          {/* Right: New Chat Button */}
+          <button
+            onClick={startNewChat}
+            className="p-2 hover:bg-gray-50 rounded transition-colors"
+            title="New conversation"
+          >
+            <svg className="w-4 h-4" style={{ color: fullBranding.colors.text }} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" />
+            </svg>
+          </button>
+        </div>
+
+        {/* A/B Test Mode Toggle (Careersy experts only) */}
+        {communityId === 'careersy' && isExpert && (
+          <div className={`flex-shrink-0 px-4 py-3 border-b ${
+            abTestMode === 'basic'
+              ? 'bg-blue-50 border-blue-100'
+              : 'bg-purple-50 border-purple-100'
+          }`}>
+            <div className="flex items-center justify-center gap-3">
+              <span className={`text-xs font-medium ${
+                abTestMode === 'basic' ? 'text-blue-700' : 'text-purple-700'
+              }`}>
+                {abTestMode === 'basic'
+                  ? '🔵 A/B TEST: Basic Mode (GPT + Domain)'
+                  : '🟣 A/B TEST: Full Voyager (Claude + Constitutional + Cartographer)'}
+              </span>
+              <button
+                onClick={() => setAbTestMode(abTestMode === 'basic' ? 'full' : 'basic')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  abTestMode === 'basic'
+                    ? 'bg-blue-600 hover:bg-blue-700 text-white'
+                    : 'bg-purple-600 hover:bg-purple-700 text-white'
+                }`}
+                title="Toggle between Basic and Full Voyager mode"
+              >
+                Switch to {abTestMode === 'basic' ? 'Full Voyager' : 'Basic Mode'}
               </button>
             </div>
           </div>
-        </div>
+        )}
 
-        {/* Messages Container */}
-        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-8 space-y-6">
+        {/* Messages Container - Mobile-first: less padding on mobile */}
+        <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 md:p-6 lg:p-8 space-y-4 md:space-y-6">
           {messages.length === 0 && (
             <div className="flex items-center justify-center h-full">
               <div className="text-center">
@@ -559,12 +494,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   <Image
                     src={fullBranding.logo}
                     alt={communityConfig.name}
-                    width={120}
-                    height={120}
-                    className="object-contain mx-auto mb-6 opacity-90"
+                    width={80}
+                    height={80}
+                    className="object-contain mx-auto mb-4 md:mb-6 opacity-90 w-16 h-16 md:w-24 md:h-24 lg:w-30 lg:h-30"
                   />
                 )}
-                <h1 className={`${fullBranding.typography.title.font} ${fullBranding.typography.title.size} ${fullBranding.typography.title.weight} ${fullBranding.typography.title.tracking} mb-2`} style={{ color: fullBranding.colors.text }}>
+                <h1 className={`${fullBranding.typography.title.font} text-4xl md:text-5xl lg:${fullBranding.typography.title.size} ${fullBranding.typography.title.weight} ${fullBranding.typography.title.tracking} mb-2`} style={{ color: fullBranding.colors.text }}>
                   {fullBranding.title}
                 </h1>
                 <div className="w-48 h-[1px] bg-gray-200 mx-auto mt-6"></div>
@@ -573,7 +508,11 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           )}
 
           {messages.map((msg, idx) => (
-            <ChatMessage key={idx} message={msg} />
+            <ChatMessage
+              key={idx}
+              message={msg}
+              branding={fullBranding}
+            />
           ))}
 
           {loading && (
@@ -591,16 +530,17 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input Form - Voyager Style */}
-        <form onSubmit={sendMessage} className="flex-shrink-0 p-8 bg-white">
-          <div style={{ width: fullBranding.spacing.inputWidth }} className="mx-auto">
+
+        {/* Input Form - Mobile-first: less padding, full width on mobile */}
+        <form onSubmit={sendMessage} className="flex-shrink-0 p-4 md:p-6 lg:p-8 bg-white">
+          <div className="w-full max-w-2xl mx-auto px-2 md:px-0">
             {/* Message Input with Add Context + Submit */}
-            <div className="relative flex items-center gap-2">
-              {/* Add Files Button */}
+            <div className="flex items-center gap-2">
+              {/* Add Files Button - Mobile-first: slightly smaller on mobile */}
               <button
                 type="button"
                 onClick={() => setShowResumeModal(true)}
-                className="flex-shrink-0 w-10 h-10 border rounded-full flex items-center justify-center transition-colors group relative"
+                className="flex-shrink-0 w-9 h-9 md:w-10 md:h-10 border rounded-full flex items-center justify-center transition-colors group relative"
                 style={{ borderColor: fullBranding.colors.border }}
                 onMouseEnter={(e) => e.currentTarget.style.borderColor = fullBranding.colors.borderHover}
                 onMouseLeave={(e) => e.currentTarget.style.borderColor = fullBranding.colors.border}
@@ -620,27 +560,31 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                 </div>
               </button>
 
-              {/* Input Field */}
-              <input
-                ref={inputRef}
-                type="text"
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                placeholder="What's your next career move?"
-                className={`flex-1 px-6 py-4 pr-14 ${fullBranding.components.input} transition-colors ${fullBranding.typography.input.size} placeholder:text-gray-400`}
-                disabled={loading}
-              />
+              {/* Input Field with Submit Button - Mobile-first: less padding on mobile */}
+              <div className="flex-1 relative">
+                <input
+                  ref={inputRef}
+                  type="text"
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder="What's your next career move?"
+                  className={`w-full px-4 py-3 md:px-6 md:py-4 pr-12 md:pr-14 ${fullBranding.components.input} transition-colors text-base placeholder:text-gray-400`}
+                  disabled={loading}
+                />
 
-              {/* Submit Button */}
-              <button
-                type="submit"
-                disabled={loading || !input.trim()}
-                className={`absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
-              >
-                <svg className="w-5 h-5" style={{ color: fullBranding.colors.userMessageText }} fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-              </button>
+                {/* Submit Button - Inside input field, smaller on mobile */}
+                <button
+                  type="submit"
+                  disabled={loading || !input.trim()}
+                  className={`absolute right-1.5 md:right-2 top-1/2 -translate-y-1/2 w-9 h-9 md:w-10 md:h-10 ${fullBranding.components.button} flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed transition-all`}
+                  style={{ backgroundColor: fullBranding.colors.primary }}
+                  title="Send message"
+                >
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </form>
@@ -659,7 +603,6 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           steps={getTutorialSteps(communityId)}
           onComplete={handleTutorialComplete}
           onSkip={handleTutorialSkip}
-          onStepChange={handleTutorialStepChange}
           accentColor={communityConfig.branding.colors.primary}
         />
       )}

@@ -12,16 +12,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { streamText } from 'ai'
 import { anthropic } from '@ai-sdk/anthropic'
+import { openai } from '@ai-sdk/openai'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getCommunityConfig, getCommunitySystemPrompt } from '@/lib/communities'
+import { FEATURE_FLAGS } from '@/lib/features'
 
 export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, conversationId, communityId = 'careersy' } = await req.json()
+    const { message, conversationId, communityId = 'careersy', mode = 'navigator', previousMode, incomingHistory, abTestMode } = await req.json()
 
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
@@ -34,13 +36,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Community not found' }, { status: 404 })
     }
 
-    // Build system prompt from community config
-    let systemPrompt = getCommunitySystemPrompt(communityConfig)
+    // Select model based on community and A/B test mode (runtime toggle)
+    // Use runtime abTestMode from request, fallback to static flag if not provided
+    const effectiveMode = abTestMode || (communityId === 'careersy' ? FEATURE_FLAGS.CAREERSY_MODE : 'full')
+    const isBasicMode = communityId === 'careersy' && effectiveMode === 'basic'
+    const model = isBasicMode
+      ? openai('gpt-4o')  // Basic mode: GPT + domain expertise only
+      : anthropic('claude-sonnet-4-20250514')  // Full Voyager mode
+
+    // Build system prompt from community config (pass abTestMode for constitutional layer control)
+    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode, communityId, abTestMode: effectiveMode })
 
     // Voyager: No auth required, no conversation history
     if (communityId === 'voyager') {
       const result = streamText({
-        model: anthropic('claude-sonnet-4-20250514'),
+        model,
         messages: [
           { role: 'system', content: systemPrompt },
           { role: 'user', content: message }
@@ -66,15 +76,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Not a member of this community' }, { status: 403 })
     }
 
-    // Add resume context if available
+    // Add resume context if available (all modes benefit from context)
     if (user?.resumeText) {
-      systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized career advice based on their actual experience, skills, and background.`
+      systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized advice based on their actual experience, skills, and background.`
     }
 
-    // Get conversation history if conversationId provided
+    // Get conversation history
+    // If incoming history provided (e.g., ephemeral draft mode), use it
+    // Otherwise, load from database
     let conversationHistory: Array<{ role: 'user' | 'assistant'; content: string }> = []
 
-    if (conversationId) {
+    if (incomingHistory && Array.isArray(incomingHistory)) {
+      // Use ephemeral messages passed from frontend
+      conversationHistory = incomingHistory
+    } else if (conversationId) {
+      // Load from database
       const conversation = await prisma.conversation.findUnique({
         where: { id: conversationId, userId: session.user.id },
         include: {
@@ -86,16 +102,25 @@ export async function POST(req: NextRequest) {
       })
 
       if (conversation && conversation.communityId === communityId) {
-        conversationHistory = conversation.messages.map(log => ({
-          role: log.role as 'user' | 'assistant',
-          content: log.content
+        conversationHistory = conversation.messages.map(msg => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content
         }))
       }
     }
 
+    // Handle mode switching - add transition context if mode just changed
+    if (previousMode && previousMode !== mode) {
+      // Add a system message explaining the mode transition
+      conversationHistory.push({
+        role: 'assistant',
+        content: `[Mode Switch: You just switched from ${previousMode} mode to ${mode} mode. Continue the conversation naturally while maintaining awareness of everything we've discussed. Adapt to your new role in ${mode} mode while preserving context from our previous conversation.]`
+      })
+    }
+
     // Stream response using Vercel AI SDK
     const result = streamText({
-      model: anthropic('claude-sonnet-4-20250514'),
+      model, // Uses model selected earlier (GPT for basic mode, Claude for full Voyager)
       messages: [
         { role: 'system', content: systemPrompt },
         ...conversationHistory,
