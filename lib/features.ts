@@ -23,6 +23,9 @@ export const FEATURE_FLAGS = {
    * 'full': Claude + constitutional framework + cartographer mode (full Voyager)
    *
    * Tests whether Voyager features add value over simple GPT wrapper
+   *
+   * Default: 'full' - Experts get complete Voyager experience (including Cartographer)
+   * Users can toggle to 'basic' via UI if they want to compare
    */
-  CAREERSY_MODE: 'basic' as 'basic' | 'full',
+  CAREERSY_MODE: 'full' as 'basic' | 'full',
 } as const;
