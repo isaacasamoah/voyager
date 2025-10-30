@@ -98,11 +98,16 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
 
   // Check if user needs tutorial (first time only)
   const checkTutorialStatus = () => {
-    const tutorialKey = `${communityId}_tutorial_completed`
-    const hasSeenTutorial = localStorage.getItem(tutorialKey)
-    if (!hasSeenTutorial && getTutorialSteps(communityId).length > 0) {
-      setTimeout(() => setShowTutorial(true), 500) // Small delay for smooth entrance
-    }
+    // Tutorial disabled for alpha - using email + guide-based onboarding
+    // Will re-enable after updating tutorial steps to match shipped features
+    return
+
+    // Original code (commented out):
+    // const tutorialKey = `${communityId}_tutorial_completed`
+    // const hasSeenTutorial = localStorage.getItem(tutorialKey)
+    // if (!hasSeenTutorial && getTutorialSteps(communityId).length > 0) {
+    //   setTimeout(() => setShowTutorial(true), 500) // Small delay for smooth entrance
+    // }
   }
 
   const handleTutorialComplete = () => {
