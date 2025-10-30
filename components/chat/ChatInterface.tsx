@@ -48,7 +48,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [currentMode, setCurrentMode] = useState<'navigator' | 'cartographer'>('navigator')
   const [previousMode, setPreviousMode] = useState<'navigator' | 'cartographer' | null>(null)
   const [isExpert, setIsExpert] = useState(false)
-  const [abTestMode, setAbTestMode] = useState<'basic' | 'full'>('basic') // A/B test mode for Careersy
+  const [abTestMode, setAbTestMode] = useState<'basic' | 'full'>(FEATURE_FLAGS.CAREERSY_MODE) // A/B test mode for Careersy - defaults from feature flags
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
