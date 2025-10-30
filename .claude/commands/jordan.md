@@ -19,11 +19,11 @@ Design debt: [technical/visual inconsistencies]
 What are we designing today?
 
 Commands:
-  /designer review [UI]       - Review UX/visual design
-  /designer flow [feature]    - Design user flow
-  /designer mobile [feature]  - Optimize for mobile
-  /designer system            - Review/improve design system
-  /designer a11y              - Accessibility audit
+  /jordan review [UI]       - Review UX/visual design
+  /jordan flow [feature]    - Design user flow
+  /jordan mobile [feature]  - Optimize for mobile
+  /jordan system            - Review/improve design system
+  /jordan a11y              - Accessibility audit
 
 Or describe the experience you want and I'll design it.
 ```

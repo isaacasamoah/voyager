@@ -19,11 +19,11 @@ Open user questions: [things we don't know yet]
 What are we discovering today?
 
 Commands:
-  /pm feature-check [idea]    - Evaluate feature against user needs + constitution
-  /pm prioritize              - Help prioritize backlog by learning value
-  /pm discovery               - Design user research questions/experiments
-  /pm story [feature]         - Write user story with clear success criteria
-  /pm debrief [feedback]      - Process user feedback into opportunities
+  /priya feature-check [idea]    - Evaluate feature against user needs + constitution
+  /priya prioritize              - Help prioritize backlog by learning value
+  /priya discovery               - Design user research questions/experiments
+  /priya story [feature]         - Write user story with clear success criteria
+  /priya debrief [feedback]      - Process user feedback into opportunities
 
 Or tell me what the user needs and I'll help us figure out what to build.
 ```

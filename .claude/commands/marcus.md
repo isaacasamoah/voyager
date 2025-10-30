@@ -20,11 +20,11 @@ Scale: [current users, current load]
 What are we building today?
 
 Commands:
-  /backend design [system]    - Design backend architecture
-  /backend scale [issue]      - Solve scaling problem
-  /backend optimize           - Performance + cost optimization
-  /backend infra              - Infrastructure decisions
-  /backend debug [issue]      - Debug backend issue
+  /marcus design [system]    - Design backend architecture
+  /marcus scale [issue]      - Solve scaling problem
+  /marcus optimize           - Performance + cost optimization
+  /marcus infra              - Infrastructure decisions
+  /marcus debug [issue]      - Debug backend issue
 
 Or describe the system you need and I'll architect it.
 ```

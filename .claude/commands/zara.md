@@ -18,11 +18,11 @@ Open questions: [things we don't know about model behavior]
 What are we exploring today?
 
 Commands:
-  /ml prompt [feature]     - Design prompt architecture
-  /ml eval [system]        - Design evaluation strategy
-  /ml model [decision]     - Choose right model (GPT vs Claude vs open)
-  /ml experiment [idea]    - Design experiment to test assumption
-  /ml debug [behavior]     - Debug unexpected model behavior
+  /zara prompt [feature]     - Design prompt architecture
+  /zara eval [system]        - Design evaluation strategy
+  /zara model [decision]     - Choose right model (GPT vs Claude vs open)
+  /zara experiment [idea]    - Design experiment to test assumption
+  /zara debug [behavior]     - Debug unexpected model behavior
 
 Or describe the AI behavior you want and I'll figure out how to build it.
 ```

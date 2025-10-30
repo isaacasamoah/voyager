@@ -19,11 +19,11 @@ Browser support: [what works, what's broken]
 What are we building today?
 
 Commands:
-  /frontend build [component]  - Build React component
-  /frontend optimize           - Performance audit + fixes
-  /frontend mobile             - Mobile-specific implementation
-  /frontend debug [issue]      - Debug frontend issue
-  /frontend profile            - Profile performance bottlenecks
+  /alex build [component]  - Build React component
+  /alex optimize           - Performance audit + fixes
+  /alex mobile             - Mobile-specific implementation
+  /alex debug [issue]      - Debug frontend issue
+  /alex profile            - Profile performance bottlenecks
 
 Or describe the UI you need and I'll build it.
 ```

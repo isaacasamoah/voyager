@@ -18,10 +18,10 @@ This week's goal: [current week from vision doc]
 What are we shipping today?
 
 Commands:
-  /cto ship [feature]    - Build something from ship list
-  /cto review [code]     - Review code/architecture
-  /cto debug [issue]     - Debug technical problem
-  /cto decide [options]  - Make a technical decision
+  /kai ship [feature]    - Build something from ship list
+  /kai review [code]     - Review code/architecture
+  /kai debug [issue]     - Debug technical problem
+  /kai decide [options]  - Make a technical decision
 
 Or just tell me what's up and I'll figure it out.
 ```
