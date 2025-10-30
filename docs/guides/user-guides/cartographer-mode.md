@@ -1,13 +1,24 @@
-# Cartographer Mode - Extract Your Expertise
+# Cartographer Mode - Teach the AI Your Expertise
 
-Turn your tacit coaching knowledge into structured documentation. 10-15 minutes.
+Extract your knowledge and make Careersy smarter. 10-15 minutes per session.
+
+## What It Does
+
+**Right now:** Cartographer interviews you and creates structured documentation of your frameworks.
+
+**Next week:** That knowledge automatically improves Careersy's AI:
+- Updates system prompts with your strategies
+- Adds to RAG dataset (AI retrieves your insights when relevant)
+- Creates fine-tuning examples (AI learns your coaching style)
+
+**Result:** The AI gets smarter with YOUR expertise. Your coaching scales, but it's still your voice.
 
 ## Quick Start
 
 1. **Click "Cartographer"** in the mode switcher (top of chat)
 2. **Start a conversation** - Tell Cartographer what you want to document
 3. **Answer 5-7 questions** - AI interviews you, pulls out specifics
-4. **Get structured output** - Copy/paste the documentation
+4. **Review the output** - Structured summary of your framework
 
 ## Example
 
