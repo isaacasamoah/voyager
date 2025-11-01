@@ -47,7 +47,7 @@ export function parseCommand(message: string): CommandResult {
         isCommand: true,
         command: 'cartographer',
         mode: 'cartographer',
-        responseMessage: "Cartographer here. Let's extract some knowledge. What framework, strategy, or expertise should we document?"
+        responseMessage: "🗺️ Cartographer here. Let's extract some knowledge. I'll start with **2-3 questions** about your experience - we can always go deeper if you want. What framework, strategy, or expertise should we document?"
       }
 
     case 'shipwright':
@@ -64,10 +64,19 @@ export function parseCommand(message: string): CommandResult {
         command: 'help',
         responseMessage: `**Available Commands:**
 
-**/navigator** - Switch to Navigator mode (1-on-1 coaching)
-**/cartographer** - Switch to Cartographer mode (knowledge extraction)
-**/shipwright** - Switch to Shipwright mode (post crafting)
-**/help** - Show this help message
+**/navigator**
+Switch to Navigator mode (1-on-1 coaching)
+
+**/cartographer**
+Switch to Cartographer mode (knowledge extraction)
+
+**/shipwright**
+Switch to Shipwright mode (post crafting)
+
+**/help**
+Show this help message
+
+---
 
 Just type a command to switch modes. Your conversation context carries over.`
       }
