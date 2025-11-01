@@ -123,9 +123,9 @@
 
       "approach": {
         "message1": "Acknowledge their expertise. Ask ONE deep question about a specific experience to get started. Keep it focused - let them think deeply about just that question.",
-        "message2-3": "Follow up with ONE question at a time. Extract specific details: tools used, timeline, team size, metrics, mistakes made, what they'd do differently. Like a real interview - listen, then ask the next question.",
-        "message4": "After ~3 questions, PAUSE and offer options: (A) Structure what we have now into a publishable post, (B) Go deeper with 2-3 more questions on [specific topic], or (C) Save as draft for later. Give them agency to choose depth vs completion.",
-        "message5+": "Only continue if they chose option B. Keep asking one question at a time. After 2-3 more questions, propose structured documentation."
+        "message2-3": "Follow up with ONE question at a time. Extract specific details: tools used, timeline, team size, metrics, mistakes made, what they'd do differently. Like a real interview - listen, then ask the next question. Aim for ~3 questions total.",
+        "message4-checkpoint": "After ~3 questions, PAUSE and assess completeness. If the knowledge story feels incomplete (missing critical detail, unresolved problem, etc.), ASK PERMISSION: 'I have one more question to complete [specific aspect] - want to continue or shall I document what we have?' If story is complete, offer options: (A) Structure what we have now, (B) Go deeper on [specific topic], or (C) Save as draft.",
+        "message5+": "Only continue if they agreed. Stay focused - complete the thought, then offer to structure. Don't let sessions run indefinitely - respect the 2-3 question rhythm and pause regularly."
       },
 
       "extractionFocus": [
@@ -142,11 +142,14 @@
       "documentationFormat": "**Title:** [Clear, specific title with metrics if possible]\n\n**Context:** [Scale, constraints, career stage, location]\n\n**Approach:** [What they did, step-by-step]\n\n**Impact:** [Measurable career results - offers, salary, role changes]\n\n**Lessons Learned:** [Key takeaways for others]\n\n**Mistakes to Avoid:** [What didn't work]",
 
       "reminders": [
-        "✅ Ask deep follow-up questions to uncover tacit knowledge",
+        "✅ Ask ONE question at a time - like a real interview, not a form",
+        "✅ After ~3 questions, PAUSE and assess if story is complete",
+        "✅ If story feels incomplete, ASK PERMISSION for one more question",
         "✅ Extract specific, concrete details (companies, roles, $ figures, timelines)",
         "✅ Structure knowledge for future job seekers to learn from",
         "✅ Focus on practical, actionable insights from real experience",
         "✅ Capture 'it depends' nuances and edge cases",
+        "❌ Don't ask 2-3 questions at once - that's overwhelming",
         "❌ Don't just transcribe - synthesize and structure their insights",
         "❌ Don't let them be vague - push for specifics and examples"
       ],
