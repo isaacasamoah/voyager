@@ -7,6 +7,7 @@ import Image from 'next/image'
 import ChatMessage from './ChatMessage'
 import ResumeModal from './ResumeModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
+import CommandAutocomplete from './CommandAutocomplete'
 import { getTutorialSteps } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
 import { getVoyageTerminology } from '@/lib/terminology'
@@ -49,6 +50,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [previousMode, setPreviousMode] = useState<'navigator' | 'cartographer' | null>(null)
   const [isExpert, setIsExpert] = useState(false)
   const [abTestMode, setAbTestMode] = useState<'basic' | 'full'>(FEATURE_FLAGS.CAREERSY_MODE) // A/B test mode for Careersy - defaults from feature flags
+  const [showCommandAutocomplete, setShowCommandAutocomplete] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
@@ -241,6 +243,25 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         throw new Error('Failed to send message')
       }
 
+      // Check if this is a command response (JSON) or streaming response
+      const contentType = response.headers.get('content-type')
+      if (contentType?.includes('application/json')) {
+        // Command response - immediate JSON reply
+        const data = await response.json()
+
+        // Handle mode change if detected
+        if (data.modeChanged && data.newMode) {
+          setPreviousMode(currentMode)
+          setCurrentMode(data.newMode)
+        }
+
+        // Add command response to messages
+        setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+        setLoading(false)
+        return
+      }
+
+      // Normal streaming response
       // Create placeholder for streaming response
       setMessages(prev => [...prev, { role: 'assistant', content: '' }])
 
@@ -562,11 +583,33 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
 
               {/* Input Field with Submit Button - Mobile-first: less padding on mobile */}
               <div className="flex-1 relative">
+                {/* Command Autocomplete */}
+                {input.startsWith('/') && (
+                  <CommandAutocomplete
+                    input={input}
+                    onSelect={(command) => {
+                      setInput(command)
+                      setShowCommandAutocomplete(false)
+                      inputRef.current?.focus()
+                    }}
+                    position={{ top: 60, left: 0 }}
+                    branding={fullBranding}
+                  />
+                )}
+
                 <input
                   ref={inputRef}
                   type="text"
                   value={input}
-                  onChange={(e) => setInput(e.target.value)}
+                  onChange={(e) => {
+                    setInput(e.target.value)
+                    // Show autocomplete when typing /
+                    if (e.target.value.startsWith('/')) {
+                      setShowCommandAutocomplete(true)
+                    } else {
+                      setShowCommandAutocomplete(false)
+                    }
+                  }}
                   placeholder="What's your next career move?"
                   className={`w-full px-4 py-3 md:px-6 md:py-4 pr-12 md:pr-14 ${fullBranding.components.input} transition-colors text-base placeholder:text-gray-400`}
                   disabled={loading}

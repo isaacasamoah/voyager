@@ -18,6 +18,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getCommunityConfig, getCommunitySystemPrompt } from '@/lib/communities'
 import { FEATURE_FLAGS } from '@/lib/features'
+import { parseCommand } from '@/lib/commands'
 
 export const dynamic = 'force-dynamic'
 
@@ -28,6 +29,18 @@ export async function POST(req: NextRequest) {
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return NextResponse.json({ error: 'Invalid message' }, { status: 400 })
+    }
+
+    // Check for commands (mode switching, help, etc.)
+    const commandResult = parseCommand(message)
+    if (commandResult.isCommand && commandResult.responseMessage) {
+      // Return command response with mode change metadata
+      return NextResponse.json({
+        message: commandResult.responseMessage,
+        modeChanged: !!commandResult.mode,
+        newMode: commandResult.mode,
+        isCommandResponse: true
+      })
     }
 
     // Get community config
