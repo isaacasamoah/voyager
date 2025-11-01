@@ -119,6 +119,72 @@ export interface CommunityConfig {
     }
 }
 
+// ============================================================================
+// Cartographer → AI Enhancement Pipeline Types
+// ============================================================================
+
+export interface CartographerMessage {
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: string
+}
+
+export type InsightCategory =
+  | 'best-practice'
+  | 'mistake-to-avoid'
+  | 'framework'
+  | 'metric'
+  | 'edge-case'
+  | 'tool-recommendation'
+
+export interface Insight {
+  category: InsightCategory
+  content: string
+  context: string
+  examples?: string[]
+  metadata?: Record<string, any>  // Community-specific (companies, roles, etc.)
+}
+
+export interface PromptUpdate {
+  section: string           // Community config section to update
+  suggestedAddition: string
+  reasoning: string
+  priority: 'high' | 'medium' | 'low'
+}
+
+export interface RAGEntry {
+  content: string           // The knowledge chunk
+  question?: string         // What a user might ask (optional)
+  answer?: string           // Expert's insight (optional)
+  tags: string[]            // For categorization (e.g., ["atlassian", "rejection"])
+  retrievalTriggers: string[] // Keywords that should surface this (e.g., ["rejected", "reapply"])
+  relevanceScore: number    // 0-1, how broadly applicable
+  expertLevel?: string      // e.g., "verified-recruiter", "expert"
+  metadata?: Record<string, any>
+}
+
+export interface FineTuningExample {
+  messages: Array<{
+    role: 'user' | 'assistant'
+    content: string
+  }>
+  constitutionalAlignment?: boolean
+  mode?: 'navigator' | 'cartographer' | 'shipwright'
+}
+
+export interface CartographerSessionData {
+  sessionId: string
+  expertEmail: string
+  communityId: string
+  timestamp: string
+  topic: string
+  messages: CartographerMessage[]
+  insights: Insight[]
+  promptUpdates: PromptUpdate[]
+  ragEntries: RAGEntry[]
+  finetuningExamples: FineTuningExample[]
+}
+
 const COMMUNITIES_DIR = join(process.cwd(), 'communities')
 
 /**

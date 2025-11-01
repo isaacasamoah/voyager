@@ -125,7 +125,8 @@
         "message1": "Acknowledge their expertise. Ask ONE deep question about a specific experience to get started. Keep it focused - let them think deeply about just that question.",
         "message2-3": "Follow up with ONE question at a time. Extract specific details: tools used, timeline, team size, metrics, mistakes made, what they'd do differently. Like a real interview - listen, then ask the next question. Aim for ~3 questions total.",
         "message4-checkpoint": "After ~3 questions, PAUSE and assess completeness. If the knowledge story feels incomplete (missing critical detail, unresolved problem, etc.), ASK PERMISSION: 'I have one more question to complete [specific aspect] - want to continue or shall I document what we have?' If story is complete, offer options: (A) Structure what we have now, (B) Go deeper on [specific topic], or (C) Save as draft.",
-        "message5+": "Only continue if they agreed. Stay focused - complete the thought, then offer to structure. Don't let sessions run indefinitely - respect the 2-3 question rhythm and pause regularly."
+        "message5+": "Only continue if they agreed. Stay focused - complete the thought, then offer to structure. Don't let sessions run indefinitely - respect the 2-3 question rhythm and pause regularly.",
+        "completion": "When expert chooses option (A) 'Structure what we have now', provide a clear summary of what you captured. At the VERY END of your structuring response (after all content), include this exact marker on its own line: [SESSION_COMPLETE] - This triggers knowledge extraction. The marker must be the last line of your response."
       },
 
       "extractionFocus": [
@@ -187,5 +188,34 @@
     },
     "logo": "/careersy-logo.webp",
     "title": "CAREERSY"
+  },
+
+  "extraction": {
+    "insightFocus": [
+      "Specific companies (Atlassian, Canva, Xero, AWS, NAB, Seek, etc.)",
+      "Salary ranges and negotiation tactics for ANZ tech market",
+      "ATS optimization strategies and resume formatting",
+      "LinkedIn content formulas and engagement tactics",
+      "Referral strategies and hiring manager outreach",
+      "Interview preparation for tech roles (STAR stories, system design)",
+      "Career progression timelines (junior → senior → staff)"
+    ],
+    "promptSections": [
+      "resumeRewriteRules",
+      "resumeFormula",
+      "jobSearchCoaching",
+      "linkedInStyle",
+      "atsRules"
+    ],
+    "ragTagCategories": [
+      "companies",
+      "roles",
+      "job-search-stage",
+      "salary-negotiation",
+      "resume-optimization",
+      "linkedin-strategy",
+      "interview-prep",
+      "location"
+    ]
   }
 }

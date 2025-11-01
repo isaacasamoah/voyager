@@ -12,6 +12,11 @@ import { getTutorialSteps } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
 import { getVoyageTerminology } from '@/lib/terminology'
 import { FEATURE_FLAGS } from '@/lib/features'
+import {
+  isCartographerSessionComplete,
+  cleanSessionCompleteMarker,
+  triggerCartographerExtraction
+} from '@/lib/cartographer-extraction'
 
 interface Message {
   role: 'user' | 'assistant'
@@ -285,6 +290,20 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         })
       }
 
+      // Check if Cartographer session is complete
+      const sessionComplete = isCartographerSessionComplete(fullResponse)
+
+      // Clean the marker before showing to user
+      if (sessionComplete) {
+        const cleanResponse = cleanSessionCompleteMarker(fullResponse)
+        setMessages(prev => {
+          const updated = [...prev]
+          updated[updated.length - 1] = { role: 'assistant', content: cleanResponse }
+          return updated
+        })
+        fullResponse = cleanResponse
+      }
+
       // Save to database after streaming completes (skip voyager)
       if (communityId !== 'voyager') {
         const saveResponse = await fetch('/api/chat', {
@@ -303,6 +322,16 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           setConversationId(data.conversationId)
           if (data.conversation) {
             setCurrentConversation(data.conversation)
+          }
+
+          // Trigger extraction if Cartographer session completed
+          if (sessionComplete && currentMode === 'cartographer' && conversationId) {
+            console.log('🧬 Cartographer session complete - triggering extraction...')
+            triggerCartographerExtraction(
+              data.conversationId || conversationId,
+              session?.user?.email,
+              communityId
+            )
           }
         }
 

@@ -157,3 +157,31 @@ model TrainingData {
   @@index([answerMessageId])
   @@index([questionMessageId])
 }
+
+model CartographerSession {
+  id            String   @id @default(cuid())
+  sessionId     String   @unique
+  expertEmail   String
+  communityId   String
+  timestamp     DateTime @default(now())
+  topic         String
+
+  // JSON columns - structured knowledge extraction
+  messages           Json  // Raw conversation array
+  insights           Json  // Structured insights array
+  promptUpdates      Json  // Suggested prompt improvements array
+  ragEntries         Json  // RAG dataset entries array
+  finetuningExamples Json  // Training examples array
+
+  // Processing metadata
+  processed       Boolean  @default(false)
+  processingError String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([expertEmail])
+  @@index([communityId])
+  @@index([timestamp])
+  @@index([processed])
+}
