@@ -33,4 +33,22 @@ Turn your tacit knowledge into structured documentation. 10-15 minute AI intervi
 
 ---
 
-**Need help?** Switch modes using the mode switcher at the top of your chat.
+## 🚀 [Shipwright Mode - Craft Quality Posts](./shipwright-mode.md)
+
+**For everyone**
+
+AI-guided post crafting. Draft thoughtful questions and contributions with structure and clarity.
+
+[Read the Shipwright guide →](./shipwright-mode.md)
+
+---
+
+## Switching Modes
+
+Type a slash command in the chat to switch modes:
+- `/navigator` - Switch to Navigator (coaching)
+- `/cartographer` - Switch to Cartographer (expert interview)
+- `/shipwright` - Switch to Shipwright (post crafting)
+- `/help` - See all commands
+
+Your conversation context carries over when you switch modes.
