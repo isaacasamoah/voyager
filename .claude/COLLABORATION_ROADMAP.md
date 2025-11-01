@@ -88,14 +88,87 @@ All collaboration modes follow the same fundamental pattern:
 - Mode control enforcement (prevents conversational mode switching)
 - Banner display system
 - Expert verification via `experts: []` array in community config
+- Command-driven mode switching (`/navigator`, `/cartographer`, `/shipwright`)
+- Improved Cartographer UX (one question at a time, self-aware negotiation)
 
 **Key Learning:**
 Constitutional framework + mode constraints created emergent meta-reasoning behavior. Cartographer refused to replace thinking and generated novel "reverse knowledge extraction" approach - learning how modes improve by seeking feedback.
 
-**What's Next (Phase 0.5):**
-- Structured knowledge output (JSON format for prompts/RAG/fine-tuning)
-- File-based knowledge storage (`knowledge/{communityId}/*.json`)
-- Automatic prompt enhancement from expert interviews
+---
+
+## Phase 0.5: Cartographer → AI Enhancement Pipeline
+
+**Status:** 🚧 IN PROGRESS (2025-11-01 to 2025-11-07)
+
+**Goal:** Close the feedback loop - make Voyager learn from expert knowledge
+
+**What We're Building:**
+
+### 1. Structured JSON Output
+**Owner:** Zara (prompt design) + Kai (backend)
+**Timeline:** 2 days
+
+Cartographer sessions generate machine-readable knowledge:
+```json
+{
+  "sessionId": "uuid",
+  "expertEmail": "eli@careersy.com",
+  "timestamp": "2025-11-01T...",
+  "topic": "Resume optimization for ANZ tech roles",
+  "insights": [
+    {
+      "category": "best-practice",
+      "content": "Lead with metrics in every bullet point",
+      "context": "ANZ tech recruiters scan for impact",
+      "examples": ["Cut p95 latency 38% by..."]
+    }
+  ],
+  "promptUpdates": [...],
+  "ragEntries": [...],
+  "finetuningExamples": [...]
+}
+```
+
+### 2. Auto-Prompt Enhancement
+**Owner:** Zara + Kai
+**Timeline:** 1 day
+
+Expert insights automatically update community system prompts:
+- Extract domain-specific best practices
+- Add to `communities/{id}.json` prompt sections
+- Version control for rollback
+- A/B test prompt changes
+
+### 3. RAG Dataset Population
+**Owner:** Marcus + Kai
+**Timeline:** 2-3 days
+
+Knowledge becomes retrievable context:
+- Semantic search on expert insights
+- Navigator retrieves relevant expertise when coaching
+- "This aligns with what Eli shared about..."
+- Compound learning - platform gets smarter
+
+### 4. Fine-Tuning Examples
+**Owner:** Zara
+**Timeline:** 1 day
+
+Generate training data for future model improvements:
+- Question → Expert answer pairs
+- Constitutional adherence examples
+- Mode-specific interaction patterns
+
+**Success Criteria:**
+- Eli uses Cartographer 3+ times
+- Navigator responses improve measurably after sessions
+- Can demonstrate "AI learned from you" to Eli
+- Knowledge persists and compounds
+
+**Why This Matters:**
+- Proves Voyager value prop: "AI that learns from you"
+- Differentiates from generic chatbots
+- Constitutional alignment: preserves and scales expertise
+- Eli sees tangible value from sharing knowledge
 
 ---
 
