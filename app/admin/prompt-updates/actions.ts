@@ -25,6 +25,14 @@ export async function approveAndApplyUpdate(
     return { success: false, error: 'Unauthorized' }
   }
 
+  // Check if running on Vercel (read-only filesystem)
+  if (process.env.VERCEL) {
+    return {
+      success: false,
+      error: 'Prompt updates can only be applied locally. Vercel has a read-only filesystem. Use the admin UI to review, then apply updates locally and push to deploy.'
+    }
+  }
+
   try {
     // Get session
     const cartographerSession = await prisma.cartographerSession.findUnique({
