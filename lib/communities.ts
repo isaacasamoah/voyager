@@ -145,11 +145,27 @@ export interface Insight {
   metadata?: Record<string, any>  // Community-specific (companies, roles, etc.)
 }
 
+export interface ConstitutionalCheck {
+  passes: boolean
+  reasoning: string
+}
+
 export interface PromptUpdate {
   section: string           // Community config section to update
   suggestedAddition: string
   reasoning: string
   priority: 'high' | 'medium' | 'low'
+  constitutionalCheck: {
+    elevation: ConstitutionalCheck
+    transparency: ConstitutionalCheck
+    agency: ConstitutionalCheck
+    growth: ConstitutionalCheck
+  }
+  confidence: number        // 0-100 confidence score
+  evidenceFromSession: string // Direct quote or reference
+  riskLevel: 'low' | 'medium' | 'high'
+  riskReasoning: string
+  autoApplyRecommendation: boolean
 }
 
 export interface RAGEntry {

@@ -36,21 +36,49 @@ export function buildCartographerExtractionPrompt(
   const promptSections = extractionConfig?.promptSections || []
   const ragTagCategories = extractionConfig?.ragTagCategories || []
 
-  return `You are a Knowledge Extraction System analyzing an expert interview from ${config.name}.
+  return `You are a specialized AI system with THREE expert roles:
 
-# YOUR ROLE
-
-Extract structured, actionable knowledge from this Cartographer session. Your job is to:
-1. Identify concrete insights (not generic advice)
-2. Suggest prompt improvements based on expert knowledge
-3. Create RAG entries with smart tags and retrieval triggers
-4. Generate fine-tuning examples that preserve expert reasoning
-
-# DOMAIN CONTEXT
+# ROLE 1: Domain Expert in ${config.name}
 
 ${config.domainExpertise?.mission || 'Community knowledge base'}
 
 ${insightFocus.length > 0 ? `\n**Focus areas for this community:**\n${insightFocus.map((f: string) => `- ${f}`).join('\n')}` : ''}
+
+# ROLE 2: Constitutional AI Specialist
+
+You evaluate EVERY prompt update against Voyager's constitutional principles:
+
+**ELEVATION OVER REPLACEMENT**
+❌ BAD: AI does the work for the user
+✅ GOOD: AI teaches the user how to do it themselves
+
+**TRANSPARENCY**
+❌ BAD: Hidden limitations, overconfident claims
+✅ GOOD: Honest about what AI can/can't do
+
+**AGENCY**
+❌ BAD: AI makes decisions for user
+✅ GOOD: AI presents options, user chooses
+
+**GROWTH**
+❌ BAD: Creates dependency on AI
+✅ GOOD: Builds user's long-term skills
+
+# ROLE 3: Prompt Engineering Expert
+
+You understand how to improve LLM system prompts:
+- When to add examples vs principles
+- How to structure instructions for clarity
+- What level of detail is needed
+- How to avoid prompt bloat
+
+# YOUR TASK
+
+Extract structured, actionable knowledge from this Cartographer session:
+1. Identify concrete insights (not generic advice)
+2. Suggest prompt improvements with constitutional validation
+3. Create RAG entries with smart tags and retrieval triggers
+4. Generate fine-tuning examples that preserve expert reasoning
 
 # CONVERSATION HISTORY
 
@@ -81,20 +109,55 @@ Analyze this conversation and extract structured knowledge following the JSON sc
 }
 
 ### Prompt Updates
+
+CRITICAL: Every prompt update MUST include constitutional validation and confidence scoring.
+
 - ✅ Suggest additions that reflect expert's novel approaches
-- ✅ Prioritize HIGH if insight contradicts current prompt
-- ✅ Include expert's exact phrasing when valuable
+- ✅ Include constitutional check for ALL 4 principles
+- ✅ Score confidence 0-100 based on evidence strength
+- ✅ Include evidence from session (direct quotes)
+- ✅ Add risk assessment (low/medium/high)
 - ❌ Don't suggest generic improvements
 - ❌ Don't update if expert's advice already covered in prompt
+- ❌ Don't auto-apply if confidence < 90 or any constitutional check fails
 
 ${promptSections.length > 0 ? `\n**Available prompt sections for this community:**\n${promptSections.map((s: string) => `- ${s}`).join('\n')}` : ''}
 
-**Example good prompt update:**
+**Confidence scoring guide:**
+- **95-100:** Expert explicitly stated this, clearly valuable, all constitutional checks pass strongly
+- **85-94:** Expert implied this clearly, likely valuable, constitutional checks pass
+- **70-84:** Requires interpretation, might help, constitutional alignment unclear
+- **<70:** Too speculative or fails constitutional check
+
+**Example prompt update with constitutional validation:**
 {
   "section": "resumeRewriteRules",
-  "suggestedAddition": "Always include team size and project scope to show scale of impact",
-  "reasoning": "Expert emphasized recruiters look for evidence of working at scale",
-  "priority": "high"
+  "suggestedAddition": "Guide users to include team size and project scope in achievement bullets. Ask: 'How many people were on your team?' and 'What was the scale of this project?' to help them quantify scope.",
+  "reasoning": "Expert emphasized recruiters look for evidence of working at scale. This teaches users to think about scope, not just outcomes.",
+  "priority": "high",
+  "constitutionalCheck": {
+    "elevation": {
+      "passes": true,
+      "reasoning": "Teaches users to identify and articulate scope themselves through coaching questions"
+    },
+    "transparency": {
+      "passes": true,
+      "reasoning": "Honest about what makes resumes strong without overpromising"
+    },
+    "agency": {
+      "passes": true,
+      "reasoning": "User decides what scope details to include"
+    },
+    "growth": {
+      "passes": true,
+      "reasoning": "Builds skill of thinking in terms of scale/impact"
+    }
+  },
+  "confidence": 92,
+  "evidenceFromSession": "Expert said: 'Recruiters want to see you've worked at scale'",
+  "riskLevel": "low",
+  "riskReasoning": "Additive suggestion, doesn't modify existing logic, teaches analysis skill",
+  "autoApplyRecommendation": true
 }
 
 ### RAG Entries
@@ -165,7 +228,18 @@ Output valid JSON matching this exact structure:
       "section": "Community config section name",
       "suggestedAddition": "What to add to the prompt",
       "reasoning": "Why this improves Navigator responses",
-      "priority": "high" | "medium" | "low"
+      "priority": "high" | "medium" | "low",
+      "constitutionalCheck": {
+        "elevation": { "passes": true/false, "reasoning": "..." },
+        "transparency": { "passes": true/false, "reasoning": "..." },
+        "agency": { "passes": true/false, "reasoning": "..." },
+        "growth": { "passes": true/false, "reasoning": "..." }
+      },
+      "confidence": 0-100,
+      "evidenceFromSession": "Direct quote or reference to conversation",
+      "riskLevel": "low" | "medium" | "high",
+      "riskReasoning": "Why this is safe/risky to auto-apply",
+      "autoApplyRecommendation": true/false
     }
   ],
 
