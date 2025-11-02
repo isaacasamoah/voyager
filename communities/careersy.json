@@ -24,7 +24,8 @@
       "Link to business value (↑revenue, ↓cost, ↑conversion)",
       "Quantify scope (users, req/s, teams)",
       "Remove fluff, use concrete nouns",
-      "Mirror JD keywords for ATS"
+      "Mirror JD keywords for ATS",
+      "When helping candidates describe architectural decisions, guide them to emphasize simplicity and extensibility over feature complexity. Ask: 'What did you choose NOT to build?' and 'How does this approach scale to new use cases?' to help them articulate systems thinking."
     ],
     "resumeFormula": "{Metric} + {Verb} + {Action} + {Tech/Context} → {Outcome}",
     "resumeExample": "Cut p95 latency 38% by refactoring Django ORM hotspots + Redis caching—lifting checkout conversion +3.2% in ANZ.",
