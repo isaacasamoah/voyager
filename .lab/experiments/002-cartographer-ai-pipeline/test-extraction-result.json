@@ -1,0 +1,93 @@
+{
+  "topic": "Interview confidence through systematic preparation",
+  "promptUpdates": [
+    {
+      "section": "interviewPrep",
+      "suggestedAddition": "When coaching users on interview preparation, teach them the Four Confidence Anchors framework: (1) Know Your Worth - help them articulate their unique strengths and market value through self-reflection exercises, (2) Know Your Salary Range - guide them to research market compensation data for their role/location, (3) Know Your Impact - coach them to quantify specific achievements with metrics, (4) Know Your Alternatives - encourage maintaining an active pipeline of opportunities. Frame this as: 'Confidence comes from preparation, not personality - you build unshakeable interview confidence through facts, not feelings.'",
+      "reasoning": "The expert explicitly shared this as their single most effective interview habit across multiple senior-level roles (consulting, Big 4, startups). This transforms vague 'be confident' advice into a concrete, repeatable preparation system. It addresses a core pain point: interview anxiety stems from uncertainty, which systematic preparation eliminates.",
+      "priority": "high",
+      "constitutionalCheck": {
+        "elevation": {
+          "passes": true,
+          "reasoning": "This teaches users HOW to prepare themselves through specific exercises (self-reflection, salary research, impact quantification, opportunity pipeline management). The AI doesn't do any of this work - it coaches the process. Users build the skill of systematic preparation."
+        },
+        "transparency": {
+          "passes": true,
+          "reasoning": "Honestly frames confidence as outcome of preparation work, not magic AI advice. Doesn't promise interview success, just better preparation. Clear about what user must invest (time researching, reflecting, documenting)."
+        },
+        "agency": {
+          "passes": true,
+          "reasoning": "User decides their worth, their salary expectations, which achievements to highlight, which alternatives to pursue. AI provides the framework but user makes all substantive decisions. Maintains user control over their career narrative."
+        },
+        "growth": {
+          "passes": true,
+          "reasoning": "Builds a systematic skill users apply to every future interview. Creates independence - once they've learned this framework, they can prep without AI assistance. Reduces dependency over time."
+        }
+      },
+      "confidence": 97,
+      "autoApplyRecommendation": true,
+      "evidenceFromSession": "Direct user quote when asked about most effective interview habit: 'preparation - knowing my worth, my salary range, my impact and knowing I have alternatives'. This was the expert's core answer, not a tangential comment. The assistant's structured summary confirmed this was the main takeaway: 'Pre-interview preparation focused on four core pillars'."
+    },
+    {
+      "section": "interviewPrep",
+      "suggestedAddition": "Emphasize that having alternatives fundamentally changes interview dynamics. When users mention feeling nervous about a specific opportunity, ask: 'What other conversations are you having right now?' If the answer is 'none' or 'just this one', pause the interview prep and help them build an active pipeline first. Explain: Confidence isn't fake - it comes from genuine optionality. When you have alternatives, you interview as an equal evaluating mutual fit, not a supplicant hoping to be chosen.",
+      "reasoning": "The expert mentioned 'knowing I have alternatives' as part of their preparation system. The assistant's summary highlighted this as transforming 'interview dynamics' and creating 'leverage'. This addresses a subtle but powerful psychological shift: scarcity mindset vs abundance mindset in interviews.",
+      "priority": "medium",
+      "constitutionalCheck": {
+        "elevation": {
+          "passes": true,
+          "reasoning": "Teaches users the principle (alternatives = confidence) and the action (build active pipeline). Doesn't build the pipeline for them - coaches them to do it. The work remains with the user."
+        },
+        "transparency": {
+          "passes": true,
+          "reasoning": "Honestly explains the psychology ('confidence isn't fake - it comes from genuine optionality'). Doesn't promise they'll get alternatives easily, just explains why it matters."
+        },
+        "agency": {
+          "passes": true,
+          "reasoning": "User decides which opportunities to pursue, how many conversations to have, which alternatives are attractive. AI just surfaces the strategic importance of optionality."
+        },
+        "growth": {
+          "passes": true,
+          "reasoning": "Teaches a long-term career strategy: always be interviewing. Builds the skill of pipeline management, not just one-off interview prep. Reduces future dependency."
+        }
+      },
+      "confidence": 92,
+      "autoApplyRecommendation": true,
+      "evidenceFromSession": "User explicitly listed 'knowing I have alternatives' as one of four preparation pillars. Assistant's structured summary stated: 'Having alternatives fundamentally changes interview dynamics' and 'you enter interviews as an equal rather than a supplicant'. Though expert didn't elaborate on the mechanism, the principle was clearly stated."
+    },
+    {
+      "section": "jobSearchCoaching",
+      "suggestedAddition": "When users ask about interview strategy, reframe the conversation: 'Before we talk about how to interview well, let's talk about how to interview confidently. Confidence doesn't come from personality - it comes from preparation. Have you: (1) Researched your market value? (2) Quantified your recent impact? (3) Set your salary expectations? (4) Maintained other opportunities?' If any answer is no, help them build that foundation first. Strong interview performance is downstream of thorough preparation.",
+      "reasoning": "The expert's core insight was that preparation precedes performance ('confidence comes from preparation, not personality'). This suggests Navigator AI should sequence coaching differently: foundation-building before tactics. Most interview prep focuses on tactics (STAR stories, behavioral questions) without addressing the confidence foundation.",
+      "priority": "medium",
+      "constitutionalCheck": {
+        "elevation": {
+          "passes": true,
+          "reasoning": "This is pure teaching - explaining the relationship between preparation and confidence, then coaching users to do the prep work themselves. AI doesn't do the research or quantification."
+        },
+        "transparency": {
+          "passes": true,
+          "reasoning": "Explicitly explains the causal mechanism (prep → confidence → performance). Doesn't over-promise. Honest that this requires upfront work."
+        },
+        "agency": {
+          "passes": true,
+          "reasoning": "User decides if they want to invest in foundation-building or jump to tactics. AI recommends sequence but user controls their process."
+        },
+        "growth": {
+          "passes": true,
+          "reasoning": "Teaches a meta-skill: understanding what drives performance. Users learn to diagnose their own confidence gaps (is it preparation or technique?) and address root causes."
+        }
+      },
+      "confidence": 89,
+      "autoApplyRecommendation": false,
+      "evidenceFromSession": "Expert stated 'confidence comes from preparation, not personality' and shared four preparation steps. Assistant's summary reinforced: 'The preparation isn't just about technical knowledge - it's about building unshakeable confidence through facts'. However, this suggestion interprets the sequencing implication rather than quoting it directly, so confidence is slightly lower (89 vs 95+).",
+      "flagForReviewReason": "Confidence score 89 - below auto-apply threshold of 95. This is a good insight but requires interpretation of what expert implied about sequencing. Human should validate this aligns with Careersy's coaching philosophy."
+    }
+  ],
+  "extractionMetadata": {
+    "sessionQuality": "high",
+    "extractionConfidence": 93,
+    "reasoning": "Short session (only 3 user messages) but expert provided a clear, explicit framework in response to direct question. The 'four pillars' model is concrete and actionable. Main limitation: expert didn't elaborate on their specific process (we asked but they chose to structure instead), so we can't extract tactical details.",
+    "suggestedFollowUp": "In future Cartographer sessions on this topic, ask: 'Walk me through your actual preparation process step-by-step - like, what do you do the week before a big interview?' to capture tactical execution details beyond the strategic framework."
+  }
+}
