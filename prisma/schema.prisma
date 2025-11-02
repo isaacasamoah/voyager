@@ -177,6 +177,12 @@ model CartographerSession {
   processed       Boolean  @default(false)
   processingError String?
 
+  // Approval tracking
+  appliedUpdates   Int[]     @default([])  // Indices of applied updates
+  rejectedUpdates  Int[]     @default([])  // Indices of rejected updates
+  appliedAt        DateTime?
+  appliedBy        String?   // Email of user who approved
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 

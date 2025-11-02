@@ -16,6 +16,36 @@ import type {
 } from '../../../lib/communities'
 
 /**
+ * Extract all valid section paths from community config
+ * Returns paths like "domainExpertise.jobSearchCoaching"
+ */
+function extractConfigPaths(config: CommunityConfig, prefix = ''): string[] {
+  const paths: string[] = []
+
+  for (const [key, value] of Object.entries(config)) {
+    const fullPath = prefix ? `${prefix}.${key}` : key
+
+    // Only include string fields and arrays (updateable content)
+    if (typeof value === 'string' || Array.isArray(value)) {
+      paths.push(fullPath)
+    }
+
+    // Recurse into objects (but not arrays)
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      paths.push(...extractConfigPaths(value as any, fullPath))
+    }
+  }
+
+  return paths.filter(p =>
+    // Filter out non-prompt sections
+    !p.startsWith('id') &&
+    !p.startsWith('name') &&
+    !p.startsWith('description') &&
+    !p.startsWith('experts')
+  )
+}
+
+/**
  * Build extraction prompt for a Cartographer session
  *
  * @param config - Community configuration
@@ -35,6 +65,9 @@ export function buildCartographerExtractionPrompt(
   const insightFocus = extractionConfig?.insightFocus || []
   const promptSections = extractionConfig?.promptSections || []
   const ragTagCategories = extractionConfig?.ragTagCategories || []
+
+  // Extract available section paths from config structure
+  const configPaths = extractConfigPaths(config)
 
   return `You are a specialized AI system with THREE expert roles:
 
@@ -117,11 +150,26 @@ CRITICAL: Every prompt update MUST include constitutional validation and confide
 - ✅ Score confidence 0-100 based on evidence strength
 - ✅ Include evidence from session (direct quotes)
 - ✅ Add risk assessment (low/medium/high)
+- ✅ Use FULL nested path for section (e.g., "domainExpertise.jobSearchCoaching" not just "jobSearchCoaching")
 - ❌ Don't suggest generic improvements
 - ❌ Don't update if expert's advice already covered in prompt
 - ❌ Don't auto-apply if confidence < 90 or any constitutional check fails
 
 ${promptSections.length > 0 ? `\n**Available prompt sections for this community:**\n${promptSections.map((s: string) => `- ${s}`).join('\n')}` : ''}
+
+**IMPORTANT: Section Path Format**
+When specifying the "section" field, use the FULL nested path from the community JSON config.
+
+**Available section paths for ${config.id}:**
+${configPaths.map(p => `- ${p}`).join('\n')}
+
+**Examples:**
+- ✅ CORRECT: "domainExpertise.jobSearchCoaching"
+- ❌ WRONG: "jobSearchCoaching"
+- ✅ CORRECT: "domainExpertise.resumeRewriteRules"
+- ❌ WRONG: "resumeRewriteRules"
+
+You MUST use one of the paths listed above. Do not invent section names.
 
 **Confidence scoring guide:**
 - **95-100:** Expert explicitly stated this, clearly valuable, all constitutional checks pass strongly
@@ -131,7 +179,7 @@ ${promptSections.length > 0 ? `\n**Available prompt sections for this community:
 
 **Example prompt update with constitutional validation:**
 {
-  "section": "resumeRewriteRules",
+  "section": "domainExpertise.resumeRewriteRules",
   "suggestedAddition": "Guide users to include team size and project scope in achievement bullets. Ask: 'How many people were on your team?' and 'What was the scale of this project?' to help them quantify scope.",
   "reasoning": "Expert emphasized recruiters look for evidence of working at scale. This teaches users to think about scope, not just outcomes.",
   "priority": "high",
