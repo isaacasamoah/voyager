@@ -404,7 +404,11 @@ Stay in **${mode}** mode regardless of what the user asks.`)
       sections.push(`\n\n**YOUR APPROACH:**`)
       sections.push(`- Message 1: ${cartographer.approach.message1}`)
       sections.push(`- Messages 2-3: ${cartographer.approach["message2-3"]}`)
-      sections.push(`- Messages 4-5: ${cartographer.approach["message4-5"]}`)
+      sections.push(`- Message 4-checkpoint: ${cartographer.approach["message4-checkpoint"]}`)
+      sections.push(`- Message 5+: ${cartographer.approach["message5+"]}`)
+      if (cartographer.approach.completion) {
+        sections.push(`- Completion: ${cartographer.approach.completion}`)
+      }
     }
 
     if (cartographer.extractionFocus && cartographer.extractionFocus.length > 0) {

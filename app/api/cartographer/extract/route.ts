@@ -16,10 +16,6 @@ import { getCommunityConfig } from '@/lib/communities'
 import { buildCartographerExtractionPrompt } from '@/../../.lab/experiments/002-cartographer-ai-pipeline/extraction-prompt'
 import Anthropic from '@anthropic-ai/sdk'
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY || ''
-})
-
 interface ExtractionRequest {
   conversationId: string
   expertEmail?: string
@@ -106,6 +102,13 @@ export async function POST(request: NextRequest) {
     const extractionPrompt = buildCartographerExtractionPrompt(config, messages)
 
     console.log(`🧬 Extracting knowledge from conversation ${conversationId}...`)
+
+    // Initialize Anthropic client
+    const apiKey = process.env.ANTHROPIC_API_KEY
+    if (!apiKey) {
+      throw new Error('ANTHROPIC_API_KEY is not set in environment variables')
+    }
+    const anthropic = new Anthropic({ apiKey })
 
     // Call LLM to extract
     const response = await anthropic.messages.create({
