@@ -49,9 +49,9 @@ export default async function PromptUpdatesPage() {
       .filter(u => u.isPending) // Only show pending updates
   })
 
-  // Categorize by confidence
+  // Categorize by confidence (treat undefined/null as needs review)
   const highConfidence = allUpdates.filter(u => u.update.confidence >= 90)
-  const needsReview = allUpdates.filter(u => u.update.confidence < 90)
+  const needsReview = allUpdates.filter(u => !u.update.confidence || u.update.confidence < 90)
 
   return (
     <div className="min-h-screen bg-gray-50 p-8">
