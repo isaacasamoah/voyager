@@ -94,28 +94,40 @@ USER REQUEST ──> FILTER ──> DECISION
 ## Ship List (Next 2-3 Weeks)
 *Goal: Eli successfully uses Voyager to improve 3 client outcomes*
 
-### Week 1: Build Core Experience
+### Week 1: Build Core Experience ✅ DONE (Oct 29 - Nov 1)
 - [x] Voyager constitutional prompt (integrate into all modes)
 - [x] Careersy community page (simple, mobile-first)
 - [x] Navigator mode (chat works, mobile responsive)
-- [ ] Cartographer mode (expert interview end-to-end) ← Testing blocked by OAuth setup
+- [x] Cartographer mode (expert interview end-to-end)
 - [x] Mobile responsive (text visibility fixed)
+- [x] v0.1.0-alpha shipped to production
+- [x] Email sent to Eli for alpha testing
 
-### Week 2: Real User Testing
-- [ ] Eli onboarding session (watch him use it, take notes)
-- [ ] One successful expert interview extraction (knowledge → structured output)
-- [ ] He uses it with 2-3 clients (you're on call for bugs)
+### Week 2: Command-Driven UX + Cartographer → AI (Nov 1-7)
+**Focus:** Make Voyager learn from expert knowledge
 
-### Week 3: Learn & Decide
+- [x] Command-driven mode switching (`/navigator`, `/cartographer`, `/shipwright`)
+- [x] Improved Cartographer UX (one question at a time, expectations set)
+- [ ] **Cartographer → AI pipeline** ← IN PROGRESS
+  - [ ] JSON output structure (knowledge extraction → machine-readable)
+  - [ ] Auto-update community prompts from expert sessions
+  - [ ] RAG dataset population (expert insights become retrievable)
+  - [ ] Fine-tuning examples generation
+- [ ] Eli uses Cartographer 3+ times
+- [ ] Monitor alpha usage patterns
+
+### Week 3: Learn & Decide (Nov 8-14)
 - [ ] Debrief with Eli: What worked? What broke? What did he WISH it did?
 - [ ] Fix top 2 pain points from real usage
+- [ ] User research: Validate profile personalization need
 - [ ] Decision point: Double down, iterate, or pivot?
 
 ### Success Metrics
-- Eli opens Voyager 3+ times without prompting
-- He completes at least 1 expert interview under 15 minutes
-- He voluntarily shows it to another coach
-- His clients report value from the interactions
+- ✅ Eli opens Voyager (sent alpha invite)
+- [ ] He completes at least 1 Cartographer session under 15 minutes
+- [ ] Navigator responses improve measurably after Cartographer sessions
+- [ ] He voluntarily shows it to another coach
+- [ ] His clients report value from the interactions
 
 ---
 
@@ -132,13 +144,52 @@ USER REQUEST ──> FILTER ──> DECISION
 - [ ] GitHub-style collaboration for platform development
 - [ ] Training data collection from builders
 
-### Shipwright - Collaboration Mode (Parked: Imagined complexity, no validated need yet)
-- [ ] Collaboration whiteboards
-- [ ] Drag-and-drop documents
-- [ ] Git repo integration
-- [ ] Pro plan features
-- [ ] Auth for knowledge protection
-**Why parked:** Designing for scale we don't have. Will know what this should be after 10 Elis use Careersy.
+### Shipwright v0.2.0 - Question Crafting Mode (Parked: Phase 1 - needs public forum)
+**Status:** APPROVED - Complete design spec ready
+**Design:** `.lab/design-briefs/SHIPWRIGHT_V0.2.0_HANDOFF.md`
+**Timeline:** 10-14 hours implementation (when unblocked)
+**Blocks:** Public forum infrastructure (Phase 1)
+
+**What it is:**
+- AI-guided question crafting through conversational refinement
+- Progressive disclosure UI (mobile-first, side-by-side desktop)
+- Copy to clipboard (post wherever: Slack, forum, email)
+- Auto-save drafts, resume sessions
+
+**Why parked:**
+- Eli's clients ask questions in his forum/Slack, not Voyager yet
+- Full value requires public posting (v0.3.0 feature)
+- Cartographer → AI is higher priority for alpha validation
+
+**When to ship:**
+- After Phase 1 public forum launches (Week 4-6)
+- Design ready, immediate build once infrastructure exists
+
+**Why we built the design now:**
+- Context-free blue sky thinking (browser session, no constraints)
+- Team validated the approach
+- Constitutional alignment confirmed (elevation, not replacement)
+
+### User Profiles (`/profile`) - Personalized Coaching (Parked: Research needed)
+**Status:** CONCEPT - Needs user validation
+**Owner:** Priya (validation) + Zara (prompt design)
+**Blocks:** User research with Eli
+
+**What it is:**
+- Conversational profile building (background, learning style, personality)
+- Living document (updates over time, not one-time form)
+- Universal system (works across all communities, not just Careersy)
+- Profile becomes prompt module for personalized Navigator coaching
+
+**Why parked:**
+- Eli hasn't asked for personalization yet
+- Don't know if users will engage with profile building
+- Need to validate value before building
+
+**When to ship:**
+- Week 3: Ask Eli if his clients would benefit from personalization
+- If validated: Lab experiment → measure engagement → ship if successful
+- If not validated: Archive permanently
 
 ### Advanced Routing (Parked: Optimization before validation)
 - [ ] Dynamic multi-model routing

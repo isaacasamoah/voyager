@@ -10,17 +10,17 @@ Production deployment, monitoring, and maintenance for Voyager.
 
 **Production Environment:**
 - Branch: `main`
-- URL: https://careersy-wingman.vercel.app
+- URL: https://voyager-platform.vercel.app
 - Auto-deploy: Enabled
 
 **Staging Environment:**
 - Branch: `develop`
-- URL: https://careersy-wingman-git-develop.vercel.app
+- URL: https://voyager-git-develop-isaac-asamoahs-projects.vercel.app
 - Auto-deploy: Enabled
 
 **Preview Deployments:**
 - All feature branches get automatic preview URLs
-- Format: `https://careersy-wingman-git-{branch-name}.vercel.app`
+- Format: `https://voyager-git-{branch-name}-isaac-asamoahs-projects.vercel.app`
 
 ### Environment Variables
 

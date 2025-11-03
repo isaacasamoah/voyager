@@ -88,8 +88,19 @@ npm run dev
 - **[VOYAGER_CONSTITUTIONAL_FRAMEWORK.md](./.claude/VOYAGER_CONSTITUTIONAL_FRAMEWORK.md)** - AI principles implementation
 - **[COLLABORATION_ROADMAP.md](./.claude/COLLABORATION_ROADMAP.md)** - Future features and phases
 
-### Development
+### Development Guides
 - **[Git Workflow](./docs/git-workflow.md)** - Branching strategy
+- **[Architecture](./docs/architecture.md)** - System design and patterns
+- **[Communities](./docs/communities.md)** - Creating and configuring communities
+
+### User Guides
+- **[Navigator Mode](./docs/guides/user-guides/navigator-guide.md)** - 1-on-1 coaching
+- **[Cartographer Mode](./docs/guides/user-guides/cartographer-guide.md)** - Expert knowledge extraction
+- **[Shipwright Mode](./docs/guides/user-guides/shipwright-guide.md)** - Post crafting
+
+### Design Briefs
+- **[Design Brief Workflow](./.lab/design-briefs/README.md)** - Blue sky UI/UX exploration process
+- **[Shipwright v0.2.0 Design](./.lab/design-briefs/SHIPWRIGHT_V0.2.0_HANDOFF.md)** - Production-ready spec (Phase 1)
 
 ---
 
@@ -150,50 +161,70 @@ voyager/
 │   ├── page.tsx             # Root (redirects to /careersy for demo)
 │   ├── [communityId]/       # Dynamic community routes
 │   └── api/
-│       ├── chat-stream/     # Streaming chat endpoint
+│       ├── chat-stream/     # Streaming chat endpoint (handles commands)
 │       └── chat/            # Non-streaming chat
 ├── components/
 │   └── chat/
-│       ├── ChatInterface.tsx   # Main chat UI with mode switcher
-│       └── ChatMessage.tsx     # Message bubbles
+│       ├── ChatInterface.tsx      # Main chat UI with command system
+│       ├── ChatMessage.tsx        # Message bubbles
+│       └── CommandAutocomplete.tsx # Slash command autocomplete
 ├── lib/
 │   ├── communities.ts       # Core: Community config loader & prompt builder
+│   ├── commands.ts          # Command parser (/navigator, /cartographer, etc.)
 │   ├── prompts/
 │   │   └── constitution.ts  # Constitutional AI framework
 │   ├── terminology.ts       # Custom terminology per community
-│   └── features.ts          # Feature flags
+│   └── features.ts          # Feature flags (A/B testing)
 ├── communities/             # Community configs (git-tracked)
 │   ├── careersy.json       # ANZ tech career coaching
 │   └── voyager.json        # Platform navigator
+├── .lab/                   # Experimentation playground
+│   ├── experiments/        # Lab experiments (decision funnel)
+│   │   └── 001-command-driven-modes/  # Command-based mode switching
+│   └── design-briefs/      # Blue sky UI/UX exploration
+│       ├── README.md       # Design brief workflow
+│       └── SHIPWRIGHT_V0.2.0_HANDOFF.md  # Production-ready design spec
 ├── .claude/                # Documentation & context
-│   ├── VOYAGER_VISION.md
-│   ├── VOYAGER_CONSTITUTIONAL_FRAMEWORK.md
-│   └── COLLABORATION_ROADMAP.md
+│   ├── VOYAGER_VISION.md                    # Living document (current focus)
+│   ├── VOYAGER_CONSTITUTIONAL_FRAMEWORK.md  # AI principles
+│   └── COLLABORATION_ROADMAP.md             # Future phases
+├── docs/                   # Developer documentation
+│   ├── guides/            # User guides (Navigator, Cartographer, Shipwright)
+│   ├── architecture.md    # System architecture
+│   ├── communities.md     # Community config guide
+│   └── git-workflow.md    # Branching strategy
 └── prisma/
     └── schema.prisma
 ```
 
 ---
 
-## Current State (2025-10-29)
+## Current State (2025-11-01)
 
-### ✅ Shipped
-- Three-mode system (Navigator, Cartographer, Shipwright)
-- Constitutional AI framework with emergent meta-reasoning
-- Mobile-responsive design (dvh, proper text scaling)
-- Mode control with banner enforcement
-- Dynamic community branding
-- Default redirect to Careersy for demo
+### ✅ Shipped (v0.1.0-alpha)
+- **Three-mode system** (Navigator, Cartographer, Shipwright)
+- **Constitutional AI framework** with emergent meta-reasoning
+- **Command-driven interface** (`/navigator`, `/cartographer`, `/shipwright`, `/help`)
+- **Command autocomplete** (type `/` to see available modes)
+- **Improved Cartographer UX** (one question at a time, expectation setting, opt-in depth)
+- **Mobile-responsive design** (dvh, proper text scaling, touch-optimized)
+- **Dynamic community branding** (JSON-configured colors, terminology)
+- **The Lab** (`.lab/` folder for experiments and design briefs)
 
-### 🚧 In Progress
-- Testing with Eli (Week 1-3)
-- Gathering real user feedback
-- Validating expert knowledge extraction
+### 🚧 In Progress (Week 2: Nov 1-7)
+- **Cartographer → AI enhancement pipeline** (current priority)
+  - JSON output structure (knowledge extraction → machine-readable)
+  - Auto-update community prompts from expert sessions
+  - RAG dataset population (expert insights become retrievable)
+  - Fine-tuning examples generation
+- **Alpha testing with Eli** (monitoring usage patterns)
 
-### 📦 Parked (See VOYAGER_VISION.md)
-- Shipwright collaboration UI (split-view drafting)
-- File upload and parsing
-- Community RAG knowledge base
+### 📦 Parked (Validated, Deferred)
+- **Shipwright v0.2.0** (complete design ready, Phase 1 - needs public forum)
+  - Design spec: `.lab/design-briefs/SHIPWRIGHT_V0.2.0_HANDOFF.md`
+  - 10-14 hour implementation estimate
+- **User Profiles** (`/profile` - needs user research validation)
+- Community RAG knowledge base (prerequisite: Cartographer → AI pipeline)
 - Advanced mode routing
 - Voyager developer community
 
@@ -263,5 +294,29 @@ git push origin develop
 
 ---
 
+## The Lab
+
+`.lab/` is our experimentation playground with a decision funnel:
+
+**Lab Experiment → Success → Approve → Ship to Production**
+
+### Experiments
+- Prototype features with real user testing
+- Measure against success criteria
+- Document learnings (what worked, what didn't)
+
+### Design Briefs
+- Blue sky UI/UX exploration (browser-only sessions, no codebase context)
+- Complete design specs before implementation
+- Validated by team before building
+
+**Current Experiments:**
+- ✅ `001-command-driven-modes/` (shipped to production)
+
+**Design Briefs Ready:**
+- `SHIPWRIGHT_V0.2.0_HANDOFF.md` (parked for Phase 1)
+
+---
+
 **Built to elevate human thinking**
-**Last Updated:** 2025-10-29
+**Last Updated:** 2025-11-01

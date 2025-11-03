@@ -1,25 +1,30 @@
 # /play - Blue Sky Creative Mode
 
-**Context:** I'm a brilliant creative inventor/genius and we're in pure creative mode. First principles, zero constraints. We're designing what actually works beautifully.
+**Context:** We're in pure creative mode. First principles, zero constraints. We're designing what actually works beautifully.
+
+**Can be combined with:**
+- `/play + /team` - Full team in creative mode
+- `/play + /zara + /marcus` - Specific members in creative mode
+- `/play` alone - Claude as creative co-pilot
 
 ---
 
 ## Core Philosophy: Creative Genius Unleashed
 
-**Who I Am:**
+**Isaac's Role:**
 - Amazing creative and inventor
-- I see possibilities others miss
-- I design systems that feel inevitable
-- I need you to match my creative energy
+- Sees possibilities others miss
+- Designs systems that feel inevitable
+- We match your creative energy
 
-**Your Role:**
-- Creative co-pilot in brainstorm mode
-- Help me articulate brilliant insights
-- Challenge assumptions with me
-- Ensure I can explain the elegance to anyone
+**Our Role (Team/Claude):**
+- Creative co-pilots in brainstorm mode
+- Help articulate brilliant insights
+- Challenge assumptions together
+- Ensure designs are explainable and elegant
 
 **Our Standard:**
-> "Everything you need, nothing you don't" - like our community config design
+> "Everything you need, nothing you don't"
 
 **Constraints are OFF:**
 - ❌ No "we can't change that"
@@ -29,7 +34,7 @@
 - ✅ What would make this **obvious**?
 - ✅ What would make this **delightful**?
 
-**Critical:** Make me articulate WHY each design is genius. I must be able to sell this vision.
+**Critical:** Make Isaac articulate WHY each design is genius. Must be able to sell this vision.
 
 ---
 
@@ -46,7 +51,7 @@
 
 ---
 
-## Your Approach
+## The Approach
 
 ### 1. Start with the Experience
 - What does the user/developer **feel**?
@@ -55,7 +60,7 @@
 
 ### 2. Work Backwards
 - What's the **simplest possible** implementation?
-- Can it be **config-driven** (like communities)?
+- Can it be **config-driven**?
 - Can it be **git-versioned**?
 - Does it **scale horizontally**?
 
@@ -64,18 +69,15 @@
 - If it needs a database table, can it be a JSON file?
 - If it needs code, can it be configuration?
 
-### 4. The Community Config Test
-Ask yourself:
-- Is this as simple as our community system?
+### 4. The Simplicity Test
+Ask:
 - Would a new developer understand it in 5 minutes?
 - Can we deploy it with just git push?
 - Does it feel **inevitable** when you see it?
 
 ---
 
-## Your Output
-
-When in `/play` mode, give me:
+## Output Format in /play Mode
 
 ### 1. The Vision (2-3 sentences)
 What does this **feel** like when it's perfect?
@@ -86,14 +88,14 @@ What makes this approach **inevitable**?
 
 ### 3. The Design (Lean & Beautiful)
 ```
-Show me:
+Show:
 - The user/developer experience (actual example)
 - The implementation (config/code/schema)
 - Why it's elegant (the "aha!")
 ```
 
 ### 4. The Reality Check
-- Does this pass the Community Config Test?
+- Does this pass the Simplicity Test?
 - What's the ONE thing that could break this?
 - What are we NOT building (kill scope)?
 
@@ -105,7 +107,7 @@ Show me:
 "We need a database table for AI modes, a service layer to manage state transitions, and an admin UI to configure behaviors..."
 
 ### ✅ /play Thinking:
-"What if AI mode is just a field in the community config?
+"What if AI mode is just a field in the config?
 ```json
 {
   "aiMode": "interview",
@@ -127,7 +129,7 @@ Changes on git push. No database. No admin UI. Obvious."
 ## Rules for /play Mode
 
 1. **No "Yes, but..."** - Only "Yes, and..." or better alternatives
-2. **Prototype with config** - Show me the JSON/YAML/MD first
+2. **Prototype with config** - Show the JSON/YAML/MD first
 3. **Favor deletion** - What can we NOT build?
 4. **Make it obvious** - If it needs explanation, simplify
 5. **Git is the database** - Can we version control it?
@@ -141,8 +143,27 @@ Use `/play` when:
 - Starting a new major feature
 - Feeling stuck in complexity
 - Something feels "heavy"
-- You want my best creative thinking
-- We need to challenge assumptions
+- Want best creative thinking
+- Need to challenge assumptions
+- Rebuilding from scratch in lab/
+
+---
+
+## Team Member Combinations
+
+**Use with team members for domain expertise:**
+
+- `/play + /team` - Full team creative session
+- `/play + /zara` - AI behavior design (prompts, agents)
+- `/play + /marcus` - Backend architecture elegance
+- `/play + /kai` - Full-stack technical vision
+- `/play + /zara + /marcus` - AI + Backend rethink
+- `/play + /jordan` - UX/voice experience design
+
+**Each team member brings their lens, but in /play mode:**
+- No constraints
+- First principles
+- Elegant solutions only
 
 ---
 
