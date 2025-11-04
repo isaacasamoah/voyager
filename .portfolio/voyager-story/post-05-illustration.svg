@@ -1,0 +1,113 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg5" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="community-glow">
+      <stop offset="0%" style="stop-color:#7b68ee;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#7b68ee;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg5)"/>
+
+  <!-- Central Platform (Voyager core) -->
+  <g transform="translate(200, 200)">
+    <circle cx="0" cy="0" r="40" fill="#4a9eff" opacity="0.2"/>
+    <circle cx="0" cy="0" r="25" fill="#4a9eff" opacity="0.4"/>
+    <circle cx="0" cy="0" r="15" fill="#4a9eff" opacity="0.8"/>
+
+    <!-- Core icon (V for Voyager) -->
+    <text x="0" y="8" font-family="Inter, system-ui, sans-serif" font-size="18" font-weight="bold" fill="#1a1a2e" text-anchor="middle">V</text>
+  </g>
+
+  <!-- Connection lines to communities -->
+  <g stroke="#4a9eff" stroke-width="2" opacity="0.3" stroke-dasharray="3,3">
+    <line x1="200" y1="200" x2="200" y2="80"/>
+    <line x1="200" y1="200" x2="320" y2="120"/>
+    <line x1="200" y1="200" x2="340" y2="240"/>
+    <line x1="200" y1="200" x2="280" y2="340"/>
+    <line x1="200" y1="200" x2="120" y2="340"/>
+    <line x1="200" y1="200" x2="60" y2="240"/>
+    <line x1="200" y1="200" x2="80" y2="120"/>
+  </g>
+
+  <!-- Community 1: Careersy (career coaching) - Top -->
+  <g transform="translate(200, 60)">
+    <circle cx="0" cy="0" r="35" fill="url(#community-glow)"/>
+    <circle cx="0" cy="0" r="22" fill="#7b68ee" opacity="0.9"/>
+    <!-- Briefcase icon -->
+    <rect x="-10" y="-5" width="20" height="12" rx="1" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+    <rect x="-6" y="-8" width="12" height="4" rx="1" fill="#1a1a2e"/>
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#7b68ee" text-anchor="middle" opacity="0.8">Careersy</text>
+  </g>
+
+  <!-- Community 2: Writing (top right) -->
+  <g transform="translate(320, 120)">
+    <circle cx="0" cy="0" r="30" fill="url(#community-glow)"/>
+    <circle cx="0" cy="0" r="18" fill="#a78bfa" opacity="0.8"/>
+    <!-- Pen icon -->
+    <line x1="-8" y1="8" x2="8" y2="-8" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="-8" cy="8" r="2" fill="#1a1a2e"/>
+    <text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#a78bfa" text-anchor="middle" opacity="0.7">Writing</text>
+  </g>
+
+  <!-- Community 3: Code/Dev (right) -->
+  <g transform="translate(340, 240)">
+    <circle cx="0" cy="0" r="30" fill="url(#community-glow)"/>
+    <circle cx="0" cy="0" r="18" fill="#818cf8" opacity="0.8"/>
+    <!-- Code brackets -->
+    <text x="0" y="6" font-family="Monaco, monospace" font-size="16" fill="#1a1a2e" text-anchor="middle" font-weight="bold">{}</text>
+    <text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#818cf8" text-anchor="middle" opacity="0.7">Dev</text>
+  </g>
+
+  <!-- Community 4: Startup (bottom right) -->
+  <g transform="translate(280, 340)">
+    <circle cx="0" cy="0" r="30" fill="url(#community-glow)"/>
+    <circle cx="0" cy="0" r="18" fill="#c084fc" opacity="0.8"/>
+    <!-- Rocket icon -->
+    <polygon points="0,-8 -4,6 0,4 4,6" fill="#1a1a2e"/>
+    <line x1="-4" y1="0" x2="-7" y2="3" stroke="#1a1a2e" stroke-width="1.5"/>
+    <line x1="4" y1="0" x2="7" y2="3" stroke="#1a1a2e" stroke-width="1.5"/>
+    <text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#c084fc" text-anchor="middle" opacity="0.7">Startup</text>
+  </g>
+
+  <!-- Community 5: Design (bottom left) -->
+  <g transform="translate(120, 340)">
+    <circle cx="0" cy="0" r="30" fill="url(#community-glow)"/>
+    <circle cx="0" cy="0" r="18" fill="#a78bfa" opacity="0.8"/>
+    <!-- Palette icon -->
+    <circle cx="0" cy="0" r="8" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+    <circle cx="-3" cy="-2" r="1.5" fill="#1a1a2e"/>
+    <circle cx="3" cy="-2" r="1.5" fill="#1a1a2e"/>
+    <circle cx="0" cy="4" r="1.5" fill="#1a1a2e"/>
+    <text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#a78bfa" text-anchor="middle" opacity="0.7">Design</text>
+  </g>
+
+  <!-- Community 6: Teaching (left) -->
+  <g transform="translate(60, 240)">
+    <circle cx="0" cy="0" r="30" fill="url(#community-glow)"/>
+    <circle cx="0" cy="0" r="18" fill="#7b68ee" opacity="0.8"/>
+    <!-- Book icon -->
+    <rect x="-8" y="-6" width="16" height="12" rx="1" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+    <line x1="0" y1="-6" x2="0" y2="6" stroke="#1a1a2e" stroke-width="2"/>
+    <text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#7b68ee" text-anchor="middle" opacity="0.7">Teaching</text>
+  </g>
+
+  <!-- Community 7: Future (top left, dotted = coming) -->
+  <g transform="translate(80, 120)" opacity="0.4">
+    <circle cx="0" cy="0" r="30" fill="url(#community-glow)"/>
+    <circle cx="0" cy="0" r="18" fill="none" stroke="#7b68ee" stroke-width="2" stroke-dasharray="3,3"/>
+    <!-- Plus icon -->
+    <line x1="0" y1="-6" x2="0" y2="6" stroke="#7b68ee" stroke-width="2"/>
+    <line x1="-6" y1="0" x2="6" y2="0" stroke="#7b68ee" stroke-width="2"/>
+    <text x="0" y="28" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#7b68ee" text-anchor="middle" opacity="0.7">You?</text>
+  </g>
+
+  <!-- Title -->
+  <text x="200" y="390" font-family="Inter, system-ui, sans-serif" font-size="12" fill="#4a9eff" text-anchor="middle" opacity="0.6">One Platform, Many Communities</text>
+</svg>
