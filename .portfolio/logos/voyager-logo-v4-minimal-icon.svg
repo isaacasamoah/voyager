@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Ultra-minimal single cell - icon/favicon version -->
+  <!-- Deep space aesthetic, maximum simplicity -->
+
+  <rect width="120" height="120" fill="#0a0a0f"/>
+
+  <!-- Single cell - pure geometry -->
+  <g transform="translate(60, 35)">
+    <!-- Bottom half hexagon (solid, monochrome) -->
+    <path d="M 0 10 L 25 25 L 25 55 L 0 70 L -25 55 L -25 25 Z"
+          fill="none"
+          stroke="#ffffff"
+          stroke-width="3"/>
+
+    <!-- Top half open (subtle) -->
+    <line x1="-25" y1="25" x2="0" y2="10"
+          stroke="#ffffff"
+          stroke-width="3"
+          stroke-dasharray="5,5"
+          opacity="0.3"/>
+    <line x1="0" y1="10" x2="25" y2="25"
+          stroke="#ffffff"
+          stroke-width="3"
+          stroke-dasharray="5,5"
+          opacity="0.3"/>
+
+    <!-- Three diagonal lines - the signature element -->
+    <line x1="-15" y1="30" x2="-7" y2="65" stroke="#ffffff" stroke-width="2.5" opacity="0.8"/>
+    <line x1="0" y1="25" x2="0" y2="70" stroke="#ffffff" stroke-width="2.5" opacity="0.8"/>
+    <line x1="15" y1="30" x2="7" y2="65" stroke="#ffffff" stroke-width="2.5" opacity="0.8"/>
+  </g>
+
+  <!-- Optional: Small accent dot at center (focal point) -->
+  <circle cx="60" cy="70" r="2" fill="#fad02c" opacity="0.8"/>
+</svg>

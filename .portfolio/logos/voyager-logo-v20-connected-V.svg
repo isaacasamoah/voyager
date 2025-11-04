@@ -1,0 +1,49 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- V20: V connected to outer hexagon top - ONE CONTINUOUS SHAPE -->>
+  <!-- Left V stroke extends to left top of hexagon, right V to right top -->
+
+  <rect width="120" height="120" fill="#ffffff"/>
+
+  <g transform="translate(60, 35)">
+
+    <!-- Outer hexagon container - BOTTOM HALF ONLY (since top is now V) -->
+    <!-- Start from left mid, go down and around, end at right mid -->
+    <path d="M -25 25 L -25 55 L 0 70 L 25 55 L 25 25"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          stroke-linecap="round"
+          stroke-linejoin="round"/>
+
+    <!-- Top half open (dashed) - REMOVED since V now connects -->
+
+    <!-- Central axis (subtle spine) -->
+    <line x1="0" y1="10" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="0.5"
+          stroke-linecap="round"
+          opacity="0.28"/>
+
+    <!-- V shape - NOW CONNECTS TO OUTER HEXAGON TOP -->
+    <!-- Left stroke: from left top of hexagon (-25, 25) to bottom apex (0, 68) -->
+    <line x1="-25" y1="25" x2="0" y2="68"
+          stroke="#1a1a2e"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          opacity="0.92"/>
+    <!-- Right stroke: from right top of hexagon (25, 25) to bottom apex (0, 68) -->
+    <line x1="25" y1="25" x2="0" y2="68"
+          stroke="#1a1a2e"
+          stroke-width="3"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          opacity="0.92"/>
+
+    <!-- Silver hexagon - top point at original V tips line (y=28) -->
+    <path d="M 0 28 L 2.5 29.5 L 2.5 32.5 L 0 34 L -2.5 32.5 L -2.5 29.5 Z"
+          fill="#c0c0c0"
+          stroke="none"
+          opacity="0.88"/>
+  </g>
+</svg>

@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- V14: Wild experiment - subtle gold honeycomb texture inside outer hex -->
+  <!-- Microscopic structure revealed -->
+
+  <rect width="120" height="120" fill="#ffffff"/>
+
+  <defs>
+    <!-- Clip path to contain honeycomb pattern inside outer hexagon -->
+    <clipPath id="hex-clip">
+      <path d="M 60 45 L 85 60 L 85 90 L 60 105 L 35 90 L 35 60 Z"/>
+    </clipPath>
+
+    <!-- Tiny honeycomb pattern -->
+    <pattern id="honeycomb-pattern" x="0" y="0" width="12" height="10.4" patternUnits="userSpaceOnUse">
+      <!-- Mini hexagons forming honeycomb grid -->
+      <path d="M 3 0 L 6 1.7 L 6 5.2 L 3 6.9 L 0 5.2 L 0 1.7 Z"
+            fill="none"
+            stroke="#fad02c"
+            stroke-width="0.4"
+            opacity="0.15"/>
+      <path d="M 9 3.45 L 12 5.15 L 12 8.65 L 9 10.35 L 6 8.65 L 6 5.15 Z"
+            fill="none"
+            stroke="#fad02c"
+            stroke-width="0.4"
+            opacity="0.15"/>
+    </pattern>
+  </defs>
+
+  <g transform="translate(60, 35)">
+
+    <!-- Honeycomb texture fill (clipped to outer hexagon) -->
+    <g clip-path="url(#hex-clip)" transform="translate(-60, -35)">
+      <rect x="30" y="40" width="60" height="70" fill="url(#honeycomb-pattern)"/>
+    </g>
+
+    <!-- Outer hexagon container (on top of texture) -->
+    <path d="M 0 10 L 25 25 L 25 55 L 0 70 L -25 55 L -25 25 Z"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="2"/>
+
+    <!-- Top half open -->
+    <line x1="-25" y1="25" x2="0" y2="10"
+          stroke="#1a1a2e"
+          stroke-width="2"
+          stroke-dasharray="4,4"
+          opacity="0.25"/>
+    <line x1="0" y1="10" x2="25" y2="25"
+          stroke="#1a1a2e"
+          stroke-width="2"
+          stroke-dasharray="4,4"
+          opacity="0.25"/>
+
+    <!-- V shape - bold over the texture -->
+    <line x1="-18" y1="28" x2="0" y2="68"
+          stroke="#1a1a2e"
+          stroke-width="1.8"
+          opacity="0.9"/>
+    <line x1="18" y1="28" x2="0" y2="68"
+          stroke="#1a1a2e"
+          stroke-width="1.8"
+          opacity="0.9"/>
+
+    <!-- Center line -->
+    <line x1="0" y1="25" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="1.2"
+          opacity="0.5"/>
+  </g>
+</svg>

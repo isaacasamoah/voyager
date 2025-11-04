@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- V4 refined: Thinner lines, diagonal lines form a clear "V" for Voyager -->
+  <!-- Deep space minimal aesthetic -->
+
+  <rect width="120" height="120" fill="#0a0a0f"/>
+
+  <!-- Single cell with V shape emphasized -->
+  <g transform="translate(60, 35)">
+
+    <!-- Bottom half hexagon (thinner stroke) -->
+    <path d="M 0 10 L 25 25 L 25 55 L 0 70 L -25 55 L -25 25 Z"
+          fill="none"
+          stroke="#ffffff"
+          stroke-width="2"/>
+
+    <!-- Top half open (subtle, thinner) -->
+    <line x1="-25" y1="25" x2="0" y2="10"
+          stroke="#ffffff"
+          stroke-width="2"
+          stroke-dasharray="4,4"
+          opacity="0.25"/>
+    <line x1="0" y1="10" x2="25" y2="25"
+          stroke="#ffffff"
+          stroke-width="2"
+          stroke-dasharray="4,4"
+          opacity="0.25"/>
+
+    <!-- Three diagonal lines forming a clear "V" shape -->
+    <!-- Left diagonal - wider angle -->
+    <line x1="-18" y1="28" x2="0" y2="68"
+          stroke="#ffffff"
+          stroke-width="1.5"
+          opacity="0.85"/>
+
+    <!-- Right diagonal - mirrors left to complete V -->
+    <line x1="18" y1="28" x2="0" y2="68"
+          stroke="#ffffff"
+          stroke-width="1.5"
+          opacity="0.85"/>
+
+    <!-- Center vertical - subtle, connects to V point -->
+    <line x1="0" y1="25" x2="0" y2="70"
+          stroke="#ffffff"
+          stroke-width="1.2"
+          opacity="0.4"/>
+
+    <!-- Gold accent at the V convergence point (bottom) -->
+    <circle cx="0" cy="68" r="2" fill="#fad02c" opacity="0.9"/>
+  </g>
+</svg>

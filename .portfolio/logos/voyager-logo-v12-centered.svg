@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- V12: Gold hexagon at vertical center of V -->
+  <!-- Positioned at midpoint of center line for perfect balance -->
+
+  <rect width="120" height="120" fill="#ffffff"/>
+
+  <g transform="translate(60, 35)">
+
+    <!-- Outer hexagon container (subtle) -->
+    <path d="M 0 10 L 25 25 L 25 55 L 0 70 L -25 55 L -25 25 Z"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="0.9"/>
+
+    <!-- Top half open (very subtle) -->
+    <line x1="-25" y1="25" x2="0" y2="10"
+          stroke="#1a1a2e"
+          stroke-width="0.9"
+          stroke-dasharray="3,3"
+          opacity="0.15"/>
+    <line x1="0" y1="10" x2="25" y2="25"
+          stroke="#1a1a2e"
+          stroke-width="0.9"
+          stroke-dasharray="3,3"
+          opacity="0.15"/>
+
+    <!-- V shape - converges at bottom apex -->
+    <line x1="-18" y1="28" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          opacity="0.85"/>
+    <line x1="18" y1="28" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          opacity="0.85"/>
+
+    <!-- Center line (25 to 70, so midpoint is 47.5) -->
+    <line x1="0" y1="25" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="0.7"
+          opacity="0.25"/>
+
+    <!-- Gold hexagon - centered on vertical line at y=47.5 -->
+    <!-- Small, nested within V width at that height -->
+    <path d="M 0 44.5 L 2.5 46 L 2.5 49 L 0 50.5 L -2.5 49 L -2.5 46 Z"
+          fill="#fad02c"
+          stroke="none"
+          opacity="0.9"/>
+  </g>
+</svg>

@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 350 180" width="350" height="180">
+  <!-- Four cells - true puzzle/honeycomb interlock pattern -->
+
+  <rect width="350" height="180" fill="#f8f9fa"/>
+
+  <defs>
+    <!-- Define a single cell as reusable component -->
+    <g id="cell">
+      <!-- Bottom hexagon (solid) -->
+      <path d="M 30 20 L 50 30 L 50 60 L 30 70 L 10 60 L 10 30 Z"
+            fill="none"
+            stroke="#1a1a2e"
+            stroke-width="2.5"/>
+      <!-- Top open (dashed) -->
+      <line x1="10" y1="30" x2="30" y2="20" stroke="#1a1a2e" stroke-width="2.5" stroke-dasharray="3,3" opacity="0.4"/>
+      <line x1="30" y1="20" x2="50" y2="30" stroke="#1a1a2e" stroke-width="2.5" stroke-dasharray="3,3" opacity="0.4"/>
+      <!-- Interior structure -->
+      <line x1="18" y1="35" x2="28" y2="65" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+      <line x1="30" y1="30" x2="30" y2="70" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+      <line x1="42" y1="35" x2="32" y2="65" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+    </g>
+  </defs>
+
+  <!-- Row 1: Two cells -->
+  <use href="#cell" x="50" y="10"/>
+  <use href="#cell" x="90" y="10"/>
+
+  <!-- Row 2: Two cells (offset for honeycomb fit) -->
+  <use href="#cell" x="70" y="55"/>
+  <use href="#cell" x="110" y="55"/>
+
+  <!-- Connection lines showing how they fit together -->
+  <line x1="90" y1="40" x2="110" y2="40" stroke="#1a1a2e" stroke-width="2.5" opacity="0.3"/>
+  <line x1="130" y1="40" x2="150" y2="40" stroke="#1a1a2e" stroke-width="2.5" opacity="0.3"/>
+</svg>

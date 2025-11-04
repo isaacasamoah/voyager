@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" width="400" height="200">
+  <!-- Three honeycomb cells joined together - puzzle fit -->
+
+  <!-- Background for visibility -->
+  <rect width="400" height="200" fill="#f8f9fa"/>
+
+  <!-- LEFT CELL -->
+  <g transform="translate(80, 0)">
+    <!-- Bottom half solid -->
+    <path d="M 40 50 L 70 70 L 70 110 L 40 130 L 10 110 L 10 70 Z"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="2.5"/>
+    <!-- Top half open (dashed) -->
+    <line x1="10" y1="70" x2="40" y2="50"
+          stroke="#1a1a2e"
+          stroke-width="2.5"
+          stroke-dasharray="4,4"
+          opacity="0.5"/>
+    <line x1="40" y1="50" x2="70" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="2.5"
+          stroke-dasharray="4,4"
+          opacity="0.5"/>
+    <!-- Interior lines -->
+    <line x1="20" y1="75" x2="35" y2="125" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+    <line x1="40" y1="70" x2="40" y2="130" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+    <line x1="60" y1="75" x2="45" y2="125" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+  </g>
+
+  <!-- CENTER CELL (slightly elevated for puzzle fit) -->
+  <g transform="translate(150, -10)">
+    <path d="M 40 50 L 70 70 L 70 110 L 40 130 L 10 110 L 10 70 Z"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="2.5"/>
+    <line x1="10" y1="70" x2="40" y2="50"
+          stroke="#1a1a2e"
+          stroke-width="2.5"
+          stroke-dasharray="4,4"
+          opacity="0.5"/>
+    <line x1="40" y1="50" x2="70" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="2.5"
+          stroke-dasharray="4,4"
+          opacity="0.5"/>
+    <line x1="20" y1="75" x2="35" y2="125" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+    <line x1="40" y1="70" x2="40" y2="130" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+    <line x1="60" y1="75" x2="45" y2="125" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+  </g>
+
+  <!-- RIGHT CELL -->
+  <g transform="translate(220, 0)">
+    <path d="M 40 50 L 70 70 L 70 110 L 40 130 L 10 110 L 10 70 Z"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="2.5"/>
+    <line x1="10" y1="70" x2="40" y2="50"
+          stroke="#1a1a2e"
+          stroke-width="2.5"
+          stroke-dasharray="4,4"
+          opacity="0.5"/>
+    <line x1="40" y1="50" x2="70" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="2.5"
+          stroke-dasharray="4,4"
+          opacity="0.5"/>
+    <line x1="20" y1="75" x2="35" y2="125" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+    <line x1="40" y1="70" x2="40" y2="130" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+    <line x1="60" y1="75" x2="45" y2="125" stroke="#1a1a2e" stroke-width="1.5" opacity="0.6"/>
+  </g>
+</svg>

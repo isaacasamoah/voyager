@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- V9: V is the hero, container recedes, gold hexagon inside -->
+  <!-- Ultra-delicate refinement -->
+
+  <rect width="120" height="120" fill="#ffffff"/>
+
+  <!-- Single cell with V as primary focus -->
+  <g transform="translate(60, 35)">
+
+    <!-- Bottom half hexagon (thinner - recedes) -->
+    <path d="M 0 10 L 25 25 L 25 55 L 0 70 L -25 55 L -25 25 Z"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="0.9"/>
+
+    <!-- Top half open (very subtle) -->
+    <line x1="-25" y1="25" x2="0" y2="10"
+          stroke="#1a1a2e"
+          stroke-width="0.9"
+          stroke-dasharray="3,3"
+          opacity="0.15"/>
+    <line x1="0" y1="10" x2="25" y2="25"
+          stroke="#1a1a2e"
+          stroke-width="0.9"
+          stroke-dasharray="3,3"
+          opacity="0.15"/>
+
+    <!-- V shape - EMPHASIZED (thicker than container) -->
+    <!-- Left diagonal -->
+    <line x1="-18" y1="28" x2="0" y2="63"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          opacity="0.85"/>
+
+    <!-- Right diagonal -->
+    <line x1="18" y1="28" x2="0" y2="63"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          opacity="0.85"/>
+
+    <!-- Center line - very subtle (thinner than everything) -->
+    <line x1="0" y1="25" x2="0" y2="65"
+          stroke="#1a1a2e"
+          stroke-width="0.7"
+          opacity="0.25"/>
+
+    <!-- Gold hexagon accent - INSIDE the main hexagon, at V convergence -->
+    <!-- Positioned higher so it's clearly within the bounds -->
+    <path d="M 0 61 L 3 62.5 L 3 65.5 L 0 67 L -3 65.5 L -3 62.5 Z"
+          fill="#fad02c"
+          stroke="none"
+          opacity="0.9"/>
+  </g>
+</svg>

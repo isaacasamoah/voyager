@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- V23: V19 with V and outer hexagon edges aligned as one shape -->
+  <!-- V tips extended from (-18,28) to (-25,25) and (18,28) to (25,25) -->
+  <!-- V bottom extended from (0,68) to (0,70) to align with hexagon bottom -->
+
+  <rect width="120" height="120" fill="#ffffff"/>
+
+  <g transform="translate(60, 35)">
+
+    <!-- Outer hexagon container - sides and bottom only (V replaces the angled parts) -->
+    <path d="M -25 25 L -25 55 L 0 70 L 25 55 L 25 25"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="1.5"/>
+
+    <!-- Top half open -->
+    <line x1="-25" y1="25" x2="0" y2="10"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          stroke-dasharray="4,4"
+          opacity="0.2"/>
+    <line x1="0" y1="10" x2="25" y2="25"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          stroke-dasharray="4,4"
+          opacity="0.2"/>
+
+    <!-- Very thin center line -->
+    <line x1="0" y1="10" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="0.5"
+          opacity="0.3"/>
+
+    <!-- V shape - BOLD, now aligned with outer hexagon edges -->
+    <!-- Left: from (-25, 25) to (0, 70) - aligns with outer hexagon -->
+    <line x1="-25" y1="25" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="3"
+          opacity="0.9"/>
+    <!-- Right: from (25, 25) to (0, 70) - aligns with outer hexagon -->
+    <line x1="25" y1="25" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="3"
+          opacity="0.9"/>
+
+    <!-- Silver hexagon - TOP POINT at y=28 (original V tips line) -->
+    <path d="M 0 28 L 2.5 29.5 L 2.5 32.5 L 0 34 L -2.5 32.5 L -2.5 29.5 Z"
+          fill="#c0c0c0"
+          stroke="none"
+          opacity="0.85"/>
+  </g>
+</svg>

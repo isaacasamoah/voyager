@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- V17: Silver hexagon vertically aligned with V tips -->
+  <!-- Perfect geometric alignment -->
+
+  <rect width="120" height="120" fill="#ffffff"/>
+
+  <g transform="translate(60, 35)">
+
+    <!-- Outer hexagon container -->
+    <path d="M 0 10 L 25 25 L 25 55 L 0 70 L -25 55 L -25 25 Z"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="1.5"/>
+
+    <!-- Top half open -->
+    <line x1="-25" y1="25" x2="0" y2="10"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          stroke-dasharray="4,4"
+          opacity="0.2"/>
+    <line x1="0" y1="10" x2="25" y2="25"
+          stroke="#1a1a2e"
+          stroke-width="1.5"
+          stroke-dasharray="4,4"
+          opacity="0.2"/>
+
+    <!-- Very thin center line -->
+    <line x1="0" y1="10" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="0.5"
+          opacity="0.3"/>
+
+    <!-- V shape - BOLD, tips at y=28 -->
+    <line x1="-18" y1="28" x2="0" y2="68"
+          stroke="#1a1a2e"
+          stroke-width="3"
+          opacity="0.9"/>
+    <line x1="18" y1="28" x2="0" y2="68"
+          stroke="#1a1a2e"
+          stroke-width="3"
+          opacity="0.9"/>
+
+    <!-- Silver hexagon - CENTER aligned with V tips at y=28 -->
+    <!-- Hexagon height is ~6px, so center at y=28 means top at 25, bottom at 31 -->
+    <path d="M 0 25 L 2.5 26.5 L 2.5 29.5 L 0 31 L -2.5 29.5 L -2.5 26.5 Z"
+          fill="#c0c0c0"
+          stroke="none"
+          opacity="0.85"/>
+  </g>
+</svg>

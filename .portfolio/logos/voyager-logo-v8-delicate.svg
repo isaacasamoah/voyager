@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- V8: Ultra-delicate, black on white, gold hexagon accent -->
+  <!-- Maximum refinement, minimal aesthetic -->
+
+  <rect width="120" height="120" fill="#ffffff"/>
+
+  <!-- Single cell with delicate V shape -->
+  <g transform="translate(60, 35)">
+
+    <!-- Bottom half hexagon (very thin stroke) -->
+    <path d="M 0 10 L 25 25 L 25 55 L 0 70 L -25 55 L -25 25 Z"
+          fill="none"
+          stroke="#1a1a2e"
+          stroke-width="1.2"/>
+
+    <!-- Top half open (very subtle) -->
+    <line x1="-25" y1="25" x2="0" y2="10"
+          stroke="#1a1a2e"
+          stroke-width="1.2"
+          stroke-dasharray="3,3"
+          opacity="0.2"/>
+    <line x1="0" y1="10" x2="25" y2="25"
+          stroke="#1a1a2e"
+          stroke-width="1.2"
+          stroke-dasharray="3,3"
+          opacity="0.2"/>
+
+    <!-- V shape - ultra delicate -->
+    <!-- Left diagonal -->
+    <line x1="-18" y1="28" x2="0" y2="68"
+          stroke="#1a1a2e"
+          stroke-width="1"
+          opacity="0.75"/>
+
+    <!-- Right diagonal -->
+    <line x1="18" y1="28" x2="0" y2="68"
+          stroke="#1a1a2e"
+          stroke-width="1"
+          opacity="0.75"/>
+
+    <!-- Center line - very subtle -->
+    <line x1="0" y1="25" x2="0" y2="70"
+          stroke="#1a1a2e"
+          stroke-width="0.8"
+          opacity="0.3"/>
+
+    <!-- Gold hexagon accent at V convergence point -->
+    <path d="M 0 66 L 3 67.5 L 3 70.5 L 0 72 L -3 70.5 L -3 67.5 Z"
+          fill="#fad02c"
+          stroke="none"
+          opacity="0.85"/>
+  </g>
+</svg>

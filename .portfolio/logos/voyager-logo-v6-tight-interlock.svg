@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <!-- Zoomed in honeycomb - 3 cells sharing walls, tight interlock -->
+  <!-- Deep space aesthetic like V4 -->
+
+  <rect width="120" height="120" fill="#0a0a0f"/>
+
+  <!-- Central honeycomb cluster - cells SHARE walls -->
+  <g transform="translate(60, 60)">
+
+    <!-- LEFT CELL -->
+    <g transform="translate(-22, 0)">
+      <!-- Only draw the walls this cell "owns" (left and bottom-left) -->
+      <line x1="-15" y1="0" x2="-7.5" y2="-13" stroke="#ffffff" stroke-width="2.5"/>
+      <line x1="-15" y1="0" x2="-15" y2="26" stroke="#ffffff" stroke-width="2.5"/>
+      <line x1="-15" y1="26" x2="-7.5" y2="39" stroke="#ffffff" stroke-width="2.5"/>
+      <!-- Top half open (dashed) -->
+      <line x1="-15" y1="0" x2="-7.5" y2="-13" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.3"/>
+      <line x1="-7.5" y1="-13" x2="0" y2="0" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.3"/>
+      <!-- Interior structure -->
+      <line x1="-10" y1="5" x2="-8" y2="34" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+      <line x1="-7.5" y1="0" x2="-7.5" y2="39" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+      <line x1="-5" y1="5" x2="-7" y2="34" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+    </g>
+
+    <!-- CENTER CELL (shares walls with both neighbors) -->
+    <g>
+      <!-- Bottom walls -->
+      <line x1="-7.5" y1="39" x2="0" y2="52" stroke="#ffffff" stroke-width="2.5"/>
+      <line x1="0" y1="52" x2="7.5" y2="39" stroke="#ffffff" stroke-width="2.5"/>
+      <!-- Side walls (right side only - left is shared with LEFT CELL) -->
+      <line x1="7.5" y1="39" x2="7.5" y2="13" stroke="#ffffff" stroke-width="2.5"/>
+      <line x1="7.5" y1="13" x2="0" y2="0" stroke="#ffffff" stroke-width="2.5"/>
+      <!-- Top half open -->
+      <line x1="-7.5" y1="13" x2="0" y2="0" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.3"/>
+      <line x1="0" y1="0" x2="7.5" y2="13" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.3"/>
+      <!-- Interior structure -->
+      <line x1="-4" y1="18" x2="-1" y2="47" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+      <line x1="0" y1="13" x2="0" y2="52" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+      <line x1="4" y1="18" x2="1" y2="47" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+    </g>
+
+    <!-- RIGHT CELL (shares left wall with CENTER) -->
+    <g transform="translate(22, 0)">
+      <!-- Only draw right side walls -->
+      <line x1="7.5" y1="39" x2="15" y2="26" stroke="#ffffff" stroke-width="2.5"/>
+      <line x1="15" y1="26" x2="15" y2="0" stroke="#ffffff" stroke-width="2.5"/>
+      <line x1="15" y1="0" x2="7.5" y2="-13" stroke="#ffffff" stroke-width="2.5"/>
+      <!-- Top half open -->
+      <line x1="0" y1="0" x2="7.5" y2="-13" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.3"/>
+      <line x1="7.5" y1="-13" x2="15" y2="0" stroke="#ffffff" stroke-width="2.5" stroke-dasharray="4,4" opacity="0.3"/>
+      <!-- Interior structure -->
+      <line x1="5" y1="5" x2="7" y2="34" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+      <line x1="7.5" y1="0" x2="7.5" y2="39" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+      <line x1="10" y1="5" x2="8" y2="34" stroke="#ffffff" stroke-width="2" opacity="0.7"/>
+    </g>
+
+    <!-- Gold accent at center junction point -->
+    <circle cx="0" cy="26" r="2.5" fill="#fad02c" opacity="0.9"/>
+  </g>
+</svg>

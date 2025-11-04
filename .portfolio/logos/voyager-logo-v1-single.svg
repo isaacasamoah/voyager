@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="200" height="200">
+  <!-- Single honeycomb cell - top half open, showing interior structure -->
+
+  <!-- Background for visibility (remove in production) -->
+  <rect width="200" height="200" fill="#f8f9fa"/>
+
+  <!-- Main hexagon outline (bottom half) -->
+  <path d="M 100 50 L 140 70 L 140 110 L 100 130 L 60 110 L 60 70 Z"
+        fill="none"
+        stroke="#1a1a2e"
+        stroke-width="3"/>
+
+  <!-- Top half "open" - dashed lines showing it's in progress -->
+  <line x1="60" y1="70" x2="100" y2="50"
+        stroke="#1a1a2e"
+        stroke-width="3"
+        stroke-dasharray="5,5"
+        opacity="0.5"/>
+  <line x1="100" y1="50" x2="140" y2="70"
+        stroke="#1a1a2e"
+        stroke-width="3"
+        stroke-dasharray="5,5"
+        opacity="0.5"/>
+
+  <!-- Three diagonal lines showing interior structure -->
+  <line x1="70" y1="75" x2="90" y2="125"
+        stroke="#1a1a2e"
+        stroke-width="2"
+        opacity="0.7"/>
+  <line x1="100" y1="70" x2="100" y2="130"
+        stroke="#1a1a2e"
+        stroke-width="2"
+        opacity="0.7"/>
+  <line x1="130" y1="75" x2="110" y2="125"
+        stroke="#1a1a2e"
+        stroke-width="2"
+        opacity="0.7"/>
+</svg>
