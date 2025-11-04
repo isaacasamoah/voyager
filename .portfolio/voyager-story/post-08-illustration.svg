@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg8" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="light-glow">
+      <stop offset="0%" style="stop-color:#f0f0ff;stop-opacity:0.8" />
+      <stop offset="100%" style="stop-color:#f0f0ff;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg8)"/>
+
+  <!-- Lab table surface -->
+  <rect x="40" y="280" width="320" height="8" rx="2" fill="#3a3a4e" opacity="0.6"/>
+
+  <!-- Experiment 1: FAILED (beaker, red) -->
+  <g transform="translate(80, 240)" opacity="0.7">
+    <!-- Beaker -->
+    <path d="M -15 -30 L -15 0 Q -15 10, 0 10 Q 15 10, 15 0 L 15 -30 Z" fill="none" stroke="#ef4444" stroke-width="2"/>
+    <rect x="-15" y="-35" width="30" height="5" fill="#ef4444" opacity="0.3"/>
+    <!-- Liquid (failed) -->
+    <ellipse cx="0" cy="5" rx="13" ry="4" fill="#ef4444" opacity="0.4"/>
+    <!-- X mark -->
+    <line x1="-20" y1="-40" x2="20" y2="15" stroke="#ef4444" stroke-width="2" opacity="0.5"/>
+    <line x1="20" y1="-40" x2="-20" y2="15" stroke="#ef4444" stroke-width="2" opacity="0.5"/>
+    <!-- Label -->
+    <text x="0" y="35" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#ef4444" text-anchor="middle" opacity="0.6">Exp 003</text>
+    <text x="0" y="45" font-family="Inter, system-ui, sans-serif" font-size="7" fill="#ef4444" text-anchor="middle" opacity="0.5">Failed</text>
+  </g>
+
+  <!-- Experiment 2: IN PROGRESS (beaker, yellow/orange) -->
+  <g transform="translate(160, 230)">
+    <!-- Beaker -->
+    <path d="M -15 -40 L -15 0 Q -15 10, 0 10 Q 15 10, 15 0 L 15 -40 Z" fill="none" stroke="#f59e0b" stroke-width="2"/>
+    <rect x="-15" y="-45" width="30" height="5" fill="#f59e0b" opacity="0.4"/>
+    <!-- Liquid (bubbling) -->
+    <ellipse cx="0" cy="5" rx="13" ry="4" fill="#f59e0b" opacity="0.5"/>
+    <!-- Bubbles -->
+    <circle cx="-5" cy="-10" r="2" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
+    <circle cx="3" cy="-20" r="2.5" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
+    <circle cx="0" cy="-30" r="1.5" fill="none" stroke="#f59e0b" stroke-width="1" opacity="0.6"/>
+    <!-- Label -->
+    <text x="0" y="35" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#f59e0b" text-anchor="middle" opacity="0.8">Exp 005</text>
+    <text x="0" y="45" font-family="Inter, system-ui, sans-serif" font-size="7" fill="#f59e0b" text-anchor="middle" opacity="0.7">Testing...</text>
+  </g>
+
+  <!-- Experiment 3: SUCCESS (beaker, green, glowing) -->
+  <g transform="translate(240, 220)">
+    <circle cx="0" cy="-10" r="35" fill="url(#light-glow)" opacity="0.3"/>
+    <!-- Beaker -->
+    <path d="M -15 -50 L -15 0 Q -15 10, 0 10 Q 15 10, 15 0 L 15 -50 Z" fill="none" stroke="#10b981" stroke-width="2.5"/>
+    <rect x="-15" y="-55" width="30" height="5" fill="#10b981" opacity="0.5"/>
+    <!-- Liquid (success) -->
+    <ellipse cx="0" cy="5" rx="13" ry="4" fill="#10b981" opacity="0.6"/>
+    <!-- Checkmark -->
+    <g transform="translate(0, -25)">
+      <line x1="-5" y1="0" x2="-2" y2="3" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+      <line x1="-2" y1="3" x2="5" y2="-5" stroke="#10b981" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <!-- Sparkles -->
+    <circle cx="-20" cy="-20" r="1.5" fill="#10b981" opacity="0.6"/>
+    <circle cx="22" cy="-30" r="1" fill="#10b981" opacity="0.6"/>
+    <!-- Label -->
+    <text x="0" y="35" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#10b981" text-anchor="middle" opacity="0.9">Exp 001</text>
+    <text x="0" y="45" font-family="Inter, system-ui, sans-serif" font-size="7" fill="#10b981" text-anchor="middle" opacity="0.7">Shipped!</text>
+  </g>
+
+  <!-- Experiment 4: DOCUMENTED FAILURE (notebook/clipboard) -->
+  <g transform="translate(320, 240)" opacity="0.6">
+    <!-- Clipboard -->
+    <rect x="-18" y="-35" width="36" height="50" rx="2" fill="#4a4a5e" opacity="0.6"/>
+    <rect x="-6" y="-38" width="12" height="4" rx="1" fill="#5a5a6e"/>
+    <!-- Lines (notes) -->
+    <line x1="-12" y1="-25" x2="12" y2="-25" stroke="#6B7280" stroke-width="1.5"/>
+    <line x1="-12" y1="-17" x2="10" y2="-17" stroke="#6B7280" stroke-width="1.5"/>
+    <line x1="-12" y1="-9" x2="11" y2="-9" stroke="#6B7280" stroke-width="1.5"/>
+    <line x1="-12" y1="-1" x2="9" y2="-1" stroke="#6B7280" stroke-width="1.5"/>
+    <!-- Label -->
+    <text x="0" y="35" font-family="Inter, system-ui, sans-serif" font-size="7" fill="#6B7280" text-anchor="middle" opacity="0.7">Documented</text>
+  </g>
+
+  <!-- Light bulb overhead (transparency/visibility) -->
+  <g transform="translate(200, 60)">
+    <circle cx="0" cy="0" r="45" fill="url(#light-glow)" opacity="0.2"/>
+    <circle cx="0" cy="0" r="20" fill="#f0f0ff" opacity="0.3"/>
+    <circle cx="0" cy="0" r="12" fill="#f0f0ff" opacity="0.6"/>
+    <!-- Bulb shape -->
+    <circle cx="0" cy="0" r="8" fill="none" stroke="#f0f0ff" stroke-width="2"/>
+    <rect x="-4" y="8" width="8" height="4" rx="1" fill="none" stroke="#f0f0ff" stroke-width="1.5"/>
+    <line x1="-3" y1="12" x2="3" y2="12" stroke="#f0f0ff" stroke-width="1.5"/>
+    <!-- Light rays -->
+    <g opacity="0.4">
+      <line x1="0" y1="-15" x2="0" y2="-25" stroke="#f0f0ff" stroke-width="1.5"/>
+      <line x1="-11" y1="-11" x2="-18" y2="-18" stroke="#f0f0ff" stroke-width="1.5"/>
+      <line x1="11" y1="-11" x2="18" y2="-18" stroke="#f0f0ff" stroke-width="1.5"/>
+      <line x1="-15" y1="0" x2="-25" y2="0" stroke="#f0f0ff" stroke-width="1.5"/>
+      <line x1="15" y1="0" x2="25" y2="0" stroke="#f0f0ff" stroke-width="1.5"/>
+    </g>
+  </g>
+
+  <!-- Blueprint/plans in background -->
+  <g opacity="0.15">
+    <rect x="50" y="120" width="80" height="60" rx="2" fill="none" stroke="#4a9eff" stroke-width="1" stroke-dasharray="3,3"/>
+    <line x1="60" y1="135" x2="120" y2="135" stroke="#4a9eff" stroke-width="0.5"/>
+    <line x1="60" y1="145" x2="115" y2="145" stroke="#4a9eff" stroke-width="0.5"/>
+    <circle cx="90" cy="160" r="8" fill="none" stroke="#4a9eff" stroke-width="0.5"/>
+  </g>
+
+  <!-- Title and tagline -->
+  <text x="200" y="330" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#4a9eff" text-anchor="middle" opacity="0.7">.lab/</text>
+  <text x="200" y="350" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle" opacity="0.6">All experiments. Even the failures.</text>
+  <text x="200" y="390" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#6B7280" text-anchor="middle" opacity="0.5" font-style="italic">The messy middle is where the learning lives</text>
+</svg>

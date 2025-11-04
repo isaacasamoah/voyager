@@ -1,0 +1,118 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background gradient (dawn/sunrise) -->
+  <defs>
+    <linearGradient id="bg10" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#2a2a4e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#4a4a6e;stop-opacity:1" />
+    </linearGradient>
+
+    <linearGradient id="sunrise" x1="0%" y1="100%" x2="0%" y2="0%">
+      <stop offset="0%" style="stop-color:#f59e0b;stop-opacity:0.3" />
+      <stop offset="50%" style="stop-color:#f97316;stop-opacity:0.2" />
+      <stop offset="100%" style="stop-color:#fb923c;stop-opacity:0" />
+    </linearGradient>
+
+    <radialGradient id="sun-glow">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg10)"/>
+
+  <!-- Sunrise glow at horizon -->
+  <ellipse cx="200" cy="220" rx="150" ry="60" fill="url(#sunrise)"/>
+
+  <!-- Sun rising -->
+  <g transform="translate(200, 220)">
+    <circle cx="0" cy="0" r="50" fill="url(#sun-glow)"/>
+    <circle cx="0" cy="0" r="25" fill="#fbbf24" opacity="0.4"/>
+    <circle cx="0" cy="0" r="15" fill="#fbbf24" opacity="0.7"/>
+  </g>
+
+  <!-- Horizon line -->
+  <line x1="0" y1="220" x2="400" y2="220" stroke="#4a9eff" stroke-width="2" opacity="0.3"/>
+
+  <!-- Path forward (center, leading to horizon) -->
+  <path d="M 200 380 L 200 220" stroke="#4a9eff" stroke-width="4" opacity="0.5"/>
+  <path d="M 190 380 L 195 220" stroke="#4a9eff" stroke-width="2" opacity="0.3"/>
+  <path d="M 210 380 L 205 220" stroke="#4a9eff" stroke-width="2" opacity="0.3"/>
+
+  <!-- Traveler (figure walking forward into the future) -->
+  <g transform="translate(200, 340)">
+    <circle cx="0" cy="-15" r="10" fill="#4a9eff" opacity="0.9"/>
+    <line x1="0" y1="-5" x2="0" y2="15" stroke="#4a9eff" stroke-width="3" opacity="0.9"/>
+    <!-- Walking pose -->
+    <line x1="0" y1="5" x2="-8" y2="18" stroke="#4a9eff" stroke-width="3" opacity="0.9"/>
+    <line x1="0" y1="5" x2="6" y2="15" stroke="#4a9eff" stroke-width="3" opacity="0.9"/>
+    <!-- Glow -->
+    <circle cx="0" cy="-15" r="18" fill="none" stroke="#4a9eff" stroke-width="1" opacity="0.3"/>
+  </g>
+
+  <!-- Destinations ahead (signposts/landmarks) -->
+  <!-- Voice (left horizon) -->
+  <g transform="translate(80, 180)" opacity="0.7">
+    <circle cx="0" cy="0" r="20" fill="#7b68ee" opacity="0.3"/>
+    <circle cx="0" cy="0" r="12" fill="#7b68ee" opacity="0.5"/>
+    <!-- Microphone icon -->
+    <ellipse cx="0" cy="-2" rx="4" ry="6" fill="none" stroke="#1a1a2e" stroke-width="2"/>
+    <line x1="0" y1="4" x2="0" y2="9" stroke="#1a1a2e" stroke-width="2"/>
+    <line x1="-4" y1="9" x2="4" y2="9" stroke="#1a1a2e" stroke-width="2"/>
+    <!-- Label -->
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#7b68ee" text-anchor="middle">Voice</text>
+  </g>
+
+  <!-- Communities (center-left horizon) -->
+  <g transform="translate(140, 160)" opacity="0.7">
+    <circle cx="0" cy="0" r="22" fill="#a78bfa" opacity="0.3"/>
+    <circle cx="0" cy="0" r="13" fill="#a78bfa" opacity="0.5"/>
+    <!-- People network icon -->
+    <circle cx="-5" cy="-2" r="3" fill="#1a1a2e"/>
+    <circle cx="5" cy="-2" r="3" fill="#1a1a2e"/>
+    <circle cx="0" cy="4" r="3" fill="#1a1a2e"/>
+    <line x1="-3" y1="0" x2="3" y2="0" stroke="#1a1a2e" stroke-width="1.5"/>
+    <!-- Label -->
+    <text x="0" y="32" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#a78bfa" text-anchor="middle">Communities</text>
+  </g>
+
+  <!-- Scale (center-right horizon) -->
+  <g transform="translate(260, 160)" opacity="0.7">
+    <circle cx="0" cy="0" r="22" fill="#818cf8" opacity="0.3"/>
+    <circle cx="0" cy="0" r="13" fill="#818cf8" opacity="0.5"/>
+    <!-- Growth arrow icon -->
+    <line x1="0" y1="6" x2="0" y2="-6" stroke="#1a1a2e" stroke-width="2"/>
+    <line x1="-4" y1="-2" x2="0" y2="-6" stroke="#1a1a2e" stroke-width="2"/>
+    <line x1="4" y1="-2" x2="0" y2="-6" stroke="#1a1a2e" stroke-width="2"/>
+    <!-- Label -->
+    <text x="0" y="32" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#818cf8" text-anchor="middle">7-Fig ARR</text>
+  </g>
+
+  <!-- Unknown/Future (right horizon) -->
+  <g transform="translate(320, 180)" opacity="0.6">
+    <circle cx="0" cy="0" r="20" fill="#4a9eff" opacity="0.3"/>
+    <circle cx="0" cy="0" r="12" fill="none" stroke="#4a9eff" stroke-width="2" stroke-dasharray="3,3" opacity="0.5"/>
+    <!-- Question mark -->
+    <text x="0" y="6" font-family="Inter, system-ui, sans-serif" font-size="14" font-weight="bold" fill="#4a9eff" text-anchor="middle" opacity="0.6">?</text>
+    <!-- Label -->
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="9" fill="#4a9eff" text-anchor="middle" opacity="0.7">Unknown</text>
+  </g>
+
+  <!-- Stars in the sky (possibility) -->
+  <g fill="#f0f0ff" opacity="0.4">
+    <circle cx="50" cy="50" r="1.5"/>
+    <circle cx="100" cy="30" r="1"/>
+    <circle cx="150" cy="60" r="1.5"/>
+    <circle cx="250" cy="40" r="1"/>
+    <circle cx="300" cy="70" r="1.5"/>
+    <circle cx="350" cy="50" r="1"/>
+    <circle cx="320" cy="30" r="1.5"/>
+  </g>
+
+  <!-- Title at top -->
+  <text x="200" y="40" font-family="Inter, system-ui, sans-serif" font-size="16" font-weight="bold" fill="#fbbf24" text-anchor="middle" opacity="0.8">The Journey Continues</text>
+
+  <!-- Bottom tagline -->
+  <text x="200" y="390" font-family="Inter, system-ui, sans-serif" font-size="11" fill="#4a9eff" text-anchor="middle" opacity="0.7">Join us. 🚀</text>
+</svg>

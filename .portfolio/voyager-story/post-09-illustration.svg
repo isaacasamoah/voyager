@@ -1,0 +1,141 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg9" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+
+    <radialGradient id="table-glow">
+      <stop offset="0%" style="stop-color:#4a9eff;stop-opacity:0.3" />
+      <stop offset="100%" style="stop-color:#4a9eff;stop-opacity:0" />
+    </radialGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" fill="url(#bg9)"/>
+
+  <!-- Table (oval) -->
+  <g>
+    <ellipse cx="200" cy="220" rx="140" ry="60" fill="url(#table-glow)"/>
+    <ellipse cx="200" cy="220" rx="130" ry="50" fill="none" stroke="#4a9eff" stroke-width="2" opacity="0.4"/>
+  </g>
+
+  <!-- ISAAC (solid, at bottom center - the real one) -->
+  <g transform="translate(200, 300)">
+    <circle cx="0" cy="-15" r="12" fill="#4a9eff" opacity="1"/>
+    <line x1="0" y1="-3" x2="0" y2="20" stroke="#4a9eff" stroke-width="3" opacity="1"/>
+    <line x1="0" y1="5" x2="-10" y2="15" stroke="#4a9eff" stroke-width="3" opacity="1"/>
+    <line x1="0" y1="5" x2="10" y2="15" stroke="#4a9eff" stroke-width="3" opacity="1"/>
+    <!-- Glow around Isaac -->
+    <circle cx="0" cy="-15" r="20" fill="none" stroke="#4a9eff" stroke-width="1" opacity="0.3"/>
+    <!-- Label -->
+    <text x="0" y="35" font-family="Inter, system-ui, sans-serif" font-size="9" font-weight="600" fill="#4a9eff" text-anchor="middle">Isaac</text>
+  </g>
+
+  <!-- KAI (CTO - translucent, top left) -->
+  <g transform="translate(100, 150)" opacity="0.5">
+    <circle cx="0" cy="-12" r="10" fill="#7b68ee"/>
+    <line x1="0" y1="-2" x2="0" y2="15" stroke="#7b68ee" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="-8" y2="11" stroke="#7b68ee" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="8" y2="11" stroke="#7b68ee" stroke-width="2.5"/>
+    <!-- Code symbol -->
+    <text x="0" y="-25" font-family="Monaco, monospace" font-size="12" fill="#7b68ee" text-anchor="middle" opacity="0.7">{}</text>
+    <!-- Label -->
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#7b68ee" text-anchor="middle">Kai</text>
+    <text x="0" y="40" font-family="Inter, system-ui, sans-serif" font-size="6" fill="#7b68ee" text-anchor="middle" opacity="0.6">CTO</text>
+  </g>
+
+  <!-- ZARA (ML Scientist - translucent, top) -->
+  <g transform="translate(160, 130)" opacity="0.5">
+    <circle cx="0" cy="-12" r="10" fill="#a78bfa"/>
+    <line x1="0" y1="-2" x2="0" y2="15" stroke="#a78bfa" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="-8" y2="11" stroke="#a78bfa" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="8" y2="11" stroke="#a78bfa" stroke-width="2.5"/>
+    <!-- Brain/network symbol -->
+    <circle cx="0" cy="-28" r="5" fill="none" stroke="#a78bfa" stroke-width="1" opacity="0.6"/>
+    <circle cx="-4" cy="-24" r="2" fill="#a78bfa" opacity="0.6"/>
+    <circle cx="4" cy="-24" r="2" fill="#a78bfa" opacity="0.6"/>
+    <circle cx="0" cy="-32" r="2" fill="#a78bfa" opacity="0.6"/>
+    <!-- Label -->
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#a78bfa" text-anchor="middle">Zara</text>
+    <text x="0" y="40" font-family="Inter, system-ui, sans-serif" font-size="6" fill="#a78bfa" text-anchor="middle" opacity="0.6">ML</text>
+  </g>
+
+  <!-- PRIYA (PM - translucent, top right) -->
+  <g transform="translate(240, 130)" opacity="0.5">
+    <circle cx="0" cy="-12" r="10" fill="#818cf8"/>
+    <line x1="0" y1="-2" x2="0" y2="15" stroke="#818cf8" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="-8" y2="11" stroke="#818cf8" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="8" y2="11" stroke="#818cf8" stroke-width="2.5"/>
+    <!-- Target/goal symbol -->
+    <circle cx="0" cy="-28" r="6" fill="none" stroke="#818cf8" stroke-width="1" opacity="0.6"/>
+    <circle cx="0" cy="-28" r="3" fill="none" stroke="#818cf8" stroke-width="1" opacity="0.6"/>
+    <circle cx="0" cy="-28" r="1.5" fill="#818cf8" opacity="0.6"/>
+    <!-- Label -->
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#818cf8" text-anchor="middle">Priya</text>
+    <text x="0" y="40" font-family="Inter, system-ui, sans-serif" font-size="6" fill="#818cf8" text-anchor="middle" opacity="0.6">PM</text>
+  </g>
+
+  <!-- JORDAN (Designer - translucent, right) -->
+  <g transform="translate(300, 150)" opacity="0.5">
+    <circle cx="0" cy="-12" r="10" fill="#c084fc"/>
+    <line x1="0" y1="-2" x2="0" y2="15" stroke="#c084fc" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="-8" y2="11" stroke="#c084fc" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="8" y2="11" stroke="#c084fc" stroke-width="2.5"/>
+    <!-- Palette symbol -->
+    <circle cx="0" cy="-28" r="5" fill="none" stroke="#c084fc" stroke-width="1" opacity="0.6"/>
+    <circle cx="-2" cy="-26" r="1.5" fill="#c084fc" opacity="0.6"/>
+    <circle cx="2" cy="-26" r="1.5" fill="#c084fc" opacity="0.6"/>
+    <circle cx="0" cy="-30" r="1.5" fill="#c084fc" opacity="0.6"/>
+    <!-- Label -->
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#c084fc" text-anchor="middle">Jordan</text>
+    <text x="0" y="40" font-family="Inter, system-ui, sans-serif" font-size="6" fill="#c084fc" text-anchor="middle" opacity="0.6">Design</text>
+  </g>
+
+  <!-- ALEX (Frontend - translucent, bottom right) -->
+  <g transform="translate(280, 240)" opacity="0.5">
+    <circle cx="0" cy="-12" r="10" fill="#7b68ee"/>
+    <line x1="0" y1="-2" x2="0" y2="15" stroke="#7b68ee" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="-8" y2="11" stroke="#7b68ee" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="8" y2="11" stroke="#7b68ee" stroke-width="2.5"/>
+    <!-- Lightning bolt (performance) -->
+    <path d="M 1 -32 L -3 -25 L 0 -25 L -2 -20 L 3 -27 L 0 -27 Z" fill="#7b68ee" opacity="0.6"/>
+    <!-- Label -->
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#7b68ee" text-anchor="middle">Alex</text>
+    <text x="0" y="40" font-family="Inter, system-ui, sans-serif" font-size="6" fill="#7b68ee" text-anchor="middle" opacity="0.6">Frontend</text>
+  </g>
+
+  <!-- MARCUS (Backend - translucent, bottom left) -->
+  <g transform="translate(120, 240)" opacity="0.5">
+    <circle cx="0" cy="-12" r="10" fill="#818cf8"/>
+    <line x1="0" y1="-2" x2="0" y2="15" stroke="#818cf8" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="-8" y2="11" stroke="#818cf8" stroke-width="2.5"/>
+    <line x1="0" y1="3" x2="8" y2="11" stroke="#818cf8" stroke-width="2.5"/>
+    <!-- Database symbol -->
+    <ellipse cx="0" cy="-30" rx="5" ry="2" fill="none" stroke="#818cf8" stroke-width="1" opacity="0.6"/>
+    <ellipse cx="0" cy="-26" rx="5" ry="2" fill="none" stroke="#818cf8" stroke-width="1" opacity="0.6"/>
+    <line x1="-5" y1="-30" x2="-5" y2="-26" stroke="#818cf8" stroke-width="1" opacity="0.6"/>
+    <line x1="5" y1="-30" x2="5" y2="-26" stroke="#818cf8" stroke-width="1" opacity="0.6"/>
+    <!-- Label -->
+    <text x="0" y="30" font-family="Inter, system-ui, sans-serif" font-size="8" fill="#818cf8" text-anchor="middle">Marcus</text>
+    <text x="0" y="40" font-family="Inter, system-ui, sans-serif" font-size="6" fill="#818cf8" text-anchor="middle" opacity="0.6">Backend</text>
+  </g>
+
+  <!-- Connection lines (thought collaboration) -->
+  <g stroke="#4a9eff" stroke-width="1" opacity="0.15" stroke-dasharray="2,2">
+    <line x1="200" y1="285" x2="100" y2="165"/>
+    <line x1="200" y1="285" x2="160" y2="145"/>
+    <line x1="200" y1="285" x2="240" y2="145"/>
+    <line x1="200" y1="285" x2="300" y2="165"/>
+    <line x1="200" y1="285" x2="280" y2="255"/>
+    <line x1="200" y1="285" x2="120" y2="255"/>
+  </g>
+
+  <!-- Title -->
+  <text x="200" y="35" font-family="Inter, system-ui, sans-serif" font-size="13" font-weight="600" fill="#4a9eff" text-anchor="middle" opacity="0.7">The Team</text>
+
+  <!-- Bottom tagline -->
+  <text x="200" y="375" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#6B7280" text-anchor="middle" opacity="0.6">They don't exist.</text>
+  <text x="200" y="390" font-family="Inter, system-ui, sans-serif" font-size="10" fill="#4a9eff" text-anchor="middle" opacity="0.7">They're more real than most teams.</text>
+</svg>
