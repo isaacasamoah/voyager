@@ -42,8 +42,9 @@ Testing hypothesis: *"Career coaches will use Voyager to extract their tacit kno
 
 **Cartographer** - Expert knowledge extraction (experts only)
 - AI interviews experts to capture tacit knowledge
-- Structures insights for future learners
-- Builds community knowledge base
+- Extracts structured JSON output (insights, prompt updates, RAG entries)
+- Automatically enhances Navigator with expert knowledge
+- Builds compounding community intelligence
 
 **Shipwright** - Craft quality community posts
 - AI helps draft well-structured questions
@@ -211,13 +212,17 @@ voyager/
 - **Dynamic community branding** (JSON-configured colors, terminology)
 - **The Lab** (`.lab/` folder for experiments and design briefs)
 
-### 🚧 In Progress (Week 2: Nov 1-7)
-- **Cartographer → AI enhancement pipeline** (current priority)
-  - JSON output structure (knowledge extraction → machine-readable)
-  - Auto-update community prompts from expert sessions
-  - RAG dataset population (expert insights become retrievable)
-  - Fine-tuning examples generation
-- **Alpha testing with Eli** (monitoring usage patterns)
+### ✅ Recently Shipped
+- **Cartographer → AI enhancement pipeline** (Experiment 002)
+  - Structured JSON extraction from expert sessions
+  - Constitutional principle extraction
+  - Admin UI for reviewing/approving knowledge updates
+  - Automatic prompt enhancement from expert insights
+  - See: `.lab/experiments/002-cartographer-ai-pipeline/`
+
+### 🚧 In Progress
+- **Alpha testing with Eli** (monitoring Cartographer usage)
+- **LinkedIn Series** (10-part Voyager journey - posts 1-10 drafted)
 
 ### 📦 Parked (Validated, Deferred)
 - **Shipwright v0.2.0** (complete design ready, Phase 1 - needs public forum)
@@ -319,4 +324,4 @@ git push origin develop
 ---
 
 **Built to elevate human thinking**
-**Last Updated:** 2025-11-01
+**Last Updated:** 2025-11-05

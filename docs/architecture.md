@@ -405,6 +405,122 @@ if (!user.communities.includes(communityId)) {
 
 ---
 
+## Cartographer → AI Enhancement Pipeline
+
+### Overview
+
+Cartographer mode now includes an extraction pipeline that transforms expert conversations into structured knowledge that automatically improves the AI.
+
+**See:** `.lab/experiments/002-cartographer-ai-pipeline/DESIGN.md` for complete design.
+
+### Architecture
+
+```
+┌────────────────────────────────────────────────────────┐
+│              CARTOGRAPHER SESSION                      │
+│   Expert ──> AI Interview ──> Structured Knowledge     │
+└───────────────────┬────────────────────────────────────┘
+                    │
+                    ▼
+           ┌────────────────┐
+           │  JSON OUTPUT   │
+           │  (structured)  │
+           └────┬───┬───┬───┘
+                │   │   │
+     ┌──────────┘   │   └──────────┐
+     ▼              ▼              ▼
+┌─────────┐  ┌──────────┐  ┌──────────────┐
+│ PROMPTS │  │   RAG    │  │ FINE-TUNING  │
+│ UPDATE  │  │ DATASET  │  │  EXAMPLES    │
+└─────────┘  └──────────┘  └──────────────┘
+     │              │              │
+     └──────┬───────┴──────┬───────┘
+            ▼              ▼
+       NAVIGATOR       FUTURE
+       IMPROVES      MODEL TRAINING
+```
+
+### JSON Output Structure
+
+```typescript
+interface CartographerSession {
+  // Metadata
+  sessionId: string
+  expertEmail: string
+  communityId: string
+  timestamp: string
+  topic: string
+
+  // Raw conversation
+  messages: Array<{
+    role: 'user' | 'assistant'
+    content: string
+    timestamp: string
+  }>
+
+  // Structured insights
+  insights: Array<{
+    category: 'best-practice' | 'mistake-to-avoid' | 'framework' | 'metric'
+    content: string
+    context: string
+    examples?: string[]
+    metadata?: {
+      companies?: string[]
+      roles?: string[]
+      experience?: string
+      location?: string
+    }
+  }>
+
+  // Prompt enhancement suggestions
+  promptUpdates: Array<{
+    section: string
+    suggestedAddition: string
+    reasoning: string
+    priority: 'high' | 'medium' | 'low'
+  }>
+
+  // RAG dataset entries
+  ragEntries: Array<{
+    question: string
+    answer: string
+    keywords: string[]
+    relevanceScore: number
+  }>
+}
+```
+
+### Flow
+
+1. **Expert Session:** User has conversation in Cartographer mode
+2. **Extraction:** System calls `/api/cartographer/extract`
+   - Sends conversation to Claude with extraction prompt
+   - Returns structured JSON
+3. **Review:** Admin UI displays extracted knowledge
+   - See insights, prompt updates, RAG entries
+   - Approve/reject/edit before applying
+4. **Application:** Approved updates modify community configs
+   - Updates `communities/{id}.json` with new knowledge
+   - Git commit + deploy = instant AI improvement
+5. **Compounding:** Each session makes Navigator smarter
+
+### Constitutional Extraction
+
+Special extraction process for constitutional principles:
+- Identifies core values from expert conversations
+- Suggests additions to constitutional framework
+- Admin reviews before updating `.lib/prompts/constitution.ts`
+
+### Benefits
+
+- **Automatic learning:** AI gets smarter from every expert session
+- **Compounding intelligence:** Knowledge builds over time
+- **Traceable:** Git history shows what knowledge was added when
+- **Reviewable:** Admin approval before changes go live
+- **Preserves expertise:** Expert knowledge becomes community asset
+
+---
+
 ## Future Enhancements
 
 ### Planned
@@ -412,6 +528,8 @@ if (!user.communities.includes(communityId)) {
 - [ ] Prompt caching
 - [ ] Redis session store
 - [ ] Webhook system for integrations
+- [ ] RAG implementation (prerequisite: Cartographer extraction pipeline ✅)
+- [ ] Fine-tuning pipeline (using Cartographer examples)
 
 ### Under Consideration
 - [ ] Multi-region deployment
@@ -441,5 +559,5 @@ if (!user.communities.includes(communityId)) {
 
 ---
 
-**Last Updated:** 2025-10-19
-**Version:** 1.0.0
+**Last Updated:** 2025-11-05
+**Version:** 1.1.0
