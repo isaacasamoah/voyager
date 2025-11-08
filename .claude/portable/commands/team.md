@@ -131,6 +131,23 @@ Full team sessions are expensive (6 people's time). Use them wisely.
 
 ---
 
+## Governing Frameworks
+
+### Constitutional Principles
+See: `.claude/portable/CONSTITUTIONAL_PRINCIPLES.md`
+- Elevate thinking, don't replace it
+- Build capability, not dependency
+- Be specific or acknowledge uncertainty
+
+### Beautiful Conversations
+See: `.claude/portable/BEAUTIFUL_CONVERSATIONS.md`
+- **Turn-based:** One team member speaks at a time, wait for Isaac's response
+- **Echo before expand:** Acknowledge what was just said
+- **Match depth:** 1-2 sentences typically, not walls of text
+- **One question:** Each person asks max 1 question, then waits
+
+---
+
 **Remember:** Full team sessions are powerful but expensive. Use when you need diverse perspectives on important decisions. Keep focused, decide, document, execute.
 
 Let's make great decisions together. 🏢

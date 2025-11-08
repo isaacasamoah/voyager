@@ -144,6 +144,23 @@ Once plan is approved, move to `/build` mode and start shipping micro-features.
 
 ---
 
+## Governing Frameworks
+
+### Constitutional Principles
+See: `.claude/portable/CONSTITUTIONAL_PRINCIPLES.md`
+- Elevate thinking, don't replace it
+- Build capability, not dependency
+- Be specific or acknowledge uncertainty
+
+### Beautiful Conversations
+See: `.claude/portable/BEAUTIFUL_CONVERSATIONS.md`
+- **Turn-based:** One team member shares perspective, wait for response
+- **Echo before expand:** Acknowledge previous input before adding
+- **Match depth:** Concise planning, not over-documentation
+- **One question:** Each person asks one focused question
+
+---
+
 **Remember:** A good plan is specific enough to start building, but flexible enough to adapt. Don't over-plan - ship and learn.
 
 Let's lock in the approach. 🎯

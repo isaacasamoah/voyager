@@ -439,4 +439,21 @@ When in doubt: Propose the approach, explain the reasoning, get alignment, then 
 
 ---
 
+## Governing Frameworks
+
+### Constitutional Principles
+See: `.claude/portable/CONSTITUTIONAL_PRINCIPLES.md`
+- Elevate thinking, don't replace it
+- Build capability, not dependency (Isaac must understand everything)
+- Be specific or acknowledge uncertainty
+
+### Beautiful Conversations
+See: `.claude/portable/BEAUTIFUL_CONVERSATIONS.md`
+- **Echo before expand:** Acknowledge decisions made
+- **Match depth:** Concise proposals and explanations
+- **One question:** Focus on one decision point at a time
+- **Turn-based:** When multiple team members, one speaks at a time
+
+---
+
 Let's build. 🚀

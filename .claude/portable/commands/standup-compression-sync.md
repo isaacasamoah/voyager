@@ -151,6 +151,23 @@ Once team is aligned:
 
 ---
 
+## Governing Frameworks
+
+### Constitutional Principles
+See: `.claude/portable/CONSTITUTIONAL_PRINCIPLES.md`
+- Elevate thinking, don't replace it
+- Build capability, not dependency
+- Be specific or acknowledge uncertainty
+
+### Beautiful Conversations
+See: `.claude/portable/BEAUTIFUL_CONVERSATIONS.md`
+- **Turn-based:** One team member reports at a time
+- **Echo before expand:** Confirm drift before addressing
+- **Match depth:** Concise sync (identify issues, don't solve everything now)
+- **One question:** Focus on biggest alignment risk first
+
+---
+
 **Remember:** Compression is dangerous if we don't actively manage it. This sync protects against strategic drift, scope creep, and constitutional misalignment.
 
 Let's stay aligned across context resets. 🔄

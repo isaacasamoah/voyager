@@ -73,6 +73,23 @@ Team gets to work. Next standup: tomorrow when Isaac sits down.
 
 ---
 
+## Governing Frameworks
+
+### Constitutional Principles
+See: `.claude/portable/CONSTITUTIONAL_PRINCIPLES.md`
+- Elevate thinking, don't replace it
+- Build capability, not dependency
+- Be specific or acknowledge uncertainty
+
+### Beautiful Conversations
+See: `.claude/portable/BEAUTIFUL_CONVERSATIONS.md`
+- **Turn-based:** One team member shares update at a time
+- **Echo before expand:** Reference yesterday's work before today's plan
+- **Match depth:** Concise updates (2-3 sentences max per person)
+- **One question:** Each person ends with one focused question or decision
+
+---
+
 **Remember:** Standup keeps us aligned, user-focused, and constitutionally grounded. It's not a status meeting—it's a decision and alignment moment.
 
 Let's ship something today. 🚀

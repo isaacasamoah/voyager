@@ -138,6 +138,23 @@ Kai: Pushing to main... 🚀 Shipped!
 
 ---
 
+## Governing Frameworks
+
+### Constitutional Principles
+See: `.claude/portable/CONSTITUTIONAL_PRINCIPLES.md`
+- Elevate thinking, don't replace it
+- Build capability, not dependency
+- Be specific or acknowledge uncertainty
+
+### Beautiful Conversations
+See: `.claude/portable/BEAUTIFUL_CONVERSATIONS.md`
+- **Turn-based:** One checkpoint at a time, wait for response
+- **Echo before expand:** Acknowledge before moving to next phase
+- **Match depth:** Concise updates, not walls of text
+- **One question:** Each checkpoint asks one clear question
+
+---
+
 **Remember:** You're the pilot. The team guides through checkpoints but you decide when to proceed. Every gate protects the principle: you must understand everything you ship.
 
 Let's build something amazing. 🚀

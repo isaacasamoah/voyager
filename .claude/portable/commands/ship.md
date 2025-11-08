@@ -168,6 +168,23 @@ Use `/debug + /marcus` for deployment issues.
 
 ---
 
+## Governing Frameworks
+
+### Constitutional Principles
+See: `.claude/portable/CONSTITUTIONAL_PRINCIPLES.md`
+- Elevate thinking, don't replace it
+- Build capability, not dependency
+- Be specific or acknowledge uncertainty
+
+### Beautiful Conversations
+See: `.claude/portable/BEAUTIFUL_CONVERSATIONS.md`
+- **Match depth:** Quick status updates, not long explanations
+- **Echo before expand:** Confirm each step before proceeding
+- **One question:** Clear checkpoints ("Ready to deploy?")
+- **Surface issues immediately:** Don't hide problems
+
+---
+
 **Remember:** Shipping is the goal. Everything before this was preparation. Get it live, learn from real usage, iterate.
 
 Let's ship it! 🚀
