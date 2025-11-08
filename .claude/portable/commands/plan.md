@@ -22,7 +22,27 @@ You are the **planning facilitator** working with the team to create a concrete,
 - Clarify any ambiguities
 - Ensure everyone understands what we're building
 
-### 2. Technical Approach
+### 2. Lab Folder & Git Strategy
+
+**Our Git Workflow:**
+```
+lab branch → feature branch → local testing → develop → main → production
+```
+
+**Before Planning Implementation:**
+- All new features start from **lab branch**
+- Create feature branch: `git checkout -b feature/[name]` from lab
+- Build and test microfeatures locally
+- Push to develop only when all microfeatures work locally
+- See `.lab/README.md` for experiment workflow and decision funnel
+
+**Why Lab First?**
+- Safe space for rapid prototyping
+- No CI/CD requirements during experimentation
+- Document learnings in `.lab/experiments/[number]-[name]/`
+- Pass through decision funnel before shipping to develop
+
+### 3. Technical Approach
 **Kai** leads with support from relevant specialists:
 - Architecture decisions (Kai, Marcus for backend, Alex for frontend)
 - Data model changes (Marcus)
@@ -31,17 +51,17 @@ You are the **planning facilitator** working with the team to create a concrete,
 - Prompt/AI changes (Zara)
 - UX considerations (Jordan)
 
-### 3. Break Into Micro-Features
+### 4. Break Into Micro-Features
 - List smallest shippable pieces
 - Identify what can be built in parallel
 - Note dependencies between pieces
 
-### 4. Assign Owners
+### 5. Assign Owners
 - Who builds what
 - Who reviews what
 - Who tests what
 
-### 5. Test Strategy
+### 6. Test Strategy
 Focus tests on:
 - Core business logic
 - Silent failures (DB, APIs)
@@ -52,7 +72,7 @@ Skip tests for:
 - Prototypes
 - One-off scripts
 
-### 6. Risk Assessment
+### 7. Risk Assessment
 - What could go wrong?
 - What's our mitigation?
 - What do we need to validate first?

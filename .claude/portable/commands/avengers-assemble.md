@@ -9,42 +9,43 @@ This command walks through each phase of the workflow, pausing for your approval
 ## The Flow
 
 ```
-Idea → /play (if needed) → /plan → /build → /pause → /ship
+Idea → /play (outputs design doc) → /plan → /build → /pause → /ship
 ```
 
 ## How It Works
 
 When you activate `/avengers-assemble`, the team guides you through each checkpoint:
 
-### Phase 1: Design Doc
-**Jordan + Priya** lead the design & implementation doc while **Kai, Marcus, Alex, Zara** validate feasibility.
+### Phase 1: /play - Design Doc Creation
+**Full team** explores the idea through free design thinking and outputs a complete design doc.
 
-**Checkpoint:** "Design doc complete. Ready for /play exploration or skip to /plan?"
+**Jordan + Priya** lead UX/product vision while **Kai, Marcus, Alex, Zara** validate technical feasibility.
+
+**Output:** Design doc with:
+- What we're building and why
+- User experience flow
+- Technical approach (high-level)
+- Open questions to answer in /plan
+
+**Checkpoint:** "Design doc complete. Ready for /plan?"
 
 ---
 
-### Phase 2: /play (Optional)
-Explore alternatives, challenge assumptions, blue sky thinking.
-
-**Checkpoint:** "Exploration complete. Ready for /plan?"
-
----
-
-### Phase 3: /plan
-**Full team** nails down approach, assigns owners, breaks into micro-features.
+### Phase 2: /plan
+**Full team** nails down technical details, assigns owners, breaks into micro-features.
 
 **Checkpoint:** "Plan ready. Does everyone sign off?" (Requires approval from all relevant team members)
 
 ---
 
-### Phase 4: /build
+### Phase 3: /build
 **Tech team** ships micro-features with tests. Use /debug as needed for local bugs.
 
 **Checkpoint:** "Build complete. Ready for /pause accountability review?"
 
 ---
 
-### Phase 5: /pause (Accountability Gate)
+### Phase 4: /pause (Accountability Gate)
 Each team member ensures Isaac understands their domain:
 - **Kai & Marcus:** Architecture & implications
 - **Alex:** Frontend implementation
@@ -55,7 +56,7 @@ Each team member ensures Isaac understands their domain:
 
 ---
 
-### Phase 6: /ship
+### Phase 5: /ship
 Push to main, deploy to production, celebrate! 🚀
 
 Use /debug if issues arise in deployment.

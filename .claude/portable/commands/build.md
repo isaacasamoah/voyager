@@ -141,7 +141,30 @@ Let me know what you want me to do..."
 - Potential issues
 - Todo list for tracking
 
-### 3. Build in Microfeatures (CRITICAL)
+### 3. Lab Folder & Git Strategy
+
+**Our Git Workflow:**
+```
+lab branch → feature branch → local testing → develop → main → production
+```
+
+**The Lab Branch:**
+- Starting point for all new features
+- Safe space for rapid experimentation
+- No CI/CD requirements during prototyping
+- Document learnings in `.lab/experiments/[number]-[name]/`
+
+**The Flow:**
+1. **Start from lab:** `git checkout lab` - All features begin here
+2. **Create feature branch:** `git checkout -b feature/[name]` from lab
+3. **Build microfeatures:** One slice at a time, test locally
+4. **When ALL microfeatures work locally:** Push to develop
+5. **Test on Vercel preview:** Verify on staging before production
+6. **Merge to main:** After validation, ship to production
+
+**See:** `.lab/README.md` for complete experiment workflow and decision funnel.
+
+### 4. Build in Microfeatures (CRITICAL)
 **One microfeature at a time. Small steps = high velocity.**
 
 **The Microfeature Rhythm:**
@@ -160,14 +183,14 @@ Let me know what you want me to do..."
 
 **Why?** Avoids context loss. Each piece proven before moving on.
 
-### 4. Ship Full Feature to Develop
+### 5. Ship Full Feature to Develop
 - All microfeatures working locally
 - Commit with clear message
 - Push to develop branch
 - Auto-deploys to Vercel preview
 - Give me the preview URL
 
-### 5. Brief Me (30 seconds)
+### 6. Brief Me (30 seconds)
 - What you built (which microfeatures)
 - Vercel preview URL to try it
 - How to test the feature

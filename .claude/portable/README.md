@@ -123,29 +123,29 @@ All commands support team member combinations:
 
 This is the standard flow for shipping features:
 
-### 1. **Idea → Design Doc**
-- Jordan + Priya lead design & implementation doc
-- Tech team (Kai, Marcus, Alex, Zara) validate feasibility
-- Output: Design doc with user flow & technical approach
+### 1. **/play** - Design Doc Creation
+- **Full team** explores the idea through free design thinking
+- Jordan + Priya lead UX/product vision
+- Kai, Marcus, Alex, Zara validate technical feasibility
+- **Output:** Design doc with:
+  - What we're building and why
+  - User experience flow
+  - Technical approach (high-level)
+  - Open questions to answer in /plan
 
-### 2. **/play** (if needed)
-- Explore alternatives, challenge assumptions
-- Blue sky thinking on implementation
-- Output: Design doc (if new feature) or refined approach
-
-### 3. **/plan**
+### 2. **/plan**
 - Nail down approach, assign owners
 - Break into micro-features
 - Team discusses trade-offs
 - **Checkpoint:** Plan approval (everyone signs off)
 
-### 4. **/build**
+### 3. **/build**
 - Ship micro-features with tests
 - Tests focus on: core logic, silent failures, edge cases
 - Skip tests for: obvious UI, prototypes, one-offs
 - Use **/debug** when hitting bugs locally
 
-### 5. **/pause**
+### 4. **/pause**
 - **Accountability gate:** Isaac must understand everything before shipping
   - Kai & Marcus: Architecture & implications
   - Alex: Frontend implementation
@@ -153,7 +153,7 @@ This is the standard flow for shipping features:
   - Zara: LLM changes, prompts, behavior
 - UX gut-check: Does it feel good to use?
 
-### 6. **/ship**
+### 5. **/ship**
 - Push to main, deploy to production
 - Use **/debug** if issues arise in deploy
 - Celebrate shipping! 🚀
