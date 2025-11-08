@@ -1,5 +1,15 @@
 # Collaboration Feature Design Roadmap
 
+> ⚠️ **DEPRECATED:** This document represents early planning (Nov 2, 2025).
+>
+> **See current roadmap:** `.lab/design-briefs/ROADMAP_TO_100K.md`
+>
+> Keeping this file for historical context and original vision.
+
+---
+
+## Original Vision (Nov 2, 2025)
+
 > **Vision:** Build the "Canva for collaboration" - making high-quality community engagement inevitable through AI-assisted artifact creation.
 
 **Core Philosophy:**
@@ -7,6 +17,26 @@
 - Guided flexibility - AI provides guardrails while preserving user creativity
 - Compound learning - Platform gets smarter over time through expert engagement and RAG
 - Accessible expertise - Everyone gets world-class coaching, not just those who can afford mentors
+
+---
+
+## What Changed (Nov 8, 2025)
+
+**New Approach:**
+- **Collab Spaces** replaced split-view artifact creation
+- **Commitment gate** as quality filter (not AI guardrails)
+- **Finite lifecycle** spaces (not infinite forums)
+- **Economy-first** thinking (sustainable business model)
+- **Kanban roadmap** (no timelines, ship when ready)
+
+**See:**
+- `.lab/design-briefs/ROADMAP_TO_100K.md` - Current roadmap
+- `.lab/design-briefs/COLLAB_SPACES_CONCEPT.md` - Collab Spaces design
+- `.lab/design-briefs/VOYAGER_ECONOMY.md` - Business model
+
+---
+
+## Historical Document (Original Phases)
 
 ---
 

@@ -77,27 +77,59 @@ USER REQUEST ──> FILTER ──> DECISION
 
 ---
 
-## Current Focus: Careersy (Eli's Coaching Community)
+## Current Focus: Building to 100K Users
 
-### Why Careersy First?
-- ✅ Real user (Eli) who's interested
-- ✅ Clear value prop (his knowledge → more clients served)
-- ✅ Proprietary IP (he cares about protecting it)
-- ✅ Could become revenue (coaches pay for force multipliers)
-- ✅ Testable in 2-3 weeks
+**Last Updated:** Nov 8, 2025
 
-### This Sprint's Hypothesis
-**"Career coaches will use Voyager to extract their tacit knowledge if the interview flow takes <15 minutes and produces immediately useful outputs"**
+### Strategic Shift (Nov 8)
+
+We've moved from "test with Eli" to **"build complete product, then launch pilot."**
+
+**Why:**
+- Economy infrastructure needed BEFORE we can collect revenue
+- Free tier needs to be generous (Collab Spaces = unlimited human collaboration)
+- Pro tier needs clear value (personalization via Profile/Realms)
+- Complete product proves business model before scaling
+
+### Current Work (NOW)
+
+**Beautiful Conversations (v0.2.0)** 🚧 IN PROGRESS
+- Making every conversation feel effortless and elevating
+- Measurable flow quality (LLM-as-judge evaluation)
+- Foundation for all future features
+- **See:** `.lab/experiments/003-beautiful-conversations/`
+
+### What's Next (Sequential Kanban)
+
+```
+NOW: Beautiful Conversations
+  ↓
+NEXT: Economy Infrastructure (payments, subscriptions, usage tracking)
+  ↓
+NEXT: Collab Spaces (free tier = generous, human collab = $0 cost)
+  ↓
+NEXT: Shipwright (AI-guided crafting for collaboration)
+  ↓
+NEXT: Profile/Realms (Pro tier value = personalization)
+  ↓
+LAUNCH: Pilot with Eli (10K Careersy members, first revenue)
+```
+
+**Full Roadmap:** `.lab/design-briefs/ROADMAP_TO_100K.md`
 
 ---
 
-## Ship List (Next 2-3 Weeks)
-*Goal: Eli successfully uses Voyager to improve 3 client outcomes*
+## Philosophy: Think Big, Start Small, Move Fast
 
-### Week 1: Build Core Experience ✅ DONE (Oct 29 - Nov 1)
-- [x] Voyager constitutional prompt (integrate into all modes)
-- [x] Careersy community page (simple, mobile-first)
-- [x] Navigator mode (chat works, mobile responsive)
+**No timelines.** Ship when ready. Move to next.
+
+### Pilot Strategy (When Ready)
+
+**Eli's Careersy (10K members):**
+- ✅ Real community (not hypothetical)
+- ✅ Clear value prop (career coaching + collaboration)
+- ✅ Revenue validation (5% Pro conversion = $9,495/month)
+- ✅ Proves business model (68%+ margins)
 - [x] Cartographer mode (expert interview end-to-end)
 - [x] Mobile responsive (text visibility fixed)
 - [x] v0.1.0-alpha shipped to production

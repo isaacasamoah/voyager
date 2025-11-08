@@ -187,6 +187,34 @@ Use **/avengers-assemble** to run the full workflow interactively from idea → 
 **Core Principle:**
 > "You're my co-pilot, not my crutch. I'm the pilot, not a passenger."
 
+## Portable vs Project-Specific Documentation
+
+**This folder (`.claude/portable/`)** is designed to be PORTABLE across projects.
+
+### What's Portable (Copy to New Projects)
+- ✅ Team personas (`/cofounders/`)
+- ✅ Commands (`/commands/`)
+- ✅ Constitutional Principles (timeless framework)
+- ✅ Beautiful Conversations (timeless framework)
+- ✅ This README
+
+### What's Project-Specific (Lives in `.claude/` root)
+- ❌ `VOYAGER_VISION.md` - Vision for THIS project
+- ❌ `VOYAGER_CONSTITUTIONAL_FRAMEWORK.md` - How we apply principles to Voyager
+- ❌ `COLLABORATION_ROADMAP.md` - Roadmap for THIS project
+
+### What's Execution-Specific (Lives in `.lab/design-briefs/`)
+- ❌ `ROADMAP_TO_100K.md` - Current execution plan
+- ❌ `INFRASTRUCTURE_JOURNEY.md` - Scale strategy for Voyager
+- ❌ `VOYAGER_ECONOMY.md` - Business model
+- ❌ Feature design briefs (Collab Spaces, Max Tier, etc.)
+
+**Key Principle:**
+When starting a new project, copy `.claude/portable/` → get instant team + workflow.
+Create NEW vision/roadmap docs specific to that project.
+
+---
+
 ## Customization
 
 Feel free to:
@@ -194,6 +222,8 @@ Feel free to:
 - **Add new commands** for your workflow
 - **Modify modes** to fit your style
 - **Extend the team** with new domain experts
+
+**Just keep it in `/portable/` if you want it in future projects!**
 
 ## Credits
 
