@@ -170,6 +170,33 @@ Use **/avengers-assemble** to run the full workflow interactively from idea → 
 
 ---
 
+## Git Flow
+
+**See:** `.claude/GIT_FLOW.md` for complete branching strategy.
+
+### Quick Reference
+
+```bash
+# Experiment (might fail, that's okay)
+git checkout develop
+git checkout -b lab-magic-links
+[build + test]
+git merge to develop if successful, delete if failed
+
+# Feature (validated approach, shipping soon)
+git checkout develop
+git checkout -b feature/user-profiles
+[build]
+git checkout develop && git merge feature/user-profiles
+
+# Production
+git checkout main && git merge develop
+```
+
+**Key principle:** Experiments use `lab-` prefix and live in `.lab/experiments/`. Regular features use `feature/` prefix.
+
+---
+
 ## Philosophy
 
 **Isaac's Approach:**
