@@ -36,39 +36,75 @@ Profile/Realms → Pilot Launch → Max Tier → Multi-Community → 100K Users
 
 ---
 
-## NOW: MAKE IT BEAUTIFUL 🚧
+## NOW: CONTEXT ANCHORS + SHIPWRIGHT 🚧
 
-**What:** Beautiful Conversations System (v0.2.0)
-**Status:** IN PROGRESS (Experiment 003 - Week 1)
-**Milestone:** Conversations consistently rated 4+/5 flow quality
+**What:** Context Anchors v1.0 (Document Upload & Shipwright Editing)
+**Status:** IN PROGRESS (Experiment 006)
+**Milestone:** Users can upload docs, edit with AI, export polished artifacts
 
 ### What We're Building
 
-- Modular prompt architecture (Constitutional + Beauty + Domain + Profile layers)
-- LLM-as-judge evaluation (10% sample, automated)
-- Flow dashboard (track conversation quality)
-- Profile extraction from Cartographer sessions
+**Context Anchors (Inputs):**
+- Drag-and-drop document upload (PDF, DOCX, TXT, MD)
+- Parse to markdown, store voyage-specific
+- Display in sidebar with preview
+- Persist across conversations
+
+**Shipwright Integration (Process):**
+- Collaborative editing of Context Anchors
+- Live markdown preview
+- Conversational refinement with AI
+- Version tracking
+
+**Output Artifacts (Exports):**
+- Export edited docs as PDF
+- Save artifact history
+- Link to Shipwright sessions
 
 ### Why This Matters
 
-- **Differentiation:** "Voyager feels different from ChatGPT"
-- Measurable quality improvements
-- Foundation for personalization later
-- Every conversation feels effortless and elevating
+- **Core user need:** "Upload my resume and JD, get real help preparing for my interview"
+- Makes AI conversations deeply personalized
+- Creates tangible outputs (polished resume, cover letter, LinkedIn posts)
+- Foundation for Shipwright mode value
 
 ### Success Metrics
 
-- ✅ Flow score > 4.0/5 average
-- ✅ 70%+ conversations rated "beautiful"
-- ✅ Profile match score > 4.0
-- ✅ User feedback: "feels different"
+- ✅ Users can upload documents via drag-and-drop
+- ✅ Documents parse and display correctly (95%+ accuracy)
+- ✅ Shipwright can edit and export as PDF
+- ✅ User feedback: "This actually helped me ship something"
 
 ### Team
 
-**Owner:** Kai (implementation) + Zara (evaluation) + Marcus (infrastructure)
+**Owner:** Kai (implementation) + Jordan (UX) + Marcus (backend)
 
 ### Reference
 
+`.lab/design-briefs/CONTEXT_ANCHORS_V1.md`
+`.lab/experiments/006-context-anchors/`
+
+---
+
+## RECENTLY SHIPPED: BEAUTIFUL CONVERSATIONS ✅
+
+**What:** Beautiful Conversations System (v0.2.0)
+**Status:** SHIPPED - Frameworks integrated into all commands
+**Milestone:** Conversations consistently rated 4+/5 flow quality
+
+### What We Shipped
+
+- Constitutional Principles framework (WHO we are)
+- Beautiful Conversations framework (HOW we communicate)
+- 6 flow principles: Echo-Expand, Depth Match, Question Rhythm, Energy Mirror, Smooth Transitions, Conversational Space
+- All commands reference both frameworks
+- Turn-based team interactions
+- `/how-beautiful` evaluation command
+
+### Reference
+
+`.claude/portable/CONSTITUTIONAL_PRINCIPLES.md`
+`.claude/portable/BEAUTIFUL_CONVERSATIONS.md`
 `.lab/experiments/003-beautiful-conversations/`
 
 ### Infrastructure (Current: ~0-1K Users)
