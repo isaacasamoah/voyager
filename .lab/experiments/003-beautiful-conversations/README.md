@@ -1,9 +1,10 @@
 # Experiment 003: Beautiful Conversations
 
-**Status:** 🚧 IN PROGRESS
+**Status:** 🚧 IN PROGRESS → KANBAN (no timelines)
 **Start Date:** 2025-11-05
-**Target Completion:** 2025-12-17 (6 weeks)
 **Owner:** Kai (lead) + Zara (evaluation) + Marcus (infrastructure)
+
+**Approach:** Ship when ready, not when calendar says
 
 ---
 
@@ -327,39 +328,46 @@ Once Beautiful Conversations ships:
 
 ---
 
-## Progress Tracking
+## Progress Tracking (Kanban)
 
-### Week 1 (Nov 5-11)
+### ✅ Done
 - [x] Create experiment folder
-- [x] Write beautiful-conversations.md
+- [x] Write beautiful-conversations.md framework
 - [x] Create evaluation rubric
-- [ ] Manually evaluate 20 conversations
-- [ ] Document patterns & insights
+- [x] Create BEAUTIFUL_CONVERSATIONS.md portable doc
+- [x] Add Conversational Space as 6th principle
+- [x] **Experiment 005: Context Drift Fix** (sandwich approach)
+  - Constitutional + Beauty principles at START
+  - Critical reminder at END (recency bias)
+  - "CLARITY + FLOW + SPACE = good"
+  - Tested and validated ✅
 
-### Week 2 (Nov 12-18)
-- [ ] Create lib/prompts/beauty.ts
-- [ ] Refactor lib/communities.ts
-- [ ] Test all modes
-- [ ] Ship to develop
+### 🚧 In Progress
+- [ ] Context Anchors (taking priority for Sophie interview)
 
-### Week 3 (Nov 19-25)
-- [ ] Database schema migration
-- [ ] Evaluation service implementation
-- [ ] Background job setup
-- [ ] API endpoint creation
+### 📋 Ready
+**LLM-as-Judge Evaluation:**
+- [ ] Database schema: ConversationFlowEvaluation
+- [ ] Evaluation service: lib/evaluation/flow-evaluator.ts
+- [ ] Background job: Sample & evaluate 10% hourly
+- [ ] API endpoint: /api/evaluate/flow
 
-### Week 4 (Nov 26-Dec 2)
-- [ ] Dashboard design
-- [ ] Dashboard implementation
-- [ ] Query optimization
-- [ ] Ship to develop
+**Flow Dashboard:**
+- [ ] Design dashboard UI/UX
+- [ ] Build /admin/flow page
+- [ ] Show: Overall scores, trends, outliers
+- [ ] Alert when flow drops below threshold
 
-### Week 5-6 (Dec 3-16)
+**Profile Extraction:**
 - [ ] UserProfile schema
-- [ ] Profile extraction pipeline
-- [ ] Prompt injection
-- [ ] Profile match evaluation
-- [ ] Ship to develop
+- [ ] Extract profiles from Cartographer sessions
+- [ ] Inject profiles into system prompts
+- [ ] Evaluate profile match scores
+
+### 🔲 Backlog
+- [ ] Manually evaluate 20 conversations (baseline)
+- [ ] A/B testing infrastructure
+- [ ] Fine-tuning dataset generation
 
 ---
 
