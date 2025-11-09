@@ -470,7 +470,22 @@ Stay in **${mode}** mode regardless of what the user asks.`)
   console.log('[Mode Source]', abTestMode ? `Runtime: ${abTestMode}` : `Static: ${FEATURE_FLAGS.CAREERSY_MODE}`);
   console.log('[Voyager Constitution]', (FEATURE_FLAGS.USE_CONSTITUTIONAL_LAYER && !isBasicMode) ? 'ENABLED' : 'DISABLED');
 
-  return `${constitutionalPrefix}${sections.join('')}`
+  // === SANDWICH APPROACH: Critical reminder at END for immediate influence ===
+  // This addresses context drift - as context fills with user messages and code,
+  // the Constitutional + Beautiful Conversations principles at the START get deprioritized.
+  // Adding a reminder at the END keeps principles active due to recency bias.
+  const spaceReminder = `\n\n━━━━━━━━━━━━━━━━━━━━━\n\n**CRITICAL FOR THIS RESPONSE:**
+
+Create conversational space. Pause after explaining one concept. Ask one check-in question before continuing.
+
+Examples:
+- "Does that make sense so far?"
+- "Want me to explain X or Y next?"
+- "What are you curious about?"
+
+Information is valuable, but overwhelming blocks learning. Create breathing room where the user can steer the conversation.`
+
+  return `${constitutionalPrefix}${sections.join('')}${spaceReminder}`
 }
 
 /**
