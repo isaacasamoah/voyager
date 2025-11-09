@@ -1,38 +1,26 @@
 import { NextAuthOptions } from "next-auth"
-import GoogleProvider from "next-auth/providers/google"
-import LinkedInProvider from "next-auth/providers/linkedin"
+import EmailProvider from "next-auth/providers/email"
 import { PrismaAdapter } from "@auth/prisma-adapter"
 import { prisma } from "./db"
 import { logAuth, logError } from "./logger"
 import { getAllCommunityConfigs, isExpert } from "./communities"
+import { Resend } from 'resend'
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as any,
   providers: [
-    GoogleProvider({
-      clientId: process.env.GOOGLE_CLIENT_ID!,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-      allowDangerousEmailAccountLinking: true,
-    }),
-    LinkedInProvider({
-      clientId: process.env.LINKEDIN_CLIENT_ID!,
-      clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
-      authorization: {
-        params: {
-          scope: 'openid profile email'
-        }
+    EmailProvider({
+      from: process.env.EMAIL_FROM || 'noreply@voyager.com',
+      sendVerificationRequest: async ({ identifier: email, url }) => {
+        await resend.emails.send({
+          from: process.env.EMAIL_FROM || 'noreply@voyager.com',
+          to: email,
+          subject: 'Log in to Voyager',
+          html: `<p>Click <a href="${url}">here</a> to log in to Voyager.</p>`,
+        })
       },
-      issuer: 'https://www.linkedin.com/oauth',
-      jwks_endpoint: 'https://www.linkedin.com/oauth/openid/jwks',
-      profile(profile) {
-        return {
-          id: profile.sub,
-          name: profile.name,
-          email: profile.email,
-          image: profile.picture,
-        }
-      },
-      allowDangerousEmailAccountLinking: true,
     }),
   ],
   callbacks: {
