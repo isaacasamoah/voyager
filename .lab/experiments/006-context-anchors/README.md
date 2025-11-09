@@ -1,6 +1,6 @@
 # Experiment 006: Context Anchors
 
-**Status:** 🚧 IN PROGRESS
+**Status:** ✅ MICRO-FEATURE 1 COMPLETE | 🚧 MICRO-FEATURE 2 IN PROGRESS
 **Branch:** `lab-context-anchors`
 **Date Started:** Nov 9, 2025
 
@@ -70,14 +70,22 @@ Context Anchors + Shipwright = The resume/document workflow everyone wishes exis
 - [x] Technical plan approved
 - [x] Scale validation (100K users)
 - [x] Lab branch created
+- [x] Database schema (ContextAnchor, OutputArtifact)
+- [x] Dependencies installed (pdf2json, mammoth, @vercel/blob)
+- [x] Upload API endpoint with file parsing
+- [x] Sidebar UI with drag-and-drop
+- [x] ContextModal for text-based input
+- [x] Context anchors integrated into AI chat stream
+- [x] **Micro-feature 1: Core Upload & Display** ✅
 
 ### 🚧 In Progress
-- [ ] Database schema
+- [ ] **Micro-feature 2: Shipwright Integration**
 
 ### 📋 Next
-- [ ] Install dependencies (pdf-parse, mammoth, md-to-pdf, @vercel/blob)
-- [ ] Upload API endpoint
-- [ ] Sidebar UI
+- [ ] Edit button on context anchors
+- [ ] Shipwright editor UI
+- [ ] Markdown editor in right pane
+- [ ] Export markdown functionality
 
 ---
 
