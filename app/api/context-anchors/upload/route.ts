@@ -198,18 +198,23 @@ async function parsePdfToMarkdown(buffer: Buffer): Promise<string> {
 }
 
 /**
- * Parse DOCX to markdown
+ * Parse DOCX to markdown (via HTML conversion)
  */
 async function parseDocxToMarkdown(buffer: Buffer): Promise<string> {
-  // Dynamic import to avoid Next.js build issues
+  // Dynamic imports to avoid Next.js build issues
   const mammoth = (await import('mammoth')).default
-  const result = await mammoth.convertToMarkdown({ buffer })
+  const TurndownService = (await import('turndown')).default
 
-  // Mammoth returns markdown with some HTML artifacts, clean them up
-  let markdown = result.value
-    .replace(/<br\s*\/?>/g, '\n') // Convert <br> to newlines
-    .replace(/\n{3,}/g, '\n\n') // Collapse multiple newlines
-    .trim()
+  // Convert DOCX to HTML
+  const result = await mammoth.convertToHtml({ buffer })
+
+  // Convert HTML to Markdown
+  const turndownService = new TurndownService({
+    headingStyle: 'atx',
+    codeBlockStyle: 'fenced',
+  })
+
+  const markdown = turndownService.turndown(result.value).trim()
 
   // Log any warnings from mammoth
   if (result.messages.length > 0) {
