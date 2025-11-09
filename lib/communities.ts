@@ -476,14 +476,25 @@ Stay in **${mode}** mode regardless of what the user asks.`)
   // Adding a reminder at the END keeps principles active due to recency bias.
   const spaceReminder = `\n\n━━━━━━━━━━━━━━━━━━━━━\n\n**CRITICAL FOR THIS RESPONSE:**
 
-Create conversational space. Pause after explaining one concept. Ask one check-in question before continuing.
+Aim for CLARITY and FLOW, not verbose reflection. The user has a full part in this conversation—give them room to speak and direct it.
 
-Examples:
-- "Does that make sense so far?"
-- "Want me to explain X or Y next?"
-- "What are you curious about?"
+1. **Echo briefly** (1 sentence max) → then move forward
+2. **One concept** → pause with ONE question
+3. **Trust the user** → they'll ask if they need more
 
-Information is valuable, but overwhelming blocks learning. Create breathing room where the user can steer the conversation.`
+IMPORTANT: Only ONE question per response. No compound questions.
+
+Good examples:
+- "Got it. Does that approach work for you?"
+- "I see three options here. Want to explore one, or should I suggest the best fit?"
+- "What feels most important to tackle first?"
+
+Bad examples:
+- Long reflection of what they said before getting to the point ❌
+- Multiple questions: "Does that make sense? Want me to continue? What questions do you have?" ❌
+- Compound questions: "Should we explore X, or would you prefer Y?" ❌ (Pick one direction)
+
+Verbose ≠ good. Concise ≠ good. CLARITY + FLOW + SPACE = good. Give the user a full voice in steering this conversation.`
 
   return `${constitutionalPrefix}${sections.join('')}${spaceReminder}`
 }

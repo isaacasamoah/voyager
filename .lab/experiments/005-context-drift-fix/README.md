@@ -62,7 +62,40 @@ return `${constitutionalPrefix}${sections.join('')}${spaceReminder}`
 
 ## Results
 
-_To be filled after testing_
+**✅ SUCCESS!**
+
+**Date Tested:** Nov 9, 2025
+
+**Test Method:**
+- Long conversation in Careersy (10+ exchanges)
+- Complex career questions that typically trigger verbose responses
+- Measured conversational space and question discipline
+
+**Key Findings:**
+
+1. **Sandwich approach works:** Principles stayed active throughout conversation
+2. **One question discipline:** AI consistently asked single, focused questions
+3. **No context drift:** Quality remained high even as context filled
+4. **User empowerment:** User felt they had full voice in steering conversation
+
+**What worked:**
+- Adding reminder at END of system prompt (recency bias)
+- Emphasizing "CLARITY + FLOW + SPACE = good"
+- "Echo briefly (1 sentence max) → move forward"
+- Explicit prohibition of compound questions
+- "Trust the user → they'll ask if they need more"
+
+**Iteration from v1 → v2:**
+- v1: Focused on "create conversational space" + "one question"
+- v2: Added "aim for clarity and flow, not verbose reflection"
+- v2: Emphasized user's full voice in conversation
+- Result: v2 struck perfect balance
+
+**User Feedback (Isaac):**
+> "ok, that feels really good. I love that. let's call that a success."
+
+**Conclusion:**
+The sandwich approach (Constitutional + Domain at START, Critical reminder at END) successfully prevents context drift and maintains Beautiful Conversations principles throughout long sessions.
 
 ---
 
