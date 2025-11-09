@@ -5,9 +5,10 @@ import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import ChatMessage from './ChatMessage'
-import ResumeModal from './ResumeModal'
+import ContextModal from './ContextModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
 import CommandAutocomplete from './CommandAutocomplete'
+import ContextAnchors from './ContextAnchors'
 import { getTutorialSteps } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
 import { getVoyageTerminology } from '@/lib/terminology'
@@ -153,17 +154,27 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     }
   }
 
-  const saveResume = async (resumeText: string) => {
-    const response = await fetch('/api/resume', {
+  const saveContext = async (content: string, filename: string) => {
+    // Create a text-based Context Anchor
+    const formData = new FormData()
+
+    // Create a blob with text content
+    const blob = new Blob([content], { type: 'text/plain' })
+    const file = new File([blob], filename + '.txt', { type: 'text/plain' })
+
+    formData.append('file', file)
+    formData.append('communityId', communityId)
+
+    const response = await fetch('/api/context-anchors/upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ resumeText }),
+      body: formData,
     })
 
     if (!response.ok) {
-      throw new Error('Failed to save resume')
+      throw new Error('Failed to save context')
     }
 
+    // Optionally still track hasResume for UI indicator
     setHasResume(true)
   }
 
@@ -407,6 +418,9 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
               ))
             )}
           </div>
+
+          {/* Context Anchors */}
+          <ContextAnchors communityId={communityId} />
 
           {/* User Info & Logout - Centered */}
           <div className="px-3 py-4 border-t border-gray-100">
@@ -662,11 +676,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         </form>
       </div>
 
-      {/* Resume Modal */}
-      <ResumeModal
+      {/* Context Modal */}
+      <ContextModal
         isOpen={showResumeModal}
         onClose={() => setShowResumeModal(false)}
-        onSave={saveResume}
+        onSave={saveContext}
+        communityId={communityId}
       />
 
       {/* Tutorial Overlay */}

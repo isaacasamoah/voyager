@@ -94,6 +94,28 @@ export async function POST(req: NextRequest) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized advice based on their actual experience, skills, and background.`
     }
 
+    // Add context anchors (uploaded documents)
+    const contextAnchors = await prisma.contextAnchor.findMany({
+      where: {
+        userId: session.user.id,
+        communityId: communityId,
+      },
+      orderBy: { createdAt: 'desc' },
+      select: {
+        filename: true,
+        fileType: true,
+        contentMarkdown: true,
+      },
+    })
+
+    if (contextAnchors.length > 0) {
+      systemPrompt += '\n\n## Reference Documents\n\nThe user has provided the following documents for context:\n\n'
+      contextAnchors.forEach((anchor, index) => {
+        systemPrompt += `### Document ${index + 1}: ${anchor.filename}\n\n${anchor.contentMarkdown}\n\n`
+      })
+      systemPrompt += 'Use these documents to provide personalized, context-aware guidance. Reference specific details from these documents when relevant.'
+    }
+
     // Get conversation history
     // If incoming history provided (e.g., ephemeral draft mode), use it
     // Otherwise, load from database
