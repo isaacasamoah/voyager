@@ -50,6 +50,63 @@ export async function GET(
   }
 }
 
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    // Check authentication
+    const session = await getServerSession(authOptions)
+    if (!session?.user?.email) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // Get user from database
+    const user = await prisma.user.findUnique({
+      where: { email: session.user.email },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    const anchorId = params.id
+    const { contentMarkdown } = await request.json()
+
+    if (!contentMarkdown) {
+      return NextResponse.json({ error: 'Missing contentMarkdown' }, { status: 400 })
+    }
+
+    // Find the anchor to verify ownership
+    const anchor = await prisma.contextAnchor.findUnique({
+      where: { id: anchorId },
+    })
+
+    if (!anchor) {
+      return NextResponse.json({ error: 'Anchor not found' }, { status: 404 })
+    }
+
+    // Verify ownership
+    if (anchor.userId !== user.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+    }
+
+    // Update the markdown content
+    const updatedAnchor = await prisma.contextAnchor.update({
+      where: { id: anchorId },
+      data: { contentMarkdown },
+    })
+
+    return NextResponse.json({ anchor: updatedAnchor }, { status: 200 })
+  } catch (error) {
+    console.error('Update context anchor error:', error)
+    return NextResponse.json(
+      { error: 'Internal server error' },
+      { status: 500 }
+    )
+  }
+}
+
 export async function DELETE(
   request: NextRequest,
   { params }: { params: { id: string } }

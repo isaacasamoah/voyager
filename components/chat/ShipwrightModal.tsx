@@ -22,6 +22,7 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     textSecondary: '#6b7280',
   }
   const [markdownContent, setMarkdownContent] = useState('')
+  const [previousMarkdown, setPreviousMarkdown] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
@@ -130,9 +131,13 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                 return newMessages
               })
             } else if (event.type === 'markdown_update') {
-              // Update markdown preview
+              // Save previous version for undo
+              setMarkdownContent(prev => {
+                setPreviousMarkdown(prev)
+                return event.content
+              })
+
               setIsEditing(true)
-              setMarkdownContent(event.content)
               setCurrentVersion(event.version)
 
               // Show update notification if we have a sectionId
@@ -195,6 +200,33 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     return sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
   }
 
+  // Handle undo - revert to previous markdown version
+  async function handleUndo() {
+    if (!previousMarkdown) return
+
+    try {
+      // Save to database
+      const response = await fetch(`/api/context-anchors/${anchorId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentMarkdown: previousMarkdown
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to undo changes')
+      }
+
+      // Update UI
+      setMarkdownContent(previousMarkdown)
+      setPreviousMarkdown(null) // Clear undo history after reverting
+    } catch (error) {
+      console.error('Undo error:', error)
+      alert('Failed to undo changes. Please try again.')
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
       {/* Modal Container */}
@@ -204,15 +236,30 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
           <h2 className="text-lg font-semibold text-gray-900">
             Edit with Shipwright
           </h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
-            title="Close"
-          >
-            <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
+          <div className="flex items-center gap-2">
+            {/* Undo Button */}
+            {previousMarkdown && (
+              <button
+                onClick={handleUndo}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors border border-gray-300"
+                title="Undo last change"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                Undo
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Close"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {/* Two-pane layout - stacks vertically on mobile, side-by-side on desktop */}
