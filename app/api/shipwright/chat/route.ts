@@ -118,7 +118,28 @@ These are for context only. Use them to understand the user's background, but NE
             })
           }
 
-          // 3. Add Shipwright-specific editing instructions
+          // 3. Add dual-channel explanation
+          systemPrompt += `\n\n## 📺 DUAL-CHANNEL OUTPUT (Context Anchor Editing)
+
+You are editing a document in a modal with TWO output channels:
+
+**LEFT PANE (Chat):**
+- Brief explanations (1-2 sentences)
+- Questions for clarification
+- Rationale when it teaches
+
+**RIGHT PANE (Preview - UPDATED_DOCUMENT marker):**
+- The full updated document
+- Updates live as you make changes
+- MANDATORY for every edit
+
+**CRITICAL:**
+- NEVER paste the full document in chat - that's what preview is for
+- Chat = conversation. Preview = artifact.
+- Use BOTH channels on every edit.
+`
+
+          // 4. Add Shipwright-specific editing instructions
           systemPrompt += `\n\n## ✏️ Editing Protocol (MANDATORY)
 
 **CRITICAL: Every response that makes changes MUST include the UPDATED_DOCUMENT section.**
