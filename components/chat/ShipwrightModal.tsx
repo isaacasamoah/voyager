@@ -57,11 +57,11 @@ export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalPr
         {/* Two-pane layout - stacks vertically on mobile, side-by-side on desktop */}
         <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Left Pane - Chat Interface (placeholder for now) */}
-          <div className="w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col">
-            <div className="px-4 py-3 border-b border-gray-200 bg-white md:hidden">
+          <div className="h-1/2 md:h-full w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col min-h-0">
+            <div className="px-4 py-3 border-b border-gray-200 bg-white md:hidden flex-shrink-0">
               <h3 className="text-sm font-semibold text-gray-700">Chat</h3>
             </div>
-            <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
               <div className="text-sm text-gray-500">
                 Chat interface coming in next step...
               </div>
@@ -69,11 +69,11 @@ export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalPr
           </div>
 
           {/* Right Pane - Markdown Preview */}
-          <div className="w-full md:w-1/2 flex flex-col bg-gray-50">
-            <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white">
+          <div className="h-1/2 md:h-full w-full md:w-1/2 flex flex-col bg-gray-50 min-h-0">
+            <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white flex-shrink-0">
               <h3 className="text-sm font-semibold text-gray-700">Preview</h3>
             </div>
-            <div className="flex-1 p-4 md:p-6 overflow-y-auto">
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
               {loading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-sm text-gray-400">Loading...</div>
