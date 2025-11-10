@@ -295,53 +295,64 @@ UPDATED_SECTION: experience
           // State machine for filtering UPDATED_SECTION/UPDATED_DOCUMENT from chat
           let streamState: 'BEFORE_MARKER' | 'IN_DOCUMENT' | 'AFTER_MARKER' = 'BEFORE_MARKER'
           let documentBuffer = ''
+          let chatBuffer = ''  // Buffer chat content until we're sure there's no marker
 
           for await (const textChunk of aiStream) {
             fullResponse += textChunk
 
-            // Check if we've hit UPDATED_SECTION or UPDATED_DOCUMENT marker
-            const hasSectionMarker = /UPDATED_SECTION:\s*\w+/.test(fullResponse)
-            const hasDocumentMarker = fullResponse.includes('UPDATED_DOCUMENT:')
+            if (streamState === 'BEFORE_MARKER') {
+              chatBuffer += textChunk
 
-            if (streamState === 'BEFORE_MARKER' && (hasSectionMarker || hasDocumentMarker)) {
-              streamState = 'IN_DOCUMENT'
+              // Check if we've hit UPDATED_SECTION or UPDATED_DOCUMENT marker
+              const sectionMatch = chatBuffer.match(/UPDATED_SECTION:\s*\w+/)
+              const documentMatch = chatBuffer.match(/UPDATED_DOCUMENT:/)
 
-              // Send only the text BEFORE the marker to chat
-              let beforeMarker: string
-              if (hasSectionMarker) {
-                const match = fullResponse.match(/UPDATED_SECTION:\s*\w+/)
-                beforeMarker = fullResponse.substring(0, match!.index)
-              } else {
-                beforeMarker = fullResponse.split('UPDATED_DOCUMENT:')[0]
+              if (sectionMatch || documentMatch) {
+                streamState = 'IN_DOCUMENT'
+
+                // Send only the text BEFORE the marker to chat
+                const markerIndex = sectionMatch ? sectionMatch.index! : documentMatch!.index!
+                const beforeMarker = chatBuffer.substring(0, markerIndex)
+
+                if (beforeMarker) {
+                  const data = JSON.stringify({
+                    type: 'message',
+                    content: beforeMarker
+                  })
+                  controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+                }
+
+                // Start buffering the document section
+                documentBuffer = chatBuffer.substring(markerIndex)
+                chatBuffer = ''
+                continue
               }
 
-              const alreadySent = fullResponse.length - textChunk.length
-              const newChatContent = beforeMarker.substring(alreadySent)
+              // Safe to stream if we have enough content and no partial marker detected
+              // Keep last 20 chars in buffer in case marker is split across chunks
+              if (chatBuffer.length > 20) {
+                const safeToSend = chatBuffer.substring(0, chatBuffer.length - 20)
+                chatBuffer = chatBuffer.substring(chatBuffer.length - 20)
 
-              if (newChatContent) {
                 const data = JSON.stringify({
                   type: 'message',
-                  content: newChatContent
+                  content: safeToSend
                 })
                 controller.enqueue(encoder.encode(`data: ${data}\n\n`))
               }
-              continue
-            }
-
-            // If we're in document mode, buffer instead of streaming to chat
-            if (streamState === 'IN_DOCUMENT') {
+            } else if (streamState === 'IN_DOCUMENT') {
+              // Buffer document content instead of streaming to chat
               documentBuffer += textChunk
-              continue
             }
+          }
 
-            // Otherwise, stream to chat normally
-            if (streamState === 'BEFORE_MARKER') {
-              const data = JSON.stringify({
-                type: 'message',
-                content: textChunk
-              })
-              controller.enqueue(encoder.encode(`data: ${data}\n\n`))
-            }
+          // Flush any remaining chat buffer (if we never hit a marker)
+          if (streamState === 'BEFORE_MARKER' && chatBuffer) {
+            const data = JSON.stringify({
+              type: 'message',
+              content: chatBuffer
+            })
+            controller.enqueue(encoder.encode(`data: ${data}\n\n`))
           }
 
           // Check if response contains surgical section update
