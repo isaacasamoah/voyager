@@ -2,7 +2,8 @@ import { NextRequest } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import Anthropic from '@anthropic-ai/sdk'
+import { getModelConfig } from '@/lib/ai-models'
+import { streamAIModel, ChatMessage } from '@/lib/ai-providers'
 
 export const dynamic = 'force-dynamic'
 
@@ -58,13 +59,8 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    // Initialize Anthropic client
-    const apiKey = process.env.ANTHROPIC_API_KEY
-    if (!apiKey) {
-      throw new Error('ANTHROPIC_API_KEY not configured')
-    }
-
-    const anthropic = new Anthropic({ apiKey })
+    // Get model configuration (uses env DEFAULT_AI_MODEL or defaults to claude-sonnet)
+    const modelConfig = getModelConfig()
 
     // Create streaming response
     const encoder = new TextEncoder()
@@ -101,33 +97,24 @@ Important:
 - Make precise, thoughtful edits based on the user's request
 - If the request is unclear, ask for clarification instead of guessing`
 
-          // Call Anthropic streaming API
-          const anthropicStream = await anthropic.messages.stream({
-            model: 'claude-3-5-sonnet-20240620',
-            max_tokens: 4096,
-            temperature: 0.7,
-            system: systemPrompt,
-            messages: [
-              {
-                role: 'user',
-                content: message
-              }
-            ]
-          })
+          // Build messages array
+          const messages: ChatMessage[] = [
+            { role: 'system', content: systemPrompt },
+            { role: 'user', content: message }
+          ]
 
-          // Stream response chunks
-          for await (const chunk of anthropicStream) {
-            if (chunk.type === 'content_block_delta' && chunk.delta.type === 'text_delta') {
-              const text = chunk.delta.text
-              fullResponse += text
+          // Stream AI response using configurable model
+          const aiStream = streamAIModel(modelConfig, messages)
 
-              // Send message chunk to client
-              const data = JSON.stringify({
-                type: 'message',
-                content: text
-              })
-              controller.enqueue(encoder.encode(`data: ${data}\n\n`))
-            }
+          for await (const textChunk of aiStream) {
+            fullResponse += textChunk
+
+            // Send message chunk to client
+            const data = JSON.stringify({
+              type: 'message',
+              content: textChunk
+            })
+            controller.enqueue(encoder.encode(`data: ${data}\n\n`))
           }
 
           // Check if response contains updated document
