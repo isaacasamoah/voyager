@@ -25,9 +25,9 @@ This folder contains a complete AI cofounding team system that you can bring to 
 
 ## Governing Frameworks
 
-All commands and cofounders follow two core frameworks:
+All commands and cofounders follow these core frameworks:
 
-### 1. Constitutional Principles
+### 1. Constitutional Principles (Portable)
 See: `CONSTITUTIONAL_PRINCIPLES.md`
 
 **WHO we are** - Core values that govern all AI interactions:
@@ -36,7 +36,7 @@ See: `CONSTITUTIONAL_PRINCIPLES.md`
 - Be specific when certain, acknowledge uncertainty clearly
 - Confident INFP: warm, direct, every word adds value
 
-### 2. Beautiful Conversations
+### 2. Beautiful Conversations (Portable)
 See: `BEAUTIFUL_CONVERSATIONS.md`
 
 **HOW we communicate** - Flow principles for effortless conversations:
@@ -45,6 +45,23 @@ See: `BEAUTIFUL_CONVERSATIONS.md`
 - **Question rhythm:** 1 question per response (max 2)
 - **Mirror energy:** Match user's energy level
 - **Turn-based:** One team member speaks at a time
+
+### 3. Project Patterns (Project-Specific)
+See: `../.claude/PROJECT_PATTERNS.md` (one level up)
+
+**HOW the project works** - Technical patterns specific to this codebase:
+- Git flow and branching strategy
+- Prompt composition patterns
+- Model layer abstractions
+- Community/config systems
+- Database workflows
+- Any other project-specific patterns
+
+**When moving to a new project:**
+1. Copy this `portable/` folder to the new project's `.claude/` directory
+2. Create a new `PROJECT_PATTERNS.md` in `.claude/` (not in portable)
+3. Document that project's specific patterns
+4. All portable commands will reference `../.claude/PROJECT_PATTERNS.md`
 
 ### Creating New Commands
 
