@@ -54,11 +54,14 @@ export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalPr
           </button>
         </div>
 
-        {/* Two-pane layout */}
-        <div className="flex-1 flex overflow-hidden">
+        {/* Two-pane layout - stacks vertically on mobile, side-by-side on desktop */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
           {/* Left Pane - Chat Interface (placeholder for now) */}
-          <div className="w-1/2 border-r border-gray-200 flex flex-col">
-            <div className="flex-1 p-6 overflow-y-auto">
+          <div className="w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col">
+            <div className="px-4 py-3 border-b border-gray-200 bg-white md:hidden">
+              <h3 className="text-sm font-semibold text-gray-700">Chat</h3>
+            </div>
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto">
               <div className="text-sm text-gray-500">
                 Chat interface coming in next step...
               </div>
@@ -66,18 +69,18 @@ export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalPr
           </div>
 
           {/* Right Pane - Markdown Preview */}
-          <div className="w-1/2 flex flex-col bg-gray-50">
-            <div className="px-6 py-3 border-b border-gray-200 bg-white">
+          <div className="w-full md:w-1/2 flex flex-col bg-gray-50">
+            <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white">
               <h3 className="text-sm font-semibold text-gray-700">Preview</h3>
             </div>
-            <div className="flex-1 p-6 overflow-y-auto">
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto">
               {loading ? (
                 <div className="flex items-center justify-center h-full">
                   <div className="text-sm text-gray-400">Loading...</div>
                 </div>
               ) : (
                 <div className="prose prose-sm max-w-none">
-                  <pre className="whitespace-pre-wrap font-mono text-sm text-gray-800 bg-white p-4 rounded-lg border border-gray-200">
+                  <pre className="whitespace-pre-wrap font-mono text-xs md:text-sm text-gray-800 bg-white p-3 md:p-4 rounded-lg border border-gray-200">
                     {markdownContent}
                   </pre>
                 </div>
