@@ -97,7 +97,7 @@ export async function POST(req: NextRequest) {
       })
     }
 
-    const { anchorId, message } = await req.json()
+    const { anchorId, message, conversationHistory } = await req.json()
 
     if (!anchorId || !message) {
       return new Response(JSON.stringify({ error: 'Missing anchorId or message' }), {
@@ -268,11 +268,26 @@ UPDATED_SECTION: experience
 
 **If the request is unclear:** Ask ONE clarifying question, then wait for response.`
 
-          // Build messages array
+          // Build messages array with conversation history
           const messages: ChatMessage[] = [
-            { role: 'system', content: systemPrompt },
-            { role: 'user', content: message }
+            { role: 'system', content: systemPrompt }
           ]
+
+          // Add conversation history if provided (maintains context across turns)
+          if (conversationHistory && Array.isArray(conversationHistory)) {
+            conversationHistory.forEach((msg: any) => {
+              // Only include user and assistant messages (system prompt is already added)
+              if (msg.role === 'user' || msg.role === 'assistant') {
+                messages.push({
+                  role: msg.role,
+                  content: msg.content
+                })
+              }
+            })
+          }
+
+          // Add current user message
+          messages.push({ role: 'user', content: message })
 
           // Stream AI response using configurable model
           const aiStream = streamAIModel(modelConfig, messages)
@@ -357,12 +372,13 @@ UPDATED_SECTION: experience
                 data: { contentMarkdown: updatedMarkdown }
               })
 
-              // Send markdown update to client
+              // Send markdown update to client (with sectionId for highlighting)
               const data = JSON.stringify({
                 type: 'markdown_update',
                 content: updatedMarkdown,
                 anchorId: anchorId,
-                version: version
+                version: version,
+                sectionId: sectionId  // Include which section was updated
               })
               controller.enqueue(encoder.encode(`data: ${data}\n\n`))
             }
@@ -380,12 +396,13 @@ UPDATED_SECTION: experience
                 data: { contentMarkdown: updatedMarkdown }
               })
 
-              // Send markdown update to client
+              // Send markdown update to client (no sectionId for full document updates)
               const data = JSON.stringify({
                 type: 'markdown_update',
                 content: updatedMarkdown,
                 anchorId: anchorId,
-                version: version
+                version: version,
+                sectionId: 'full_document'  // Full document update (no specific section)
               })
               controller.enqueue(encoder.encode(`data: ${data}\n\n`))
             }

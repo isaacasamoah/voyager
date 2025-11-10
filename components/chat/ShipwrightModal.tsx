@@ -78,13 +78,14 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     setMessages(prev => [...prev, { role: 'assistant', content: '' }])
 
     try {
-      // Call streaming API
+      // Call streaming API with full conversation history
       const response = await fetch('/api/shipwright/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           anchorId,
-          message: userMessage
+          message: userMessage,
+          conversationHistory: messages  // Include all previous messages
         })
       })
 
