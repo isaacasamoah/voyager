@@ -13,9 +13,10 @@ interface ContextAnchor {
 
 interface ContextAnchorsProps {
   communityId: string
+  branding?: any
 }
 
-export default function ContextAnchors({ communityId }: ContextAnchorsProps) {
+export default function ContextAnchors({ communityId, branding }: ContextAnchorsProps) {
   const [anchors, setAnchors] = useState<ContextAnchor[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
@@ -277,6 +278,7 @@ export default function ContextAnchors({ communityId }: ContextAnchorsProps) {
         <ShipwrightModal
           anchorId={editingAnchorId}
           onClose={() => setEditingAnchorId(null)}
+          branding={branding}
         />
       )}
     </div>

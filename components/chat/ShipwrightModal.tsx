@@ -10,9 +10,17 @@ interface Message {
 interface ShipwrightModalProps {
   anchorId: string
   onClose: () => void
+  branding?: any
 }
 
-export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalProps) {
+export default function ShipwrightModal({ anchorId, onClose, branding }: ShipwrightModalProps) {
+  // Use community colors or fallback to Voyager defaults
+  const colors = branding?.colors || {
+    primary: '#000000',
+    background: '#ffffff',
+    text: '#000000',
+    textSecondary: '#6b7280',
+  }
   const [markdownContent, setMarkdownContent] = useState('')
   const [loading, setLoading] = useState(true)
   const [messages, setMessages] = useState<Message[]>([])
@@ -215,11 +223,14 @@ export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalPr
                       className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}
                     >
                       <div
-                        className={`max-w-[85%] rounded-lg p-3 ${
-                          message.role === 'user'
-                            ? 'bg-blue-600 text-white'
-                            : 'bg-gray-100 text-gray-900'
-                        }`}
+                        className="max-w-[85%] rounded-lg p-3"
+                        style={message.role === 'user' ? {
+                          backgroundColor: colors.primary,
+                          color: branding?.colors?.userMessageText || '#ffffff'
+                        } : {
+                          backgroundColor: '#f3f4f6',
+                          color: colors.text
+                        }}
                       >
                         <p className="text-sm whitespace-pre-wrap break-words">
                           {message.content}
@@ -242,13 +253,18 @@ export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalPr
                   onKeyDown={handleKeyDown}
                   placeholder="Type a message..."
                   disabled={sending}
-                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-50 disabled:text-gray-400"
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-400"
+                  style={{ '--tw-ring-color': colors.primary } as any}
                   rows={2}
                 />
                 <button
                   onClick={handleSend}
                   disabled={!input.trim() || sending}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex-shrink-0 text-sm font-medium"
+                  className="px-4 py-2 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex-shrink-0 text-sm font-medium"
+                  style={!input.trim() || sending ? {} : {
+                    backgroundColor: colors.primary,
+                    color: branding?.colors?.userMessageText || '#ffffff'
+                  }}
                 >
                   {sending ? '...' : 'Send'}
                 </button>
@@ -261,7 +277,7 @@ export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalPr
             <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white flex-shrink-0 flex items-center justify-between">
               <h3 className="text-sm font-semibold text-gray-700">Preview</h3>
               {isEditing && (
-                <div className="flex items-center gap-2 text-xs text-blue-600">
+                <div className="flex items-center gap-2 text-xs" style={{ color: colors.primary }}>
                   <div className="animate-pulse">●</div>
                   <span>AI is editing...</span>
                 </div>

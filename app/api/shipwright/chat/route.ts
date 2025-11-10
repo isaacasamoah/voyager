@@ -59,6 +59,15 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // Fetch ALL context anchors for this user/community (to give Shipwright full context)
+    const allAnchors = await prisma.contextAnchor.findMany({
+      where: {
+        userId: user.id,
+        communityId: anchor.communityId
+      },
+      orderBy: { createdAt: 'desc' }
+    })
+
     // Get model configuration (uses env DEFAULT_AI_MODEL or defaults to claude-sonnet)
     const modelConfig = getModelConfig()
 
@@ -71,13 +80,25 @@ export async function POST(req: NextRequest) {
           let fullResponse = ''
           let updatedMarkdown = anchor.contentMarkdown
 
+          // Build context section with all uploaded documents
+          let contextSection = `## Document Being Edited: ${anchor.filename}
+\`\`\`markdown
+${anchor.contentMarkdown}
+\`\`\``
+
+          // Add other context anchors if they exist
+          const otherAnchors = allAnchors.filter(a => a.id !== anchor.id)
+          if (otherAnchors.length > 0) {
+            contextSection += `\n\n## Additional Context Documents (for reference):\n`
+            otherAnchors.forEach((otherAnchor, index) => {
+              contextSection += `\n### ${index + 1}. ${otherAnchor.filename}\n\`\`\`markdown\n${otherAnchor.contentMarkdown}\n\`\`\`\n`
+            })
+          }
+
           // System prompt for Shipwright editing
           const systemPrompt = `You are Shipwright, an AI document editor. You help users refine their documents through conversation.
 
-Current document content:
-\`\`\`markdown
-${anchor.contentMarkdown}
-\`\`\`
+${contextSection}
 
 When the user asks you to edit the document:
 1. Respond conversationally to acknowledge their request
