@@ -116,7 +116,7 @@ export default function ShipwrightModal({ anchorId, onClose }: ShipwrightModalPr
                       Start editing your document by chatting with Shipwright
                     </p>
                     <p className="text-xs text-gray-400">
-                      Try: "Fix the formatting" or "Make this more concise"
+                      Try: &ldquo;Fix the formatting&rdquo; or &ldquo;Make this more concise&rdquo;
                     </p>
                   </div>
                 </div>

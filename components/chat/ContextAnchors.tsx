@@ -26,6 +26,7 @@ export default function ContextAnchors({ communityId }: ContextAnchorsProps) {
   // Fetch context anchors on mount
   useEffect(() => {
     fetchAnchors()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [communityId])
 
   async function fetchAnchors() {
