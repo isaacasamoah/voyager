@@ -81,13 +81,16 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
 
     try {
       // Call streaming API with full conversation history
+      // Filter out empty messages (Anthropic API rejects empty content)
+      const validMessages = messages.filter(msg => msg.content.trim().length > 0)
+
       const response = await fetch('/api/shipwright/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           anchorId,
           message: userMessage,
-          conversationHistory: messages  // Include all previous messages
+          conversationHistory: validMessages  // Only send messages with content
         })
       })
 
