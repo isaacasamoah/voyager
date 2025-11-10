@@ -23,6 +23,7 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
   }
   const [markdownContent, setMarkdownContent] = useState('')
   const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [sending, setSending] = useState(false)
@@ -36,6 +37,7 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     async function fetchAnchor() {
       try {
         setLoading(true)
+        setLoadError(null)
         const response = await fetch(`/api/context-anchors/${anchorId}`)
 
         if (!response.ok) {
@@ -46,6 +48,7 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
         setMarkdownContent(data.anchor.contentMarkdown || '')
       } catch (error) {
         console.error('Error fetching anchor:', error)
+        setLoadError('Failed to load document. Please try closing and reopening.')
       } finally {
         setLoading(false)
       }
@@ -288,10 +291,22 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                 <div className="flex items-center justify-center h-full">
                   <div className="text-sm text-gray-400">Loading...</div>
                 </div>
+              ) : loadError ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center max-w-sm">
+                    <p className="text-sm text-red-600 mb-2">{loadError}</p>
+                    <button
+                      onClick={onClose}
+                      className="text-xs text-gray-500 underline hover:text-gray-700"
+                    >
+                      Close and try again
+                    </button>
+                  </div>
+                </div>
               ) : (
                 <div className="prose prose-sm max-w-none">
                   <pre className="whitespace-pre-wrap font-mono text-xs md:text-sm text-gray-800 bg-white p-3 md:p-4 rounded-lg border border-gray-200">
-                    {markdownContent}
+                    {markdownContent || '(empty document)'}
                   </pre>
                 </div>
               )}

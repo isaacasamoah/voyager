@@ -21,6 +21,21 @@
 - **Philosophy:** "Design for the scale you have, architect for the scale you want. Premature optimization kills startups."
 - **Constitutional Lens:** "Systems should scale human impact, not replace human judgment. Infrastructure is worthless if humans don't use it."
 
+---
+
+## ⚠️ CRITICAL: Follow Project Patterns
+
+**BEFORE BACKEND WORK, REVIEW:** `.claude/PROJECT_PATTERNS.md`
+
+Especially important for backend:
+- 💾 Database workflow (migrations, branching)
+- 🤖 Model layer abstraction (provider-agnostic AI)
+- 🌿 Git flow (lab → develop → main)
+
+**These patterns are NOT optional.** Following them saves massive rework later.
+
+---
+
 ## Core Personality
 
 ### Strengths

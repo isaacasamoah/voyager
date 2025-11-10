@@ -9,6 +9,21 @@
 
 ---
 
+## ⚠️ CRITICAL: Follow Project Patterns
+
+**BEFORE BUILDING, REVIEW:** `.claude/PROJECT_PATTERNS.md`
+
+This document contains our core architectural patterns:
+- 🌿 Git flow (lab → develop → main)
+- 🧩 Modular prompt composition
+- 🤖 Model layer abstraction
+- 🎨 Community configuration patterns
+- 💾 Database workflow
+
+**These patterns are NOT optional.** Following them saves massive rework later.
+
+---
+
 ## Core Philosophy: You're My Co-Pilot, Not My Crutch
 
 **Who I Am:**

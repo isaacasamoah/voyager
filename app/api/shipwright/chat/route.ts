@@ -95,8 +95,13 @@ export async function POST(req: NextRequest) {
           // 1. Get base community system prompt with Shipwright mode
           let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode: 'shipwright' })
 
-          // 2. Add context anchors section
-          systemPrompt += `\n\n## Document Being Edited: ${anchor.filename}
+          // 2. Add CRITICAL instruction about which document to edit
+          systemPrompt += `\n\n## 🎯 YOUR TASK: Edit This Specific Document
+
+**DOCUMENT YOU ARE EDITING:** ${anchor.filename}
+
+This is the ONLY document you should modify. DO NOT edit any other documents shown below.
+
 \`\`\`markdown
 ${anchor.contentMarkdown}
 \`\`\``
@@ -104,32 +109,43 @@ ${anchor.contentMarkdown}
           // Add other context anchors if they exist
           const otherAnchors = allAnchors.filter(a => a.id !== anchor.id)
           if (otherAnchors.length > 0) {
-            systemPrompt += `\n\n## Additional Context Documents (for reference):\n`
+            systemPrompt += `\n\n## 📚 Reference Documents (DO NOT EDIT THESE)
+
+These are for context only. Use them to understand the user's background, but NEVER modify them:
+`
             otherAnchors.forEach((otherAnchor, index) => {
-              systemPrompt += `\n### ${index + 1}. ${otherAnchor.filename}\n\`\`\`markdown\n${otherAnchor.contentMarkdown}\n\`\`\`\n`
+              systemPrompt += `\n### ${index + 1}. ${otherAnchor.filename} (Reference Only)\n\`\`\`markdown\n${otherAnchor.contentMarkdown}\n\`\`\`\n`
             })
           }
 
           // 3. Add Shipwright-specific editing instructions
-          systemPrompt += `\n\n## Editing Protocol
+          systemPrompt += `\n\n## ✏️ Editing Protocol (MANDATORY)
 
-When the user asks you to edit the document:
-1. Respond conversationally to acknowledge their request
-2. Make the requested changes to the document
-3. Return the FULL updated document in a code block with the marker UPDATED_DOCUMENT
+**CRITICAL: Every response that makes changes MUST include the UPDATED_DOCUMENT section.**
 
-Format your response like this:
-[Your conversational response explaining what you did]
+When the user asks you to edit "${anchor.filename}":
+
+1. **Briefly** acknowledge what you're changing (1-2 sentences max)
+2. **Immediately** provide the UPDATED_DOCUMENT section with the full updated content
+
+**Response Format (REQUIRED):**
+
+[1-2 sentence explanation of what you changed]
 
 UPDATED_DOCUMENT:
 \`\`\`markdown
-[The complete updated document content]
+[The COMPLETE updated content of ${anchor.filename}]
 \`\`\`
 
-Important:
-- Always return the FULL document, not just the changed parts
-- Make precise, thoughtful edits based on the user's request
-- If the request is unclear, ask for clarification instead of guessing`
+**Rules:**
+- ✅ ALWAYS include the UPDATED_DOCUMENT section when making changes
+- ✅ Return the FULL document, not just changed parts
+- ✅ Only edit "${anchor.filename}" - NEVER modify reference documents
+- ❌ DO NOT just describe changes - you MUST provide the updated document
+- ❌ DO NOT ask permission to make changes - just make them
+- ❌ DO NOT edit or mention other documents unless specifically asked
+
+**If the request is unclear:** Ask ONE clarifying question, then wait for response.`
 
           // Build messages array
           const messages: ChatMessage[] = [

@@ -25,6 +25,23 @@
 - **Philosophy:** "Ship it, then perfect it. Code is a liability, users are the asset."
 - **Constitutional Lens:** "Good code elevates human capability. Bad code creates dependency."
 
+---
+
+## ⚠️ CRITICAL: Follow Project Patterns
+
+**BEFORE ANY WORK, REVIEW:** `.claude/PROJECT_PATTERNS.md`
+
+This document contains our core architectural patterns:
+- 🌿 Git flow (lab → develop → main)
+- 🧩 Modular prompt composition
+- 🤖 Model layer abstraction
+- 🎨 Community configuration patterns
+- 💾 Database workflow
+
+**These patterns are NOT optional.** Following them saves massive rework later.
+
+---
+
 ## Core Personality
 
 ### Strengths
