@@ -8,6 +8,72 @@ import { getCommunityConfig, getCommunitySystemPrompt } from '@/lib/communities'
 
 export const dynamic = 'force-dynamic'
 
+/**
+ * Merge a section update into the full document (Surgical Updates)
+ *
+ * Strategy: Use markdown section headers to identify boundaries
+ * - header: Everything before first ## or ### header
+ * - summary/experience/education/skills/projects: Section between matching headers
+ *
+ * Falls back to appending if section not found (graceful degradation)
+ */
+function mergeSectionIntoDocument(
+  currentDocument: string,
+  sectionId: string,
+  sectionContent: string
+): string {
+  // Section header patterns for resume/document structure
+  const sectionPatterns: Record<string, RegExp> = {
+    header: /^([\s\S]*?)(?=\n##)/m, // Everything before first ## header
+    summary: /##\s*(Professional Summary|Summary|About|Objective)([\s\S]*?)(?=\n##|$)/i,
+    experience: /##\s*(Experience|Work History|Employment)([\s\S]*?)(?=\n##|$)/i,
+    education: /##\s*(Education|Certifications|Qualifications)([\s\S]*?)(?=\n##|$)/i,
+    skills: /##\s*(Skills|Technical Skills|Technologies)([\s\S]*?)(?=\n##|$)/i,
+    projects: /##\s*(Projects|Portfolio|Personal Projects)([\s\S]*?)(?=\n##|$)/i,
+  }
+
+  const pattern = sectionPatterns[sectionId]
+
+  if (!pattern) {
+    // Unknown section - append to end (graceful fallback)
+    console.warn(`Unknown section ID: ${sectionId}, appending to end`)
+    return `${currentDocument}\n\n${sectionContent}`
+  }
+
+  // Special case: header section (content before first ##)
+  if (sectionId === 'header') {
+    const firstHeaderMatch = currentDocument.match(/\n##/)
+    if (firstHeaderMatch && firstHeaderMatch.index !== undefined) {
+      const restOfDocument = currentDocument.substring(firstHeaderMatch.index)
+      return `${sectionContent}${restOfDocument}`
+    }
+    // No headers found - replace entire document
+    return sectionContent
+  }
+
+  // Standard sections: find and replace section content
+  const match = currentDocument.match(pattern)
+
+  if (match && match.index !== undefined) {
+    // Extract the section header from the match
+    const sectionHeader = match[1] ? `## ${match[1].trim()}` : ''
+
+    // Build the replacement: header + new content
+    const replacement = sectionHeader ? `${sectionHeader}\n${sectionContent}` : sectionContent
+
+    // Replace the entire matched section
+    const before = currentDocument.substring(0, match.index)
+    const after = currentDocument.substring(match.index + match[0].length)
+
+    return `${before}${replacement}${after}`
+  }
+
+  // Section not found - append to end with appropriate header
+  console.warn(`Section ${sectionId} not found, appending to end`)
+  const sectionHeader = sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
+  return `${currentDocument}\n\n## ${sectionHeader}\n${sectionContent}`
+}
+
 export async function POST(req: NextRequest) {
   try {
     // Check authentication
@@ -139,32 +205,66 @@ You are editing a document in a modal with TWO output channels:
 - Use BOTH channels on every edit.
 `
 
-          // 4. Add Shipwright-specific editing instructions
-          systemPrompt += `\n\n## ✏️ Editing Protocol (MANDATORY)
+          // 4. Add Shipwright-specific editing instructions (SURGICAL UPDATES)
+          systemPrompt += `\n\n## ✏️ Editing Protocol (MANDATORY - Surgical Updates)
 
-**CRITICAL: Every response that makes changes MUST include the UPDATED_DOCUMENT section.**
+**CRITICAL: Use SURGICAL UPDATES for fast, targeted editing.**
 
 When the user asks you to edit "${anchor.filename}":
 
 1. **Briefly** acknowledge what you're changing (1-2 sentences max)
-2. **Immediately** provide the UPDATED_DOCUMENT section with the full updated content
+2. **Identify which section** needs updating
+3. **Immediately** provide ONLY the updated section (not the full document)
 
 **Response Format (REQUIRED):**
 
 [1-2 sentence explanation of what you changed]
 
-UPDATED_DOCUMENT:
+UPDATED_SECTION: <section_identifier>
 \`\`\`markdown
-[The COMPLETE updated content of ${anchor.filename}]
+[ONLY the updated section content]
 \`\`\`
 
+**Section Identifiers:**
+- \`header\` - Name, contact info, title/headline at top of document
+- \`summary\` - Professional summary, about me, objective section
+- \`experience\` - Work experience, job history section
+- \`education\` - Education, certifications, courses section
+- \`skills\` - Technical skills, tools, technologies section
+- \`projects\` - Personal projects, portfolio items section
+- \`full_document\` - Use ONLY when user explicitly asks to rewrite entire document
+
+**Examples:**
+
+User: "Change my title to Senior Product Manager"
+You: "Updating your title in the header.
+
+UPDATED_SECTION: header
+\`\`\`markdown
+# Sarah Chen
+Senior Product Manager | Melbourne, AU
+sarah.chen@email.com | linkedin.com/in/sarahchen
+\`\`\`"
+
+User: "Add metrics to my Atlassian role"
+You: "Adding conversion and revenue metrics to your Atlassian experience.
+
+UPDATED_SECTION: experience
+\`\`\`markdown
+### Product Manager | Atlassian
+*Jan 2022 - Present | Sydney, AU*
+- Led checkout redesign → 15% conversion lift ($500K impact)
+- Shipped 3 major features used by 10M+ users
+\`\`\`"
+
 **Rules:**
-- ✅ ALWAYS include the UPDATED_DOCUMENT section when making changes
-- ✅ Return the FULL document, not just changed parts
-- ✅ Only edit "${anchor.filename}" - NEVER modify reference documents
-- ❌ DO NOT just describe changes - you MUST provide the updated document
-- ❌ DO NOT ask permission to make changes - just make them
-- ❌ DO NOT edit or mention other documents unless specifically asked
+- ✅ Use surgical updates (section-only) for targeted changes
+- ✅ Only use \`full_document\` if user says "rewrite" or "start over"
+- ✅ Preserve your teaching approach - explain WHY changes work better
+- ✅ Apply your ANZ tech career expertise to every edit
+- ❌ DO NOT regenerate sections that weren't changed
+- ❌ DO NOT edit reference documents (other anchors)
+- ❌ DO NOT ask permission - make the improvement and explain
 
 **If the request is unclear:** Ask ONE clarifying question, then wait for response.`
 
@@ -177,19 +277,29 @@ UPDATED_DOCUMENT:
           // Stream AI response using configurable model
           const aiStream = streamAIModel(modelConfig, messages)
 
-          // State machine for filtering UPDATED_DOCUMENT from chat
+          // State machine for filtering UPDATED_SECTION/UPDATED_DOCUMENT from chat
           let streamState: 'BEFORE_MARKER' | 'IN_DOCUMENT' | 'AFTER_MARKER' = 'BEFORE_MARKER'
           let documentBuffer = ''
 
           for await (const textChunk of aiStream) {
             fullResponse += textChunk
 
-            // Check if we've hit the UPDATED_DOCUMENT marker
-            if (streamState === 'BEFORE_MARKER' && fullResponse.includes('UPDATED_DOCUMENT:')) {
+            // Check if we've hit UPDATED_SECTION or UPDATED_DOCUMENT marker
+            const hasSectionMarker = /UPDATED_SECTION:\s*\w+/.test(fullResponse)
+            const hasDocumentMarker = fullResponse.includes('UPDATED_DOCUMENT:')
+
+            if (streamState === 'BEFORE_MARKER' && (hasSectionMarker || hasDocumentMarker)) {
               streamState = 'IN_DOCUMENT'
 
               // Send only the text BEFORE the marker to chat
-              const beforeMarker = fullResponse.split('UPDATED_DOCUMENT:')[0]
+              let beforeMarker: string
+              if (hasSectionMarker) {
+                const match = fullResponse.match(/UPDATED_SECTION:\s*\w+/)
+                beforeMarker = fullResponse.substring(0, match!.index)
+              } else {
+                beforeMarker = fullResponse.split('UPDATED_DOCUMENT:')[0]
+              }
+
               const alreadySent = fullResponse.length - textChunk.length
               const newChatContent = beforeMarker.substring(alreadySent)
 
@@ -219,11 +329,46 @@ UPDATED_DOCUMENT:
             }
           }
 
-          // Check if response contains updated document
-          const updateMarker = 'UPDATED_DOCUMENT:'
-          if (fullResponse.includes(updateMarker)) {
-            // Extract updated markdown
-            const afterMarker = fullResponse.split(updateMarker)[1]
+          // Check if response contains surgical section update
+          const sectionMarkerMatch = fullResponse.match(/UPDATED_SECTION:\s*(\w+)/)
+          if (sectionMarkerMatch) {
+            const sectionId = sectionMarkerMatch[1]
+            const afterMarker = fullResponse.split(sectionMarkerMatch[0])[1]
+            const codeBlockMatch = afterMarker.match(/```markdown\n([\s\S]*?)```/)
+
+            if (codeBlockMatch && codeBlockMatch[1]) {
+              const sectionContent = codeBlockMatch[1].trim()
+
+              // If full_document, replace entire document
+              if (sectionId === 'full_document') {
+                updatedMarkdown = sectionContent
+              } else {
+                // Surgical update: merge section into existing document
+                updatedMarkdown = mergeSectionIntoDocument(
+                  anchor.contentMarkdown,
+                  sectionId,
+                  sectionContent
+                )
+              }
+
+              // Save updated markdown to database
+              await prisma.contextAnchor.update({
+                where: { id: anchorId },
+                data: { contentMarkdown: updatedMarkdown }
+              })
+
+              // Send markdown update to client
+              const data = JSON.stringify({
+                type: 'markdown_update',
+                content: updatedMarkdown,
+                anchorId: anchorId,
+                version: version
+              })
+              controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+            }
+          } else if (fullResponse.includes('UPDATED_DOCUMENT:')) {
+            // Fallback: Legacy full document update (backwards compatibility)
+            const afterMarker = fullResponse.split('UPDATED_DOCUMENT:')[1]
             const codeBlockMatch = afterMarker.match(/```markdown\n([\s\S]*?)```/)
 
             if (codeBlockMatch && codeBlockMatch[1]) {
