@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getModelConfig } from '@/lib/ai-models'
 import { streamAIModel, ChatMessage } from '@/lib/ai-providers'
+import { getCommunityConfig, getCommunitySystemPrompt } from '@/lib/communities'
 
 export const dynamic = 'force-dynamic'
 
@@ -59,6 +60,15 @@ export async function POST(req: NextRequest) {
       })
     }
 
+    // Get community configuration for modular prompt composition
+    const communityConfig = getCommunityConfig(anchor.communityId)
+    if (!communityConfig) {
+      return new Response(JSON.stringify({ error: 'Community not found' }), {
+        status: 404,
+        headers: { 'Content-Type': 'application/json' }
+      })
+    }
+
     // Fetch ALL context anchors for this user/community (to give Shipwright full context)
     const allAnchors = await prisma.contextAnchor.findMany({
       where: {
@@ -80,8 +90,13 @@ export async function POST(req: NextRequest) {
           let fullResponse = ''
           let updatedMarkdown = anchor.contentMarkdown
 
-          // Build context section with all uploaded documents
-          let contextSection = `## Document Being Edited: ${anchor.filename}
+          // === MODULAR PROMPT COMPOSITION (Voyager Pattern) ===
+
+          // 1. Get base community system prompt with Shipwright mode
+          let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode: 'shipwright' })
+
+          // 2. Add context anchors section
+          systemPrompt += `\n\n## Document Being Edited: ${anchor.filename}
 \`\`\`markdown
 ${anchor.contentMarkdown}
 \`\`\``
@@ -89,16 +104,14 @@ ${anchor.contentMarkdown}
           // Add other context anchors if they exist
           const otherAnchors = allAnchors.filter(a => a.id !== anchor.id)
           if (otherAnchors.length > 0) {
-            contextSection += `\n\n## Additional Context Documents (for reference):\n`
+            systemPrompt += `\n\n## Additional Context Documents (for reference):\n`
             otherAnchors.forEach((otherAnchor, index) => {
-              contextSection += `\n### ${index + 1}. ${otherAnchor.filename}\n\`\`\`markdown\n${otherAnchor.contentMarkdown}\n\`\`\`\n`
+              systemPrompt += `\n### ${index + 1}. ${otherAnchor.filename}\n\`\`\`markdown\n${otherAnchor.contentMarkdown}\n\`\`\`\n`
             })
           }
 
-          // System prompt for Shipwright editing
-          const systemPrompt = `You are Shipwright, an AI document editor. You help users refine their documents through conversation.
-
-${contextSection}
+          // 3. Add Shipwright-specific editing instructions
+          systemPrompt += `\n\n## Editing Protocol
 
 When the user asks you to edit the document:
 1. Respond conversationally to acknowledge their request
