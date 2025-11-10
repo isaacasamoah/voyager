@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import ShipwrightModal from './ShipwrightModal'
 
 interface ContextAnchor {
   id: string
@@ -269,6 +270,14 @@ export default function ContextAnchors({ communityId }: ContextAnchorsProps) {
           ))
         )}
       </div>
+
+      {/* Shipwright Modal */}
+      {editingAnchorId && (
+        <ShipwrightModal
+          anchorId={editingAnchorId}
+          onClose={() => setEditingAnchorId(null)}
+        />
+      )}
     </div>
   )
 }
