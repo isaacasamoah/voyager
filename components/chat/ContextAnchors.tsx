@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+import ShipwrightModal from './ShipwrightModal'
 
 interface ContextAnchor {
   id: string
@@ -12,18 +13,21 @@ interface ContextAnchor {
 
 interface ContextAnchorsProps {
   communityId: string
+  branding?: any
 }
 
-export default function ContextAnchors({ communityId }: ContextAnchorsProps) {
+export default function ContextAnchors({ communityId, branding }: ContextAnchorsProps) {
   const [anchors, setAnchors] = useState<ContextAnchor[]>([])
   const [loading, setLoading] = useState(true)
   const [uploading, setUploading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [isDragging, setIsDragging] = useState(false)
+  const [editingAnchorId, setEditingAnchorId] = useState<string | null>(null)
 
   // Fetch context anchors on mount
   useEffect(() => {
     fetchAnchors()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [communityId])
 
   async function fetchAnchors() {
@@ -135,6 +139,10 @@ export default function ContextAnchors({ communityId }: ContextAnchorsProps) {
     }
   }
 
+  function handleEdit(anchorId: string) {
+    setEditingAnchorId(anchorId)
+  }
+
   function getFileIcon(fileType: string) {
     const iconClass = "w-4 h-4"
 
@@ -239,6 +247,17 @@ export default function ContextAnchors({ communityId }: ContextAnchorsProps) {
                 </p>
               </div>
 
+              {/* Edit Button */}
+              <button
+                onClick={() => handleEdit(anchor.id)}
+                className="flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-blue-50 rounded"
+                title="Edit with Shipwright"
+              >
+                <svg className="w-3 h-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                </svg>
+              </button>
+
               {/* Remove Button */}
               <button
                 onClick={() => handleRemove(anchor.id)}
@@ -253,6 +272,15 @@ export default function ContextAnchors({ communityId }: ContextAnchorsProps) {
           ))
         )}
       </div>
+
+      {/* Shipwright Modal */}
+      {editingAnchorId && (
+        <ShipwrightModal
+          anchorId={editingAnchorId}
+          onClose={() => setEditingAnchorId(null)}
+          branding={branding}
+        />
+      )}
     </div>
   )
 }

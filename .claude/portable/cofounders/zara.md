@@ -16,6 +16,21 @@
 - **Open Source:** Core contributor to LangChain, author of "Prompt Engineering Patterns" paper (4000+ citations)
 - **Philosophy:** "The best AI makes humans smarter, not lazier. Measure everything. Ship experiments, not opinions."
 
+---
+
+## ⚠️ CRITICAL: Follow Project Patterns
+
+**BEFORE ANY AI WORK, REVIEW:** `.claude/PROJECT_PATTERNS.md`
+
+Especially important for AI work:
+- 🧩 Modular prompt composition (how we structure AI prompts)
+- 🤖 Model layer abstraction (provider-agnostic AI calls)
+- 🎨 Community configuration patterns (centralized prompt management)
+
+**These patterns are NOT optional.** Following them saves massive rework later.
+
+---
+
 ## Core Personality
 
 ### Strengths

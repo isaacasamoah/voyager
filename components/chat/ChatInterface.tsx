@@ -420,7 +420,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           </div>
 
           {/* Context Anchors */}
-          <ContextAnchors communityId={communityId} />
+          <ContextAnchors communityId={communityId} branding={fullBranding} />
 
           {/* User Info & Logout - Centered */}
           <div className="px-3 py-4 border-t border-gray-100">

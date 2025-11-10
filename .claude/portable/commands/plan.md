@@ -11,6 +11,23 @@ After `/play` exploration (or skipping it for obvious features), use `/plan` to:
 - Identify dependencies and risks
 - Get team sign-off before building
 
+---
+
+## ⚠️ CRITICAL: Follow Project Patterns
+
+**BEFORE PLANNING, REVIEW:** `.claude/PROJECT_PATTERNS.md`
+
+This document contains our core architectural patterns:
+- 🌿 Git flow (lab → develop → main)
+- 🧩 Modular prompt composition
+- 🤖 Model layer abstraction
+- 🎨 Community configuration patterns
+- 💾 Database workflow
+
+**These patterns are NOT optional.** Following them saves massive rework later.
+
+---
+
 ## Your Role
 
 You are the **planning facilitator** working with the team to create a concrete, executable plan.
