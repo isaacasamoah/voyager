@@ -29,6 +29,7 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
   const [sending, setSending] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [currentVersion, setCurrentVersion] = useState(0)
+  const [lastUpdate, setLastUpdate] = useState<{ section: string; timestamp: number } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
 
@@ -134,6 +135,17 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
               setMarkdownContent(event.content)
               setCurrentVersion(event.version)
 
+              // Show update notification if we have a sectionId
+              if (event.sectionId && event.sectionId !== 'full_document') {
+                setLastUpdate({
+                  section: formatSectionName(event.sectionId),
+                  timestamp: Date.now()
+                })
+
+                // Auto-dismiss notification after 4 seconds
+                setTimeout(() => setLastUpdate(null), 4000)
+              }
+
               // Clear editing indicator after short delay
               setTimeout(() => setIsEditing(false), 1000)
             } else if (event.type === 'error') {
@@ -176,6 +188,11 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
       e.preventDefault()
       handleSend()
     }
+  }
+
+  // Format section ID for display (e.g., "experience" -> "Experience")
+  function formatSectionName(sectionId: string): string {
+    return sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
   }
 
   return (
@@ -278,12 +295,33 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
 
           {/* Right Pane - Markdown Preview */}
           <div className="h-1/2 md:h-full w-full md:w-1/2 flex flex-col bg-gray-50 min-h-0">
-            <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white flex-shrink-0 flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-700">Preview</h3>
-              {isEditing && (
-                <div className="flex items-center gap-2 text-xs" style={{ color: colors.primary }}>
-                  <div className="animate-pulse">●</div>
-                  <span>AI is editing...</span>
+            <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white flex-shrink-0 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-gray-700">Preview</h3>
+                {isEditing && (
+                  <div className="flex items-center gap-2 text-xs" style={{ color: colors.primary }}>
+                    <div className="animate-pulse">●</div>
+                    <span>AI is editing...</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Update Notification Banner */}
+              {lastUpdate && (
+                <div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded px-3 py-2 text-xs animate-slide-down">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="font-medium text-gray-700">Updated: {lastUpdate.section}</span>
+                  </div>
+                  <button
+                    onClick={() => setLastUpdate(null)}
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label="Dismiss notification"
+                  >
+                    ×
+                  </button>
                 </div>
               )}
             </div>
