@@ -177,15 +177,46 @@ UPDATED_DOCUMENT:
           // Stream AI response using configurable model
           const aiStream = streamAIModel(modelConfig, messages)
 
+          // State machine for filtering UPDATED_DOCUMENT from chat
+          let streamState: 'BEFORE_MARKER' | 'IN_DOCUMENT' | 'AFTER_MARKER' = 'BEFORE_MARKER'
+          let documentBuffer = ''
+
           for await (const textChunk of aiStream) {
             fullResponse += textChunk
 
-            // Send message chunk to client
-            const data = JSON.stringify({
-              type: 'message',
-              content: textChunk
-            })
-            controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+            // Check if we've hit the UPDATED_DOCUMENT marker
+            if (streamState === 'BEFORE_MARKER' && fullResponse.includes('UPDATED_DOCUMENT:')) {
+              streamState = 'IN_DOCUMENT'
+
+              // Send only the text BEFORE the marker to chat
+              const beforeMarker = fullResponse.split('UPDATED_DOCUMENT:')[0]
+              const alreadySent = fullResponse.length - textChunk.length
+              const newChatContent = beforeMarker.substring(alreadySent)
+
+              if (newChatContent) {
+                const data = JSON.stringify({
+                  type: 'message',
+                  content: newChatContent
+                })
+                controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+              }
+              continue
+            }
+
+            // If we're in document mode, buffer instead of streaming to chat
+            if (streamState === 'IN_DOCUMENT') {
+              documentBuffer += textChunk
+              continue
+            }
+
+            // Otherwise, stream to chat normally
+            if (streamState === 'BEFORE_MARKER') {
+              const data = JSON.stringify({
+                type: 'message',
+                content: textChunk
+              })
+              controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+            }
           }
 
           // Check if response contains updated document
