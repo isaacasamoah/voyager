@@ -1,6 +1,11 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
+
+// Dynamically import CodeMirror to avoid SSR issues
+const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false })
+const markdown = dynamic(() => import('@codemirror/lang-markdown').then(mod => mod.markdown), { ssr: false })
 
 interface Message {
   role: 'user' | 'assistant'
@@ -33,6 +38,11 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
   const [lastUpdate, setLastUpdate] = useState<{ section: string; timestamp: number } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  // Edit mode state
+  const [editMode, setEditMode] = useState<'ai' | 'manual'>('ai')
+  const [draftMarkdown, setDraftMarkdown] = useState('')
+  const [isSavingEdit, setIsSavingEdit] = useState(false)
 
   // Fetch the context anchor content on mount
   useEffect(() => {
@@ -230,6 +240,54 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     }
   }
 
+  // Handle switching to manual edit mode
+  function handleStartManualEdit() {
+    setDraftMarkdown(markdownContent) // Initialize draft with current content
+    setEditMode('manual')
+  }
+
+  // Handle saving manual edits
+  async function handleSaveManualEdit() {
+    setIsSavingEdit(true)
+
+    try {
+      // Save to database
+      const response = await fetch(`/api/context-anchors/${anchorId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentMarkdown: draftMarkdown
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save changes')
+      }
+
+      // Update local state (save previous for undo)
+      setPreviousMarkdown(markdownContent)
+      setMarkdownContent(draftMarkdown)
+
+      // Notify AI about the manual edit
+      const userMessage = "I just edited the document manually."
+      setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+
+      // Switch back to AI mode
+      setEditMode('ai')
+    } catch (error) {
+      console.error('Save edit error:', error)
+      alert('Failed to save changes. Please try again.')
+    } finally {
+      setIsSavingEdit(false)
+    }
+  }
+
+  // Handle canceling manual edit
+  function handleCancelManualEdit() {
+    setDraftMarkdown('') // Clear draft
+    setEditMode('ai')
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
       {/* Modal Container */}
@@ -343,12 +401,47 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
             </div>
           </div>
 
-          {/* Right Pane - Markdown Preview */}
+          {/* Right Pane - Markdown Preview/Editor */}
           <div className="h-1/2 md:h-full w-full md:w-1/2 flex flex-col bg-gray-50 min-h-0">
             <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white flex-shrink-0 flex flex-col gap-2">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-gray-700">Preview</h3>
-                {isEditing && (
+                <div className="flex items-center gap-3">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    {editMode === 'manual' ? 'Edit Document' : 'Preview'}
+                  </h3>
+                  {/* Mode Toggle - uses community colors */}
+                  <div className="flex items-center rounded-lg border border-gray-300 overflow-hidden">
+                    <button
+                      onClick={() => editMode === 'manual' ? handleCancelManualEdit() : setEditMode('ai')}
+                      disabled={editMode === 'ai' || isSavingEdit}
+                      className="px-3 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+                      style={editMode === 'ai' ? {
+                        backgroundColor: colors.primary,
+                        color: colors.userMessageText || '#ffffff'
+                      } : {
+                        backgroundColor: '#ffffff',
+                        color: colors.text
+                      }}
+                    >
+                      🤖 AI Edits
+                    </button>
+                    <button
+                      onClick={handleStartManualEdit}
+                      disabled={editMode === 'manual' || isSavingEdit}
+                      className="px-3 py-1 text-xs font-medium transition-colors border-l border-gray-300 disabled:cursor-not-allowed"
+                      style={editMode === 'manual' ? {
+                        backgroundColor: colors.primary,
+                        color: colors.userMessageText || '#ffffff'
+                      } : {
+                        backgroundColor: '#ffffff',
+                        color: colors.text
+                      }}
+                    >
+                      ✏️ You Edit
+                    </button>
+                  </div>
+                </div>
+                {isEditing && editMode === 'ai' && (
                   <div className="flex items-center gap-2 text-xs" style={{ color: colors.primary }}>
                     <div className="animate-pulse">●</div>
                     <span>AI is editing...</span>
@@ -392,7 +485,56 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                     </button>
                   </div>
                 </div>
+              ) : editMode === 'manual' ? (
+                /* Manual Edit Mode - CodeMirror editor */
+                <div className="h-full flex flex-col gap-3">
+                  <div className="flex-1 min-h-0 border border-gray-300 rounded-lg overflow-hidden">
+                    <CodeMirror
+                      value={draftMarkdown}
+                      height="100%"
+                      extensions={[markdown()]}
+                      onChange={(value) => setDraftMarkdown(value)}
+                      theme="light"
+                      basicSetup={{
+                        lineNumbers: true,
+                        highlightActiveLineGutter: true,
+                        foldGutter: false,
+                        dropCursor: true,
+                        allowMultipleSelections: true,
+                        indentOnInput: true,
+                        bracketMatching: true,
+                        closeBrackets: true,
+                        autocompletion: true,
+                        highlightActiveLine: true,
+                        highlightSelectionMatches: true
+                      }}
+                      className="h-full text-sm"
+                    />
+                  </div>
+                  {/* Save/Cancel buttons */}
+                  <div className="flex gap-2 justify-end flex-shrink-0">
+                    <button
+                      onClick={handleCancelManualEdit}
+                      disabled={isSavingEdit}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveManualEdit}
+                      disabled={isSavingEdit}
+                      className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.userMessageText || '#ffffff'
+                      }}
+                    >
+                      {isSavingEdit ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                </div>
               ) : (
+                /* AI Mode - Preview */
                 <div className="prose prose-sm max-w-none">
                   <pre className="whitespace-pre-wrap font-mono text-xs md:text-sm text-gray-800 bg-white p-3 md:p-4 rounded-lg border border-gray-200">
                     {markdownContent || '(empty document)'}
