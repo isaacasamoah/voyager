@@ -10,8 +10,9 @@
 ## THE SEQUENCE
 
 ```
-Beautiful Conversations → Economy Setup → Collab Spaces → Shipwright →
-Profile/Realms → Pilot Launch → Max Tier → Multi-Community → 100K Users
+Beautiful Conversations ✅ → Shipwright (Documents) ✅ → Economy Setup →
+Collab Spaces → Shipwright (Collab/Whiteboards) → Profile/Realms →
+Pilot Launch → Max Tier → Multi-Community → 100K Users
 ```
 
 **No timelines. Just: What's next? Ship it. Move to next.**
@@ -36,30 +37,32 @@ Profile/Realms → Pilot Launch → Max Tier → Multi-Community → 100K Users
 
 ---
 
-## NOW: CONTEXT ANCHORS + SHIPWRIGHT 🚧
+## RECENTLY SHIPPED: CONTEXT ANCHORS + SHIPWRIGHT (DOCUMENTS) ✅
 
 **What:** Context Anchors v1.0 (Document Upload & Shipwright Editing)
-**Status:** IN PROGRESS (Experiment 006)
+**Status:** SHIPPED - Document editing live, manual mode with CodeMirror working!
 **Milestone:** Users can upload docs, edit with AI, export polished artifacts
 
-### What We're Building
+### What We Shipped
 
 **Context Anchors (Inputs):**
-- Drag-and-drop document upload (PDF, DOCX, TXT, MD)
-- Parse to markdown, store voyage-specific
-- Display in sidebar with preview
-- Persist across conversations
+- ✅ Drag-and-drop document upload (PDF, DOCX, TXT, MD)
+- ✅ Parse to markdown, store voyage-specific
+- ✅ Display in sidebar with preview
+- ✅ Persist across conversations
 
 **Shipwright Integration (Process):**
-- Collaborative editing of Context Anchors
-- Live markdown preview
-- Conversational refinement with AI
-- Version tracking
+- ✅ Collaborative editing of Context Anchors
+- ✅ Live markdown preview
+- ✅ Conversational refinement with AI
+- ✅ Manual editing mode with CodeMirror
+- ✅ Version tracking with undo
+- ✅ Two-pane interface (chat + preview/editor)
 
 **Output Artifacts (Exports):**
-- Export edited docs as PDF
-- Save artifact history
-- Link to Shipwright sessions
+- ✅ Export edited docs as PDF
+- ✅ Save artifact history
+- ✅ Link to Shipwright sessions
 
 ### Why This Matters
 
@@ -72,8 +75,14 @@ Profile/Realms → Pilot Launch → Max Tier → Multi-Community → 100K Users
 
 - ✅ Users can upload documents via drag-and-drop
 - ✅ Documents parse and display correctly (95%+ accuracy)
-- ✅ Shipwright can edit and export as PDF
-- ✅ User feedback: "This actually helped me ship something"
+- ✅ Shipwright can edit with AI guidance
+- ✅ Manual editing with CodeMirror works beautifully
+- ⬜ Export as PDF (coming next)
+- ⬜ User feedback: "This actually helped me ship something"
+
+### Coming Soon: Shipwright for More
+- 📋 **Shipwright for Collab Spaces** - AI-guided question/response crafting
+- 📋 **Shipwright for Whiteboards** - Visual collaboration with AI guidance
 
 ### Team
 
@@ -251,23 +260,34 @@ Profile/Realms → Pilot Launch → Max Tier → Multi-Community → 100K Users
 
 ---
 
-## NEXT+2: AI-GUIDED COLLABORATION 📋
+## NOW: SHIPWRIGHT FOR COLLAB SPACES 📋
 
-**What:** Shipwright (v0.5.0)
-**Status:** PLANNING PHASE
+**What:** Shipwright v2 - Collab Spaces & Whiteboards (v0.5.0)
+**Status:** DESIGN PHASE - Documents done ✅, expanding to collaboration
 **Milestone:** AI-guided crafting validates, users love it
 
 ### What We're Building
 
-**Question Crafting Mode:**
+**Shipwright for Documents (SHIPPED ✅):**
+- ✅ Upload and edit documents with AI guidance
+- ✅ Manual editing mode with CodeMirror
+- ✅ Two-pane interface (chat + editor)
+- ✅ Version tracking with undo
+
+**Question Crafting Mode (Next):**
 - AI guides user to craft clear opening question for Collab Space
 - Asks clarifying questions (context, goal, success criteria)
 - Helps structure thinking (Elevation, not replacement)
 
-**Response Crafting Mode:**
+**Response Crafting Mode (Next):**
 - AI helps user craft thoughtful response to Collab Space
 - Sees full conversation context
 - Guides toward helpful, constructive contributions
+
+**Whiteboard Mode (Coming Soon):**
+- Visual collaboration with AI guidance
+- Structured thinking tools (frameworks, diagrams)
+- Export as images or documents
 
 **Draft System:**
 - Save drafts
@@ -275,8 +295,9 @@ Profile/Realms → Pilot Launch → Max Tier → Multi-Community → 100K Users
 - Post when ready
 
 **Works Everywhere:**
-- Navigator (solo conversations)
-- Collab Spaces (collaborative conversations)
+- ✅ Navigator (solo conversations with documents)
+- 📋 Collab Spaces (collaborative conversations)
+- 📋 Whiteboards (visual collaboration)
 
 ### Why This Matters
 
@@ -643,13 +664,16 @@ TBD - will create design doc during /play session
 
 ## SHIP LIST (In Order)
 
+**SHIPPED:**
+- ✅ v0.2.0: Beautiful Conversations
+- ✅ v0.2.5: Shipwright for Documents (Context Anchors + Manual Editing)
+
 **NOW:**
-- 🚧 v0.2.0: Beautiful Conversations
+- 📋 v0.3.0: Economy infrastructure
 
 **NEXT:**
-- 📋 v0.3.0: Economy infrastructure
 - 📋 v0.4.0: Collab Spaces (private → public)
-- 📋 v0.5.0: Shipwright
+- 📋 v0.5.0: Shipwright for Collab Spaces & Whiteboards
 - 📋 v0.6.0: Profile & Realms
 - 🎯 v0.7.0: Pilot launch with Eli
 
@@ -668,12 +692,14 @@ TBD - will create design doc during /play session
 
 **Product Ideas:**
 - Cross-community collaboration (spaces spanning communities)
-- Artifact Shipwrighting (co-write documents, proposals, whiteboards)
 - Enterprise features (SSO, advanced permissions, custom integrations)
 - Mobile apps (iOS, Android native)
 - Advanced AI features (fine-tuned models per community, voice interaction)
 - Tool marketplace monetization (users can charge for custom tools)
 - Educational integrations (LMS plugins, course creation)
+- Real-time collaborative editing (Google Docs style)
+- Voice/video in Collab Spaces
+- Advanced document templates and automation
 
 **Elinya's Strategic Questions (To Explore):**
 - Sister app for entrepreneurs (vision → reality)
