@@ -2,6 +2,15 @@
 
 Refine your work through collaborative editing until it's ready to share.
 
+## Current Status
+
+**✅ Available Now:**
+- **Document Editing** - Upload and edit documents with AI guidance + manual editing mode
+
+**📋 Coming Soon:**
+- **Collab Space Crafting** - AI-guided question and response crafting for collaborative spaces
+- **Whiteboard Mode** - Visual collaboration with AI guidance
+
 ---
 
 ## What Shipwright Does
@@ -16,7 +25,7 @@ Instead of just talking about what makes good writing, Shipwright helps you crea
 
 Shipwright works with three types of artifacts:
 
-### 📝 Messages
+### 📝 Messages 📋 COMING SOON
 Draft messages ready to send (emails, Slack posts, LinkedIn updates)
 
 **Example:**
@@ -25,21 +34,33 @@ Draft messages ready to send (emails, Slack posts, LinkedIn updates)
 - Together you refine until it feels right
 - Copy → Send
 
+*Note: Currently in design phase. Use Navigator mode for message drafting.*
+
 ---
 
-### 📄 Documents
+### 📄 Documents ✅ AVAILABLE NOW
 Polish uploaded files (resumes, cover letters, proposals)
+
+**Features:**
+- Two-pane interface: Chat with Shipwright + Live preview/editor
+- **AI Edit Mode**: Conversational refinement with live updates
+- **Manual Edit Mode**: Direct editing with CodeMirror markdown editor
+- Version tracking with one-level undo
+- Real-time preview as you chat or edit
+- Save changes to your Context Anchor
 
 **Example:**
 - Upload your resume as a Context Anchor
+- Click to edit with Shipwright (opens modal)
 - "Tailor this for the Sophie role"
 - Shipwright suggests improvements with rationale
-- Together you refine bullet points, add metrics, tighten language
-- Export as PDF → Submit
+- Switch to manual edit mode if you want to type directly
+- Watch live preview update as AI or you make changes
+- Save when ready → Export as PDF → Submit
 
 ---
 
-### 🎨 Whiteboards
+### 🎨 Whiteboards 📋 COMING SOON
 Clarify ideas through visual thinking (brainstorms, flows, wireframes)
 
 **Example:**
@@ -48,6 +69,8 @@ Clarify ideas through visual thinking (brainstorms, flows, wireframes)
 - Together you build the flow with sticky notes and arrows
 - When you can explain it to a 5-year-old, the idea is clear
 - Save or export for your team
+
+*Note: Visual collaboration mode in design phase. For now, use document mode for text-based brainstorming.*
 
 ---
 
