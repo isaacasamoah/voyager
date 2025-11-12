@@ -2,10 +2,10 @@
 
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
+import { markdown } from '@codemirror/lang-markdown'
 
 // Dynamically import CodeMirror to avoid SSR issues
 const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false })
-const markdown = dynamic(() => import('@codemirror/lang-markdown').then(mod => mod.markdown), { ssr: false })
 
 interface Message {
   role: 'user' | 'assistant'
