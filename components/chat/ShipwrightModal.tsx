@@ -44,6 +44,11 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
   const [draftMarkdown, setDraftMarkdown] = useState('')
   const [isSavingEdit, setIsSavingEdit] = useState(false)
 
+  // Export state
+  const [isExporting, setIsExporting] = useState(false)
+  const [filename, setFilename] = useState<string>('')
+  const [communityId] = useState('careersy') // TODO: Pass from props
+
   // Fetch the context anchor content on mount
   useEffect(() => {
     async function fetchAnchor() {
@@ -85,9 +90,16 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     // Add user message to chat
     setMessages(prev => [...prev, { role: 'user', content: userMessage }])
 
-    // Add empty assistant message that we'll stream into
-    const assistantMessageIndex = messages.length + 1
-    setMessages(prev => [...prev, { role: 'assistant', content: '' }])
+    // Track if we've added an assistant message yet
+    let assistantMessageAdded = false
+    let assistantMessageIndex = messages.length + 1
+    let hasMarkdownUpdate = false
+
+    // Track streaming preview
+    let streamingMarkdown = ''
+    let inMarkdownBlock = false
+    let sectionStarted = false
+    let savedPreviousMarkdown = false
 
     try {
       // Call streaming API with full conversation history
@@ -134,21 +146,63 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
             const event = JSON.parse(data)
 
             if (event.type === 'message') {
-              // Append to assistant message
-              setMessages(prev => {
-                const newMessages = [...prev]
-                newMessages[assistantMessageIndex] = {
-                  role: 'assistant',
-                  content: newMessages[assistantMessageIndex].content + event.content
+              // Create assistant message on first content
+              if (!assistantMessageAdded) {
+                setMessages(prev => [...prev, { role: 'assistant', content: event.content }])
+                assistantMessageAdded = true
+              } else {
+                // Append to existing assistant message
+                setMessages(prev => {
+                  const newMessages = [...prev]
+                  newMessages[assistantMessageIndex] = {
+                    role: 'assistant',
+                    content: newMessages[assistantMessageIndex].content + event.content
+                  }
+                  return newMessages
+                })
+              }
+
+              // Stream preview updates
+              // Look for UPDATED_SECTION: marker and subsequent markdown block
+              streamingMarkdown += event.content
+
+              // Check if we've entered a markdown block
+              if (!sectionStarted && streamingMarkdown.includes('UPDATED_SECTION:')) {
+                sectionStarted = true
+              }
+
+              if (sectionStarted) {
+                // Check if we've started the markdown code block
+                if (!inMarkdownBlock && streamingMarkdown.includes('```markdown')) {
+                  inMarkdownBlock = true
+                  setIsEditing(true)
                 }
-                return newMessages
-              })
+
+                // If we're in the markdown block, extract and show it in preview
+                if (inMarkdownBlock) {
+                  const markdownMatch = streamingMarkdown.match(/```markdown\n([\s\S]*?)(?:```|$)/)
+                  if (markdownMatch) {
+                    const partialMarkdown = markdownMatch[1]
+
+                    // Save previous markdown for undo (only once, before streaming starts)
+                    if (!savedPreviousMarkdown) {
+                      setMarkdownContent(prev => {
+                        setPreviousMarkdown(prev)
+                        return prev // Don't change it yet
+                      })
+                      savedPreviousMarkdown = true
+                    }
+
+                    // Stream this into the preview pane
+                    setMarkdownContent(partialMarkdown)
+                  }
+                }
+              }
             } else if (event.type === 'markdown_update') {
-              // Save previous version for undo
-              setMarkdownContent(prev => {
-                setPreviousMarkdown(prev)
-                return event.content
-              })
+              hasMarkdownUpdate = true
+              // Final update from backend (with surgical merge applied)
+              // Don't overwrite previousMarkdown - we already saved it during streaming
+              setMarkdownContent(event.content)
 
               setIsEditing(true)
               setCurrentVersion(event.version)
@@ -168,16 +222,50 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
               setTimeout(() => setIsEditing(false), 1000)
             } else if (event.type === 'error') {
               console.error('Stream error:', event.message)
-              setMessages(prev => {
-                const newMessages = [...prev]
-                newMessages[assistantMessageIndex] = {
+              if (!assistantMessageAdded) {
+                setMessages(prev => [...prev, {
                   role: 'assistant',
                   content: 'Sorry, something went wrong. Please try again.'
-                }
-                return newMessages
-              })
+                }])
+                assistantMessageAdded = true
+              } else {
+                setMessages(prev => {
+                  const newMessages = [...prev]
+                  newMessages[assistantMessageIndex] = {
+                    role: 'assistant',
+                    content: 'Sorry, something went wrong. Please try again.'
+                  }
+                  return newMessages
+                })
+              }
             } else if (event.type === 'done') {
-              // Stream complete
+              // Stream complete - add completion message if we had a markdown update
+              console.log('Stream done. hasMarkdownUpdate:', hasMarkdownUpdate, 'assistantMessageAdded:', assistantMessageAdded)
+
+              if (hasMarkdownUpdate) {
+                const completionMessage = "Finished - check the preview, what do you think?"
+                if (!assistantMessageAdded) {
+                  console.log('Adding new completion message')
+                  setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: completionMessage
+                  }])
+                } else {
+                  console.log('Appending completion to existing message at index:', assistantMessageIndex)
+                  // Append to existing message if there was chat content
+                  setMessages(prev => {
+                    const newMessages = [...prev]
+                    const currentContent = newMessages[assistantMessageIndex]?.content || ''
+                    newMessages[assistantMessageIndex] = {
+                      role: 'assistant',
+                      content: currentContent ? `${currentContent}\n\n${completionMessage}` : completionMessage
+                    }
+                    return newMessages
+                  })
+                }
+              } else {
+                console.log('No markdown update, skipping completion message')
+              }
               break
             }
           } catch (e) {
@@ -187,14 +275,21 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
       }
     } catch (error) {
       console.error('Send message error:', error)
-      setMessages(prev => {
-        const newMessages = [...prev]
-        newMessages[assistantMessageIndex] = {
+      if (!assistantMessageAdded) {
+        setMessages(prev => [...prev, {
           role: 'assistant',
           content: 'Sorry, I encountered an error. Please try again.'
-        }
-        return newMessages
-      })
+        }])
+      } else {
+        setMessages(prev => {
+          const newMessages = [...prev]
+          newMessages[assistantMessageIndex] = {
+            role: 'assistant',
+            content: 'Sorry, I encountered an error. Please try again.'
+          }
+          return newMessages
+        })
+      }
     } finally {
       setSending(false)
     }
@@ -288,6 +383,53 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     setEditMode('ai')
   }
 
+  // Handle export as markdown
+  async function handleExport() {
+    // Get filename from user
+    const userFilename = prompt('Enter filename (without extension):', filename || 'document')
+    if (!userFilename) return // User cancelled
+
+    setFilename(userFilename)
+    setIsExporting(true)
+
+    try {
+      const response = await fetch('/api/output-artifacts/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentMarkdown: markdownContent,
+          filename: userFilename,
+          artifactType: 'document',
+          communityId,
+          conversationId: null, // TODO: Track conversation ID
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to export')
+      }
+
+      const { artifact } = await response.json()
+
+      // Download the file
+      if (artifact.outputUrl) {
+        const link = document.createElement('a')
+        link.href = artifact.outputUrl
+        link.download = artifact.filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+
+      alert('Document exported successfully!')
+    } catch (error) {
+      console.error('Export error:', error)
+      alert('Failed to export document. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
       {/* Modal Container */}
@@ -298,6 +440,22 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
             Edit with Shipwright
           </h2>
           <div className="flex items-center gap-2">
+            {/* Export Button */}
+            <button
+              onClick={handleExport}
+              disabled={isExporting}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: colors.primary,
+              }}
+              title="Export as markdown"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              {isExporting ? 'Exporting...' : 'Export'}
+            </button>
+
             {/* Undo Button */}
             {previousMarkdown && (
               <button
@@ -361,12 +519,40 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                           color: colors.text
                         }}
                       >
-                        <p className="text-sm whitespace-pre-wrap break-words">
-                          {message.content}
-                        </p>
+                        <div className="text-sm whitespace-pre-wrap break-words">
+                          {message.content.split('\n').map((line, i) => (
+                            <span key={i}>
+                              {line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/).map((part, j) => {
+                                if (part.startsWith('**') && part.endsWith('**')) {
+                                  return <strong key={j}>{part.slice(2, -2)}</strong>
+                                } else if (part.startsWith('*') && part.endsWith('*')) {
+                                  return <em key={j}>{part.slice(1, -1)}</em>
+                                } else if (part.startsWith('`') && part.endsWith('`')) {
+                                  return <code key={j} className="bg-gray-200 px-1 rounded text-xs">{part.slice(1, -1)}</code>
+                                }
+                                return part
+                              })}
+                              {i < message.content.split('\n').length - 1 && <br />}
+                            </span>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   ))}
+
+                  {/* Loading indicator while AI is responding */}
+                  {sending && (
+                    <div className="flex justify-start w-full">
+                      <div className="max-w-[85%] rounded-lg p-3 bg-gray-100">
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
                   <div ref={messagesEndRef} />
                 </>
               )}
