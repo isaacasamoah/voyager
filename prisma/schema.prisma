@@ -8,25 +8,27 @@ datasource db {
 }
 
 model User {
-  id                     String       @id @default(cuid())
-  email                  String       @unique
+  id                     String            @id @default(cuid())
+  email                  String            @unique
   name                   String?
   image                  String?
-  createdAt              DateTime     @default(now())
-  updatedAt              DateTime     @updatedAt
+  createdAt              DateTime          @default(now())
+  updatedAt              DateTime          @updatedAt
   emailVerified          DateTime?
   stripeCurrentPeriodEnd DateTime?
-  stripeCustomerId       String?      @unique
+  stripeCustomerId       String?           @unique
   stripePriceId          String?
-  stripeSubscriptionId   String?      @unique
+  stripeSubscriptionId   String?           @unique
   resumeText             String?
-  communities            String[]     @default([])
+  communities            String[]          @default([])
   accounts               Account[]
   conversations          Conversation[]
   messages               Message[]
   sessions               Session[]
   validations            Validation[]
   votes                  Vote[]
+  contextAnchors         ContextAnchor[]
+  outputArtifacts        OutputArtifact[]
 }
 
 model Account {
@@ -190,4 +192,37 @@ model CartographerSession {
   @@index([communityId])
   @@index([timestamp])
   @@index([processed])
+}
+
+model ContextAnchor {
+  id              String   @id @default(cuid())
+  userId          String
+  communityId     String
+  filename        String
+  fileType        String   // pdf, docx, txt, md
+  contentMarkdown String   @db.Text
+  originalUrl     String?  // Vercel Blob URL for original file
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, communityId])
+}
+
+model OutputArtifact {
+  id              String   @id @default(cuid())
+  userId          String
+  communityId     String
+  artifactType    String   // resume, cover-letter, linkedin-post, email
+  filename        String
+  contentMarkdown String   @db.Text
+  outputUrl       String?  // PDF in Vercel Blob
+  conversationId  String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, communityId])
 }

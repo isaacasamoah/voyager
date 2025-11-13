@@ -5,9 +5,11 @@ import { useSession, signOut } from 'next-auth/react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import ChatMessage from './ChatMessage'
-import ResumeModal from './ResumeModal'
+import ContextModal from './ContextModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
 import CommandAutocomplete from './CommandAutocomplete'
+import ContextAnchors from './ContextAnchors'
+import OutputArtifacts from './OutputArtifacts'
 import { getTutorialSteps } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
 import { getVoyageTerminology } from '@/lib/terminology'
@@ -153,17 +155,27 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
     }
   }
 
-  const saveResume = async (resumeText: string) => {
-    const response = await fetch('/api/resume', {
+  const saveContext = async (content: string, filename: string) => {
+    // Create a text-based Context Anchor
+    const formData = new FormData()
+
+    // Create a blob with text content
+    const blob = new Blob([content], { type: 'text/plain' })
+    const file = new File([blob], filename + '.txt', { type: 'text/plain' })
+
+    formData.append('file', file)
+    formData.append('communityId', communityId)
+
+    const response = await fetch('/api/context-anchors/upload', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ resumeText }),
+      body: formData,
     })
 
     if (!response.ok) {
-      throw new Error('Failed to save resume')
+      throw new Error('Failed to save context')
     }
 
+    // Optionally still track hasResume for UI indicator
     setHasResume(true)
   }
 
@@ -408,6 +420,16 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             )}
           </div>
 
+          {/* Context Anchors (Full Voyager mode only) */}
+          {!(communityId === 'careersy' && abTestMode === 'basic') && (
+            <ContextAnchors communityId={communityId} branding={fullBranding} />
+          )}
+
+          {/* Output Artifacts (Full Voyager mode only) */}
+          {!(communityId === 'careersy' && abTestMode === 'basic') && (
+            <OutputArtifacts communityId={communityId} branding={fullBranding} />
+          )}
+
           {/* User Info & Logout - Centered */}
           <div className="px-3 py-4 border-t border-gray-100">
             <div className="flex flex-col items-center mb-3">
@@ -455,44 +477,6 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             </button>
           </div>
 
-          {/* Center: Mode Switcher (Expert Only, Full Voyager Mode) */}
-          {isExpert && !(communityId === 'careersy' && abTestMode === 'basic') && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-              <button
-                onClick={() => {
-                  if (currentMode !== 'navigator') {
-                    setPreviousMode(currentMode)
-                    setCurrentMode('navigator')
-                  }
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  currentMode === 'navigator'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                title="Navigator mode - Private coaching"
-              >
-                🧭 Navigator
-              </button>
-              <button
-                onClick={() => {
-                  if (currentMode !== 'cartographer') {
-                    setPreviousMode(currentMode)
-                    setCurrentMode('cartographer')
-                  }
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  currentMode === 'cartographer'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                title="Cartographer mode - Share knowledge"
-              >
-                🗺️ Cartographer
-              </button>
-            </div>
-          )}
-
           {/* Right: New Chat Button */}
           <button
             onClick={startNewChat}
@@ -517,8 +501,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                 abTestMode === 'basic' ? 'text-blue-700' : 'text-purple-700'
               }`}>
                 {abTestMode === 'basic'
-                  ? '🔵 A/B TEST: Basic Mode (GPT + Domain)'
-                  : '🟣 A/B TEST: Full Voyager (Claude + Constitutional + Cartographer)'}
+                  ? '🔵 A/B TEST: Basic Mode (Chatbot + Domain Expertise)'
+                  : '🟣 A/B TEST: Full Voyager (Claude + Constitutional + Shipwright + Context Anchors + Outputs)'}
               </span>
               <button
                 onClick={() => setAbTestMode(abTestMode === 'basic' ? 'full' : 'basic')}
@@ -662,11 +646,12 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
         </form>
       </div>
 
-      {/* Resume Modal */}
-      <ResumeModal
+      {/* Context Modal */}
+      <ContextModal
         isOpen={showResumeModal}
         onClose={() => setShowResumeModal(false)}
-        onSave={saveResume}
+        onSave={saveContext}
+        communityId={communityId}
       />
 
       {/* Tutorial Overlay */}

@@ -137,6 +137,9 @@ export async function POST(req: NextRequest) {
       systemPrompt += `\n\nUser's Resume:\n${user.resumeText}\n\nUse this resume to provide personalized advice based on their actual experience, skills, and background.`
     }
 
+    // Note: Context anchors are added in chat-stream endpoint (where AI actually runs)
+    // This endpoint is only for saving messages to DB after streaming completes
+
     const messages: ChatMessage[] = [
       { role: 'system', content: systemPrompt },
       ...conversation.messages.map(m => ({

@@ -1,0 +1,736 @@
+'use client'
+
+import { useState, useEffect, useRef } from 'react'
+import dynamic from 'next/dynamic'
+import { markdown } from '@codemirror/lang-markdown'
+
+// Dynamically import CodeMirror to avoid SSR issues
+const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false })
+
+interface Message {
+  role: 'user' | 'assistant'
+  content: string
+}
+
+interface ShipwrightModalProps {
+  anchorId: string
+  onClose: () => void
+  branding?: any
+}
+
+export default function ShipwrightModal({ anchorId, onClose, branding }: ShipwrightModalProps) {
+  // Use community colors or fallback to Voyager defaults
+  const colors = branding?.colors || {
+    primary: '#000000',
+    background: '#ffffff',
+    text: '#000000',
+    textSecondary: '#6b7280',
+  }
+  const [markdownContent, setMarkdownContent] = useState('')
+  const [previousMarkdown, setPreviousMarkdown] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [loadError, setLoadError] = useState<string | null>(null)
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState('')
+  const [sending, setSending] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [currentVersion, setCurrentVersion] = useState(0)
+  const [lastUpdate, setLastUpdate] = useState<{ section: string; timestamp: number } | null>(null)
+  const messagesEndRef = useRef<HTMLDivElement>(null)
+  const inputRef = useRef<HTMLTextAreaElement>(null)
+
+  // Edit mode state
+  const [editMode, setEditMode] = useState<'ai' | 'manual'>('ai')
+  const [draftMarkdown, setDraftMarkdown] = useState('')
+  const [isSavingEdit, setIsSavingEdit] = useState(false)
+
+  // Export state
+  const [isExporting, setIsExporting] = useState(false)
+  const [filename, setFilename] = useState<string>('')
+  const [communityId] = useState('careersy') // TODO: Pass from props
+
+  // Fetch the context anchor content on mount
+  useEffect(() => {
+    async function fetchAnchor() {
+      try {
+        setLoading(true)
+        setLoadError(null)
+        const response = await fetch(`/api/context-anchors/${anchorId}`)
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch context anchor')
+        }
+
+        const data = await response.json()
+        setMarkdownContent(data.anchor.contentMarkdown || '')
+      } catch (error) {
+        console.error('Error fetching anchor:', error)
+        setLoadError('Failed to load document. Please try closing and reopening.')
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchAnchor()
+  }, [anchorId])
+
+  // Auto-scroll to bottom when messages change
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [messages])
+
+  // Handle sending message with streaming
+  async function handleSend() {
+    if (!input.trim() || sending) return
+
+    const userMessage = input.trim()
+    setInput('')
+    setSending(true)
+
+    // Add user message to chat
+    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+
+    // Track if we've added an assistant message yet
+    let assistantMessageAdded = false
+    let assistantMessageIndex = messages.length + 1
+    let hasMarkdownUpdate = false
+
+    // Track streaming preview
+    let streamingMarkdown = ''
+    let inMarkdownBlock = false
+    let sectionStarted = false
+    let savedPreviousMarkdown = false
+
+    try {
+      // Call streaming API with full conversation history
+      // Filter out empty messages (Anthropic API rejects empty content)
+      const validMessages = messages.filter(msg => msg.content.trim().length > 0)
+
+      const response = await fetch('/api/shipwright/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          anchorId,
+          message: userMessage,
+          conversationHistory: validMessages  // Only send messages with content
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to send message')
+      }
+
+      // Parse SSE stream
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+
+      if (!reader) {
+        throw new Error('No response stream')
+      }
+
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        buffer += decoder.decode(value, { stream: true })
+        const lines = buffer.split('\n')
+        buffer = lines.pop() || ''
+
+        for (const line of lines) {
+          if (!line.trim() || !line.startsWith('data: ')) continue
+
+          const data = line.slice(6) // Remove 'data: ' prefix
+          try {
+            const event = JSON.parse(data)
+
+            if (event.type === 'message') {
+              // Create assistant message on first content
+              if (!assistantMessageAdded) {
+                setMessages(prev => [...prev, { role: 'assistant', content: event.content }])
+                assistantMessageAdded = true
+              } else {
+                // Append to existing assistant message
+                setMessages(prev => {
+                  const newMessages = [...prev]
+                  newMessages[assistantMessageIndex] = {
+                    role: 'assistant',
+                    content: newMessages[assistantMessageIndex].content + event.content
+                  }
+                  return newMessages
+                })
+              }
+
+              // Stream preview updates
+              // Look for UPDATED_SECTION: marker and subsequent markdown block
+              streamingMarkdown += event.content
+
+              // Check if we've entered a markdown block
+              if (!sectionStarted && streamingMarkdown.includes('UPDATED_SECTION:')) {
+                sectionStarted = true
+              }
+
+              if (sectionStarted) {
+                // Check if we've started the markdown code block
+                if (!inMarkdownBlock && streamingMarkdown.includes('```markdown')) {
+                  inMarkdownBlock = true
+                  setIsEditing(true)
+                }
+
+                // If we're in the markdown block, extract and show it in preview
+                if (inMarkdownBlock) {
+                  const markdownMatch = streamingMarkdown.match(/```markdown\n([\s\S]*?)(?:```|$)/)
+                  if (markdownMatch) {
+                    const partialMarkdown = markdownMatch[1]
+
+                    // Save previous markdown for undo (only once, before streaming starts)
+                    if (!savedPreviousMarkdown) {
+                      setMarkdownContent(prev => {
+                        setPreviousMarkdown(prev)
+                        return prev // Don't change it yet
+                      })
+                      savedPreviousMarkdown = true
+                    }
+
+                    // Stream this into the preview pane
+                    setMarkdownContent(partialMarkdown)
+                  }
+                }
+              }
+            } else if (event.type === 'markdown_update') {
+              hasMarkdownUpdate = true
+              // Final update from backend (with surgical merge applied)
+              // Don't overwrite previousMarkdown - we already saved it during streaming
+              setMarkdownContent(event.content)
+
+              setIsEditing(true)
+              setCurrentVersion(event.version)
+
+              // Show update notification if we have a sectionId
+              if (event.sectionId && event.sectionId !== 'full_document') {
+                setLastUpdate({
+                  section: formatSectionName(event.sectionId),
+                  timestamp: Date.now()
+                })
+
+                // Auto-dismiss notification after 4 seconds
+                setTimeout(() => setLastUpdate(null), 4000)
+              }
+
+              // Clear editing indicator after short delay
+              setTimeout(() => setIsEditing(false), 1000)
+            } else if (event.type === 'error') {
+              console.error('Stream error:', event.message)
+              if (!assistantMessageAdded) {
+                setMessages(prev => [...prev, {
+                  role: 'assistant',
+                  content: 'Sorry, something went wrong. Please try again.'
+                }])
+                assistantMessageAdded = true
+              } else {
+                setMessages(prev => {
+                  const newMessages = [...prev]
+                  newMessages[assistantMessageIndex] = {
+                    role: 'assistant',
+                    content: 'Sorry, something went wrong. Please try again.'
+                  }
+                  return newMessages
+                })
+              }
+            } else if (event.type === 'done') {
+              // Stream complete - add completion message if we had a markdown update
+              console.log('Stream done. hasMarkdownUpdate:', hasMarkdownUpdate, 'assistantMessageAdded:', assistantMessageAdded)
+
+              if (hasMarkdownUpdate) {
+                const completionMessage = "Finished - check the preview, what do you think?"
+                if (!assistantMessageAdded) {
+                  console.log('Adding new completion message')
+                  setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: completionMessage
+                  }])
+                } else {
+                  console.log('Appending completion to existing message at index:', assistantMessageIndex)
+                  // Append to existing message if there was chat content
+                  setMessages(prev => {
+                    const newMessages = [...prev]
+                    const currentContent = newMessages[assistantMessageIndex]?.content || ''
+                    newMessages[assistantMessageIndex] = {
+                      role: 'assistant',
+                      content: currentContent ? `${currentContent}\n\n${completionMessage}` : completionMessage
+                    }
+                    return newMessages
+                  })
+                }
+              } else {
+                console.log('No markdown update, skipping completion message')
+              }
+              break
+            }
+          } catch (e) {
+            console.error('Failed to parse SSE event:', e)
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Send message error:', error)
+      if (!assistantMessageAdded) {
+        setMessages(prev => [...prev, {
+          role: 'assistant',
+          content: 'Sorry, I encountered an error. Please try again.'
+        }])
+      } else {
+        setMessages(prev => {
+          const newMessages = [...prev]
+          newMessages[assistantMessageIndex] = {
+            role: 'assistant',
+            content: 'Sorry, I encountered an error. Please try again.'
+          }
+          return newMessages
+        })
+      }
+    } finally {
+      setSending(false)
+    }
+  }
+
+  // Handle Enter key to send
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  // Format section ID for display (e.g., "experience" -> "Experience")
+  function formatSectionName(sectionId: string): string {
+    return sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
+  }
+
+  // Handle undo - revert to previous markdown version
+  async function handleUndo() {
+    if (!previousMarkdown) return
+
+    try {
+      // Save to database
+      const response = await fetch(`/api/context-anchors/${anchorId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentMarkdown: previousMarkdown
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to undo changes')
+      }
+
+      // Update UI
+      setMarkdownContent(previousMarkdown)
+      setPreviousMarkdown(null) // Clear undo history after reverting
+    } catch (error) {
+      console.error('Undo error:', error)
+      alert('Failed to undo changes. Please try again.')
+    }
+  }
+
+  // Handle switching to manual edit mode
+  function handleStartManualEdit() {
+    setDraftMarkdown(markdownContent) // Initialize draft with current content
+    setEditMode('manual')
+  }
+
+  // Handle saving manual edits
+  async function handleSaveManualEdit() {
+    setIsSavingEdit(true)
+
+    try {
+      // Save to database
+      const response = await fetch(`/api/context-anchors/${anchorId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentMarkdown: draftMarkdown
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to save changes')
+      }
+
+      // Update local state (save previous for undo)
+      setPreviousMarkdown(markdownContent)
+      setMarkdownContent(draftMarkdown)
+
+      // Notify AI about the manual edit
+      const userMessage = "I just edited the document manually."
+      setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+
+      // Switch back to AI mode
+      setEditMode('ai')
+    } catch (error) {
+      console.error('Save edit error:', error)
+      alert('Failed to save changes. Please try again.')
+    } finally {
+      setIsSavingEdit(false)
+    }
+  }
+
+  // Handle canceling manual edit
+  function handleCancelManualEdit() {
+    setDraftMarkdown('') // Clear draft
+    setEditMode('ai')
+  }
+
+  // Handle export as markdown
+  async function handleExport() {
+    // Get filename from user
+    const userFilename = prompt('Enter filename (without extension):', filename || 'document')
+    if (!userFilename) return // User cancelled
+
+    setFilename(userFilename)
+    setIsExporting(true)
+
+    try {
+      const response = await fetch('/api/output-artifacts/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentMarkdown: markdownContent,
+          filename: userFilename,
+          artifactType: 'document',
+          communityId,
+          conversationId: null, // TODO: Track conversation ID
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to export')
+      }
+
+      const { artifact } = await response.json()
+
+      // Download the file
+      if (artifact.outputUrl) {
+        const link = document.createElement('a')
+        link.href = artifact.outputUrl
+        link.download = artifact.filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+
+      alert('Document exported successfully!')
+    } catch (error) {
+      console.error('Export error:', error)
+      alert('Failed to export document. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+      {/* Modal Container */}
+      <div className="w-full h-full max-w-[100vw] max-h-[100vh] bg-white flex flex-col">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200">
+          <h2 className="text-lg font-semibold text-gray-900">
+            Edit with Shipwright
+          </h2>
+          <div className="flex items-center gap-2">
+            {/* Export Button */}
+            <button
+              onClick={handleExport}
+              disabled={isExporting}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: colors.primary,
+              }}
+              title="Export as markdown"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              {isExporting ? 'Exporting...' : 'Export'}
+            </button>
+
+            {/* Undo Button */}
+            {previousMarkdown && (
+              <button
+                onClick={handleUndo}
+                className="flex items-center gap-1 px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors border border-gray-300"
+                title="Undo last change"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
+                </svg>
+                Undo
+              </button>
+            )}
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              title="Close"
+            >
+              <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* Two-pane layout - stacks vertically on mobile, side-by-side on desktop */}
+        <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+          {/* Left Pane - Chat Interface */}
+          <div className="h-1/2 md:h-full w-full md:w-1/2 border-b md:border-b-0 md:border-r border-gray-200 flex flex-col min-h-0">
+            <div className="px-4 py-3 border-b border-gray-200 bg-white md:hidden flex-shrink-0">
+              <h3 className="text-sm font-semibold text-gray-700">Chat</h3>
+            </div>
+
+            {/* Messages */}
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0 space-y-4">
+              {messages.length === 0 ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center max-w-sm">
+                    <p className="text-sm text-gray-500 mb-2">
+                      Start editing your document by chatting with Shipwright
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      Try: &ldquo;Fix the formatting&rdquo; or &ldquo;Make this more concise&rdquo;
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} w-full`}
+                    >
+                      <div
+                        className="max-w-[85%] rounded-lg p-3"
+                        style={message.role === 'user' ? {
+                          backgroundColor: colors.primary,
+                          color: branding?.colors?.userMessageText || '#ffffff'
+                        } : {
+                          backgroundColor: '#f3f4f6',
+                          color: colors.text
+                        }}
+                      >
+                        <div className="text-sm whitespace-pre-wrap break-words">
+                          {message.content.split('\n').map((line, i) => (
+                            <span key={i}>
+                              {line.split(/(\*\*[^*]+\*\*|\*[^*]+\*|`[^`]+`)/).map((part, j) => {
+                                if (part.startsWith('**') && part.endsWith('**')) {
+                                  return <strong key={j}>{part.slice(2, -2)}</strong>
+                                } else if (part.startsWith('*') && part.endsWith('*')) {
+                                  return <em key={j}>{part.slice(1, -1)}</em>
+                                } else if (part.startsWith('`') && part.endsWith('`')) {
+                                  return <code key={j} className="bg-gray-200 px-1 rounded text-xs">{part.slice(1, -1)}</code>
+                                }
+                                return part
+                              })}
+                              {i < message.content.split('\n').length - 1 && <br />}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+
+                  {/* Loading indicator while AI is responding */}
+                  {sending && (
+                    <div className="flex justify-start w-full">
+                      <div className="max-w-[85%] rounded-lg p-3 bg-gray-100">
+                        <div className="flex items-center gap-1">
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                          <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <div ref={messagesEndRef} />
+                </>
+              )}
+            </div>
+
+            {/* Input */}
+            <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+              <div className="flex gap-2">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Type a message..."
+                  disabled={sending}
+                  className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-400"
+                  style={{ '--tw-ring-color': colors.primary } as any}
+                  rows={2}
+                />
+                <button
+                  onClick={handleSend}
+                  disabled={!input.trim() || sending}
+                  className="px-4 py-2 rounded-lg disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex-shrink-0 text-sm font-medium"
+                  style={!input.trim() || sending ? {} : {
+                    backgroundColor: colors.primary,
+                    color: branding?.colors?.userMessageText || '#ffffff'
+                  }}
+                >
+                  {sending ? '...' : 'Send'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Pane - Markdown Preview/Editor */}
+          <div className="h-1/2 md:h-full w-full md:w-1/2 flex flex-col bg-gray-50 min-h-0">
+            <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white flex-shrink-0 flex flex-col gap-2">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <h3 className="text-sm font-semibold text-gray-700">
+                    {editMode === 'manual' ? 'Edit Document' : 'Preview'}
+                  </h3>
+                  {/* Mode Toggle - uses community colors */}
+                  <div className="flex items-center rounded-lg border border-gray-300 overflow-hidden">
+                    <button
+                      onClick={() => editMode === 'manual' ? handleCancelManualEdit() : setEditMode('ai')}
+                      disabled={editMode === 'ai' || isSavingEdit}
+                      className="px-3 py-1 text-xs font-medium transition-colors disabled:cursor-not-allowed"
+                      style={editMode === 'ai' ? {
+                        backgroundColor: colors.primary,
+                        color: colors.userMessageText || '#ffffff'
+                      } : {
+                        backgroundColor: '#ffffff',
+                        color: colors.text
+                      }}
+                    >
+                      🤖 AI Edits
+                    </button>
+                    <button
+                      onClick={handleStartManualEdit}
+                      disabled={editMode === 'manual' || isSavingEdit}
+                      className="px-3 py-1 text-xs font-medium transition-colors border-l border-gray-300 disabled:cursor-not-allowed"
+                      style={editMode === 'manual' ? {
+                        backgroundColor: colors.primary,
+                        color: colors.userMessageText || '#ffffff'
+                      } : {
+                        backgroundColor: '#ffffff',
+                        color: colors.text
+                      }}
+                    >
+                      ✏️ You Edit
+                    </button>
+                  </div>
+                </div>
+                {isEditing && editMode === 'ai' && (
+                  <div className="flex items-center gap-2 text-xs" style={{ color: colors.primary }}>
+                    <div className="animate-pulse">●</div>
+                    <span>AI is editing...</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Update Notification Banner */}
+              {lastUpdate && (
+                <div className="flex items-center justify-between bg-yellow-50 border border-yellow-200 rounded px-3 py-2 text-xs animate-slide-down">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    <span className="font-medium text-gray-700">Updated: {lastUpdate.section}</span>
+                  </div>
+                  <button
+                    onClick={() => setLastUpdate(null)}
+                    className="text-gray-500 hover:text-gray-700 transition-colors"
+                    aria-label="Dismiss notification"
+                  >
+                    ×
+                  </button>
+                </div>
+              )}
+            </div>
+            <div className="flex-1 p-4 md:p-6 overflow-y-auto min-h-0">
+              {loading ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-sm text-gray-400">Loading...</div>
+                </div>
+              ) : loadError ? (
+                <div className="flex items-center justify-center h-full">
+                  <div className="text-center max-w-sm">
+                    <p className="text-sm text-red-600 mb-2">{loadError}</p>
+                    <button
+                      onClick={onClose}
+                      className="text-xs text-gray-500 underline hover:text-gray-700"
+                    >
+                      Close and try again
+                    </button>
+                  </div>
+                </div>
+              ) : editMode === 'manual' ? (
+                /* Manual Edit Mode - CodeMirror editor */
+                <div className="h-full flex flex-col gap-3">
+                  <div className="flex-1 min-h-0 border border-gray-300 rounded-lg overflow-hidden">
+                    <CodeMirror
+                      value={draftMarkdown}
+                      height="100%"
+                      extensions={[markdown()]}
+                      onChange={(value) => setDraftMarkdown(value)}
+                      theme="light"
+                      basicSetup={{
+                        lineNumbers: true,
+                        highlightActiveLineGutter: true,
+                        foldGutter: false,
+                        dropCursor: true,
+                        allowMultipleSelections: true,
+                        indentOnInput: true,
+                        bracketMatching: true,
+                        closeBrackets: true,
+                        autocompletion: true,
+                        highlightActiveLine: true,
+                        highlightSelectionMatches: true
+                      }}
+                      className="h-full text-sm"
+                    />
+                  </div>
+                  {/* Save/Cancel buttons */}
+                  <div className="flex gap-2 justify-end flex-shrink-0">
+                    <button
+                      onClick={handleCancelManualEdit}
+                      disabled={isSavingEdit}
+                      className="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleSaveManualEdit}
+                      disabled={isSavingEdit}
+                      className="px-4 py-2 text-sm font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      style={{
+                        backgroundColor: colors.primary,
+                        color: colors.userMessageText || '#ffffff'
+                      }}
+                    >
+                      {isSavingEdit ? 'Saving...' : 'Save Changes'}
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                /* AI Mode - Preview */
+                <div className="prose prose-sm max-w-none">
+                  <pre className="whitespace-pre-wrap font-mono text-xs md:text-sm text-gray-800 bg-white p-3 md:p-4 rounded-lg border border-gray-200">
+                    {markdownContent || '(empty document)'}
+                  </pre>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

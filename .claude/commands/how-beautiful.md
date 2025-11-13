@@ -37,6 +37,18 @@ Score each dimension (1-5):
 - Did responses build specifically on user's message?
 - Generic test: Could response follow any message? (fail if yes)
 
+**6. Conversational Space (DOUBLE WEIGHTED)**
+- Did the AI create pause points for user input?
+- Did it check understanding before executing?
+- Did it invite collaboration vs. just doing?
+
+**Scoring for Conversational Space:**
+- 5: Multiple natural pause points, invited input at key moments
+- 4: At least one clear pause before taking action
+- 3: Explained but didn't pause for confirmation
+- 2: Acted without checking understanding first
+- 1: No explanation, just executed without user involvement
+
 ## Output Format
 
 ```
@@ -51,8 +63,10 @@ DIMENSION SCORES:
 3. Question Rhythm: [score]/5 - [one line reasoning]
 4. Energy Mirror: [score]/5 - [one line reasoning]
 5. Smooth Transitions: [score]/5 - [one line reasoning]
+6. Conversational Space: [score]/5 (×2 weight) - [one line reasoning]
 
-OVERALL FLOW: [score]/5 - [Beautiful/Good/Adequate/Poor/Broken]
+OVERALL FLOW: [weighted score]/5 - [Beautiful/Good/Adequate/Poor/Broken]
+Calculation: (1+2+3+4+5 + (6×2)) / 10
 
 WHAT WORKED:
 - [1-2 specific strengths]

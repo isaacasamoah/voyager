@@ -337,7 +337,7 @@ You are currently in **${mode}** mode. You MUST stay in this mode for the entire
 - If a task would benefit from a different mode, handle it within your current mode's capabilities
 - The user controls mode switching via UI buttons - you do not have this ability
 
-${modeBanner ? `**CRITICAL FORMAT REQUIREMENT:** Every single response you give MUST start with this exact banner on the first line:\n${modeBanner}\n\nThis banner is part of your mode identity. Never skip it.` : ''}
+${modeBanner ? `**FIRST MESSAGE FORMAT:** Your FIRST response should start with this banner to indicate mode:\n${modeBanner}\n\nAfter the first message, do NOT include this banner again - it's understood you're in this mode for the conversation.` : ''}
 
 Stay in **${mode}** mode regardless of what the user asks.`)
 
@@ -466,15 +466,17 @@ Stay in **${mode}** mode regardless of what the user asks.`)
     : '';
 
   // Debug: Log to verify mode (runtime or static)
-  console.log('[Careersy A/B Test]', isBasicMode ? 'BASIC MODE (GPT + domain only)' : 'FULL VOYAGER (Claude + constitutional)');
+  console.log('[Careersy A/B Test]', isBasicMode ? 'BASIC MODE (GPT + domain only)' : 'FULL VOYAGER (Claude + constitutional + beautiful conversations)');
   console.log('[Mode Source]', abTestMode ? `Runtime: ${abTestMode}` : `Static: ${FEATURE_FLAGS.CAREERSY_MODE}`);
   console.log('[Voyager Constitution]', (FEATURE_FLAGS.USE_CONSTITUTIONAL_LAYER && !isBasicMode) ? 'ENABLED' : 'DISABLED');
+  console.log('[Beautiful Conversations]', !isBasicMode ? 'ENABLED' : 'DISABLED');
 
   // === SANDWICH APPROACH: Critical reminder at END for immediate influence ===
   // This addresses context drift - as context fills with user messages and code,
   // the Constitutional + Beautiful Conversations principles at the START get deprioritized.
   // Adding a reminder at the END keeps principles active due to recency bias.
-  const spaceReminder = `\n\n━━━━━━━━━━━━━━━━━━━━━\n\n**CRITICAL FOR THIS RESPONSE:**
+  // ONLY in full Voyager mode (not in basic A/B test mode)
+  const spaceReminder = (!isBasicMode) ? `\n\n━━━━━━━━━━━━━━━━━━━━━\n\n**CRITICAL FOR THIS RESPONSE:**
 
 Aim for CLARITY and FLOW, not verbose reflection. The user has a full part in this conversation—give them room to speak and direct it.
 
@@ -494,7 +496,7 @@ Bad examples:
 - Multiple questions: "Does that make sense? Want me to continue? What questions do you have?" ❌
 - Compound questions: "Should we explore X, or would you prefer Y?" ❌ (Pick one direction)
 
-Verbose ≠ good. Concise ≠ good. CLARITY + FLOW + SPACE = good. Give the user a full voice in steering this conversation.`
+Verbose ≠ good. Concise ≠ good. CLARITY + FLOW + SPACE = good. Give the user a full voice in steering this conversation.` : '';
 
   return `${constitutionalPrefix}${sections.join('')}${spaceReminder}`
 }

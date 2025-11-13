@@ -9,6 +9,21 @@
 
 ---
 
+## ⚠️ CRITICAL: Follow Project Patterns
+
+**WHILE DESIGNING, KEEP IN MIND:** `.claude/PROJECT_PATTERNS.md`
+
+Even in creative mode, designs should align with our patterns:
+- 🌿 Git flow (lab → develop → main)
+- 🧩 Modular prompt composition
+- 🤖 Model layer abstraction
+- 🎨 Community configuration patterns
+- 💾 Database workflow
+
+**Design with these patterns, not against them.** Makes implementation smoother.
+
+---
+
 ## Core Philosophy: Creative Genius Unleashed
 
 **Isaac's Role:**
