@@ -44,6 +44,11 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
   const [draftMarkdown, setDraftMarkdown] = useState('')
   const [isSavingEdit, setIsSavingEdit] = useState(false)
 
+  // Export state
+  const [isExporting, setIsExporting] = useState(false)
+  const [filename, setFilename] = useState<string>('')
+  const [communityId] = useState('careersy') // TODO: Pass from props
+
   // Fetch the context anchor content on mount
   useEffect(() => {
     async function fetchAnchor() {
@@ -288,6 +293,53 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     setEditMode('ai')
   }
 
+  // Handle export as markdown
+  async function handleExport() {
+    // Get filename from user
+    const userFilename = prompt('Enter filename (without extension):', filename || 'document')
+    if (!userFilename) return // User cancelled
+
+    setFilename(userFilename)
+    setIsExporting(true)
+
+    try {
+      const response = await fetch('/api/output-artifacts/export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          contentMarkdown: markdownContent,
+          filename: userFilename,
+          artifactType: 'document',
+          communityId,
+          conversationId: null, // TODO: Track conversation ID
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to export')
+      }
+
+      const { artifact } = await response.json()
+
+      // Download the file
+      if (artifact.outputUrl) {
+        const link = document.createElement('a')
+        link.href = artifact.outputUrl
+        link.download = artifact.filename
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
+      }
+
+      alert('Document exported successfully!')
+    } catch (error) {
+      console.error('Export error:', error)
+      alert('Failed to export document. Please try again.')
+    } finally {
+      setIsExporting(false)
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
       {/* Modal Container */}
@@ -298,6 +350,22 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
             Edit with Shipwright
           </h2>
           <div className="flex items-center gap-2">
+            {/* Export Button */}
+            <button
+              onClick={handleExport}
+              disabled={isExporting}
+              className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: colors.primary,
+              }}
+              title="Export as markdown"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              </svg>
+              {isExporting ? 'Exporting...' : 'Export'}
+            </button>
+
             {/* Undo Button */}
             {previousMarkdown && (
               <button

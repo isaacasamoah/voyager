@@ -9,6 +9,7 @@ import ContextModal from './ContextModal'
 import TutorialOverlay from '../tutorial/TutorialOverlay'
 import CommandAutocomplete from './CommandAutocomplete'
 import ContextAnchors from './ContextAnchors'
+import OutputArtifacts from './OutputArtifacts'
 import { getTutorialSteps } from '../tutorial/tutorialSteps'
 import { CommunityConfig } from '@/lib/communities'
 import { getVoyageTerminology } from '@/lib/terminology'
@@ -421,6 +422,9 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
 
           {/* Context Anchors */}
           <ContextAnchors communityId={communityId} branding={fullBranding} />
+
+          {/* Output Artifacts */}
+          <OutputArtifacts communityId={communityId} branding={fullBranding} />
 
           {/* User Info & Logout - Centered */}
           <div className="px-3 py-4 border-t border-gray-100">
