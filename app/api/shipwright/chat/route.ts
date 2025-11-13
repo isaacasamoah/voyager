@@ -9,69 +9,118 @@ import { getCommunityConfig, getCommunitySystemPrompt } from '@/lib/communities'
 export const dynamic = 'force-dynamic'
 
 /**
- * Merge a section update into the full document (Surgical Updates)
+ * Merge a section update into the full document (NEW APPROACH - Header-Based Matching)
  *
- * Strategy: Use markdown section headers to identify boundaries
- * - header: Everything before first ## or ### header
- * - summary/experience/education/skills/projects: Section between matching headers
- *
- * Falls back to appending if section not found (graceful degradation)
+ * Strategy:
+ * 1. AI provides the COMPLETE section including the header (e.g., "## Work Experience\n...")
+ * 2. We extract the header from the AI's content
+ * 3. Find that exact header in the document
+ * 4. Replace everything from that header until the next ## (or end of document)
+ * 5. Much more robust - no keyword guessing, just direct header matching
  */
 function mergeSectionIntoDocument(
   currentDocument: string,
   sectionId: string,
   sectionContent: string
-): string {
-  // Section header patterns for resume/document structure
-  const sectionPatterns: Record<string, RegExp> = {
-    header: /^([\s\S]*?)(?=\n##)/m, // Everything before first ## header
-    summary: /##\s*(Professional Summary|Summary|About|Objective)([\s\S]*?)(?=\n##|$)/i,
-    experience: /##\s*(Experience|Work History|Employment)([\s\S]*?)(?=\n##|$)/i,
-    education: /##\s*(Education|Certifications|Qualifications)([\s\S]*?)(?=\n##|$)/i,
-    skills: /##\s*(Skills|Technical Skills|Technologies)([\s\S]*?)(?=\n##|$)/i,
-    projects: /##\s*(Projects|Portfolio|Personal Projects)([\s\S]*?)(?=\n##|$)/i,
-  }
-
-  const pattern = sectionPatterns[sectionId]
-
-  if (!pattern) {
-    // Unknown section - append to end (graceful fallback)
-    console.warn(`Unknown section ID: ${sectionId}, appending to end`)
-    return `${currentDocument}\n\n${sectionContent}`
-  }
+): { success: boolean; content: string; availableHeaders?: string[] } {
+  console.log('🔍 SURGICAL UPDATE DEBUG:', {
+    sectionId,
+    contentPreview: sectionContent.substring(0, 100) + '...',
+    contentIncludesHeader: sectionContent.trim().startsWith('#')
+  })
 
   // Special case: header section (content before first ##)
   if (sectionId === 'header') {
     const firstHeaderMatch = currentDocument.match(/\n##/)
     if (firstHeaderMatch && firstHeaderMatch.index !== undefined) {
       const restOfDocument = currentDocument.substring(firstHeaderMatch.index)
-      return `${sectionContent}${restOfDocument}`
+      // Strip any # markers from the content
+      const cleanContent = sectionContent.replace(/^#+\s*.*\n/, '').trim()
+      return { success: true, content: `${cleanContent}${restOfDocument}` }
     }
-    // No headers found - replace entire document
-    return sectionContent
+    return { success: true, content: sectionContent }
   }
 
-  // Standard sections: find and replace section content
-  const match = currentDocument.match(pattern)
-
-  if (match && match.index !== undefined) {
-    // Extract the section header from the match
-    const sectionHeader = match[1] ? `## ${match[1].trim()}` : ''
-
-    // Build the replacement: header + new content
-    const replacement = sectionHeader ? `${sectionHeader}\n${sectionContent}` : sectionContent
-
-    // Replace the entire matched section
-    const before = currentDocument.substring(0, match.index)
-    const after = currentDocument.substring(match.index + match[0].length)
-
-    return `${before}${replacement}${after}`
+  // Full document replacement
+  if (sectionId === 'full_document') {
+    return { success: true, content: sectionContent }
   }
 
-  // Section not found - append to end with appropriate header
-  console.warn(`Section ${sectionId} not found, appending to end`)
-  const sectionHeader = sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
-  return `${currentDocument}\n\n## ${sectionHeader}\n${sectionContent}`
+  // Extract header from AI's content (if present)
+  const headerMatch = sectionContent.match(/^##\s*([^\n]+)/)
+
+  if (!headerMatch) {
+    // AI didn't include a header - this shouldn't happen with new approach
+    console.warn('❌ AI content missing header. Expected format: "## Section Name\\ncontent..."')
+    const available = currentDocument.match(/##\s*[^\n]+/g) || []
+    return {
+      success: false,
+      content: currentDocument,
+      availableHeaders: available
+    }
+  }
+
+  const aiHeaderText = headerMatch[1].trim() // e.g., "Work Experience"
+  console.log('📝 AI provided header:', aiHeaderText)
+
+  // Find this exact header in the document (case-insensitive)
+  const escapedHeader = aiHeaderText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  const headerRegex = new RegExp(
+    `^##\\s*${escapedHeader}\\s*$`,
+    'im' // case-insensitive, multiline
+  )
+
+  // Split document into lines to find the header
+  const lines = currentDocument.split('\n')
+  let headerLineIndex = -1
+
+  for (let i = 0; i < lines.length; i++) {
+    if (headerRegex.test(lines[i])) {
+      headerLineIndex = i
+      break
+    }
+  }
+
+  if (headerLineIndex === -1) {
+    // Header not found in document
+    console.warn(`❌ Header "${aiHeaderText}" not found in document`)
+    const available = currentDocument.match(/##\s*[^\n]+/g) || []
+    console.warn('Available headers:', available)
+    return {
+      success: false,
+      content: currentDocument,
+      availableHeaders: available
+    }
+  }
+
+  console.log(`✅ Found header at line ${headerLineIndex + 1}`)
+
+  // Find the end of this section (next ## or end of document)
+  let sectionEndIndex = lines.length
+  for (let i = headerLineIndex + 1; i < lines.length; i++) {
+    if (lines[i].match(/^##\s/)) {
+      sectionEndIndex = i
+      break
+    }
+  }
+
+  console.log(`📍 Section spans lines ${headerLineIndex + 1} to ${sectionEndIndex}`)
+
+  // Build the new document:
+  // - Everything before the section
+  // - The new section content (includes header)
+  // - Everything after the section
+  const beforeSection = lines.slice(0, headerLineIndex).join('\n')
+  const afterSection = lines.slice(sectionEndIndex).join('\n')
+
+  const newDocument = [
+    beforeSection,
+    sectionContent.trim(),
+    afterSection
+  ].filter(part => part.length > 0).join('\n\n')
+
+  console.log('✅ Surgical update successful')
+  return { success: true, content: newDocument }
 }
 
 export async function POST(req: NextRequest) {
@@ -219,35 +268,52 @@ When the user asks you to edit "${anchor.filename}":
 
 **Two-Step Response Flow:**
 
-**Step 1 - Proposal (NO UPDATE YET):**
-[Explain what you propose to change and why it's better - 2-3 sentences with your domain expertise]
+**First Response - Proposal (NO UPDATE YET):**
+- Explain what you propose to change and why it's better (2-3 sentences with your domain expertise)
+- End with: "Does this sound good? I can make this change for you."
+- DO NOT include UPDATED_SECTION yet
 
-Does this sound good? I can make this change for you.
-
-**Step 2 - After User Confirms (UPDATE ONLY):**
+**Second Response - After User Confirms:**
+- Provide ONLY the UPDATED_SECTION marker with the new content
+- No additional explanation needed (you already explained in the proposal)
+- Format:
+\`\`\`
 UPDATED_SECTION: <section_identifier>
 \`\`\`markdown
-[ONLY the updated section content - DO NOT include the section header (##) itself, just the content beneath it]
+## Exact Section Header From Document
+[updated content here]
+\`\`\`
 \`\`\`
 
-**CRITICAL:** Do NOT include the section header (e.g., ## Experience, ## Skills) in your UPDATED_SECTION content. The system will handle the header automatically. Only provide the content UNDER that header.
+**CRITICAL - NEW APPROACH:**
+You MUST include the COMPLETE section with its header. Copy the exact header from the document (e.g., "## Work Experience", "## Who I Am") and include it at the start of your markdown block. This ensures we match the right section.
 
 **Section Identifiers:**
-- \`header\` - Name, contact info, title/headline at top of document
-- \`summary\` - Professional summary, about me, objective section
-- \`experience\` - Work experience, job history section
-- \`education\` - Education, certifications, courses section
-- \`skills\` - Technical skills, tools, technologies section
-- \`projects\` - Personal projects, portfolio items section
+- \`header\` - Name, contact info, title/headline at top of document (don't include ## for this one)
+- \`experience\` - Work experience section (include the ## header)
+- \`education\` - Education section (include the ## header)
+- \`skills\` - Skills section (include the ## header)
+- \`projects\` - Projects section (include the ## header)
+- For ANY other section: Just use any identifier and include the exact ## header from the document
 - \`full_document\` - Use ONLY when user explicitly asks to rewrite entire document
+
+**How to find the header:**
+1. Look at the document in context
+2. Find the section you're editing
+3. Copy its ## header EXACTLY (including any emojis, special characters, etc.)
+4. Include that header at the start of your UPDATED_SECTION content
+
+**If you can't find the section:**
+ASK THE USER: "I see these sections in your document: [list]. Which one should I update?"
 
 **Examples:**
 
+Example 1 (Header section - no ## marker):
 User: "Change my title to Senior Product Manager"
-You (Step 1 - Proposal): "I'll update your title to 'Senior Product Manager' which signals increased seniority and responsibility - this is particularly important for roles requiring 5+ years of experience. Does this sound good? I can make this change for you."
+You: "I'll update your title to 'Senior Product Manager' which signals increased seniority and responsibility - this is particularly important for roles requiring 5+ years of experience. Does this sound good? I can make this change for you."
 
 User: "yes"
-You (Step 2 - Update):
+You:
 UPDATED_SECTION: header
 \`\`\`markdown
 # Sarah Chen
@@ -257,17 +323,35 @@ sarah.chen@email.com | linkedin.com/in/sarahchen
 
 ---
 
+Example 2 (Regular section - INCLUDE the ## header):
 User: "Add metrics to my Atlassian role"
-You (Step 1 - Proposal): "I'll add a quantified achievement to your Atlassian experience - something like '15% conversion lift' with dollar impact. Hiring managers in ANZ tech prioritize metrics that show business impact. Does this sound good? I can make this change for you."
+You: "I'll add a quantified achievement to your Atlassian experience - something like '15% conversion lift' with dollar impact. Hiring managers in ANZ tech prioritize metrics that show business impact. Does this sound good? I can make this change for you."
 
 User: "sounds great"
-You (Step 2 - Update):
+You:
 UPDATED_SECTION: experience
 \`\`\`markdown
+## Work Experience
+
 ### Product Manager | Atlassian
 *Jan 2022 - Present | Sydney, AU*
 - Led checkout redesign → 15% conversion lift ($500K impact)
 - Shipped 3 major features used by 10M+ users
+\`\`\`
+
+---
+
+Example 3 (Custom section name - INCLUDE the exact ## header):
+User: "Update my Who I Am section to be more compelling"
+You: "I'll strengthen your 'Who I Am' section with more specific value props and personality. I'll lead with your unique edge and close with what drives you. Does this sound good?"
+
+User: "yes"
+You:
+UPDATED_SECTION: any
+\`\`\`markdown
+## Who I Am
+
+A product leader who turns messy problems into elegant solutions. I've spent the last 5 years at Atlassian shipping features that 10M+ people use daily - but what really drives me is the moment when complexity clicks into simplicity for users. Outside of work, you'll find me debugging terrible code in open source projects or attempting to grow tomatoes in Melbourne's unpredictable weather.
 \`\`\`"
 
 **Rules:**
@@ -373,9 +457,10 @@ UPDATED_SECTION: experience
           }
 
           // Check if response contains surgical section update
-          const sectionMarkerMatch = fullResponse.match(/UPDATED_SECTION:\s*(\w+)/)
+          // Support both standard keywords (e.g., "summary") and custom headers (e.g., "custom:Who I Am")
+          const sectionMarkerMatch = fullResponse.match(/UPDATED_SECTION:\s*([^\s\n]+(?:\s+[^\n]+)?)/i)
           if (sectionMarkerMatch) {
-            const sectionId = sectionMarkerMatch[1]
+            let sectionId = sectionMarkerMatch[1].trim()
             const afterMarker = fullResponse.split(sectionMarkerMatch[0])[1]
             const codeBlockMatch = afterMarker.match(/```markdown\n([\s\S]*?)```/)
 
@@ -385,30 +470,54 @@ UPDATED_SECTION: experience
               // If full_document, replace entire document
               if (sectionId === 'full_document') {
                 updatedMarkdown = sectionContent
+
+                // Save and send update
+                await prisma.contextAnchor.update({
+                  where: { id: anchorId },
+                  data: { contentMarkdown: updatedMarkdown }
+                })
+
+                const data = JSON.stringify({
+                  type: 'markdown_update',
+                  content: updatedMarkdown,
+                  anchorId: anchorId,
+                  version: version,
+                  sectionId: sectionId
+                })
+                controller.enqueue(encoder.encode(`data: ${data}\n\n`))
               } else {
                 // Surgical update: merge section into existing document
-                updatedMarkdown = mergeSectionIntoDocument(
+                const result = mergeSectionIntoDocument(
                   anchor.contentMarkdown,
                   sectionId,
                   sectionContent
                 )
+
+                if (result.success) {
+                  // Success - save and send update
+                  updatedMarkdown = result.content
+
+                  await prisma.contextAnchor.update({
+                    where: { id: anchorId },
+                    data: { contentMarkdown: updatedMarkdown }
+                  })
+
+                  const data = JSON.stringify({
+                    type: 'markdown_update',
+                    content: updatedMarkdown,
+                    anchorId: anchorId,
+                    version: version,
+                    sectionId: sectionId
+                  })
+                  controller.enqueue(encoder.encode(`data: ${data}\n\n`))
+                } else {
+                  // Failed to find section - log for debugging but don't update
+                  // The AI should ask the user for clarification before trying again
+                  console.warn('❌ Section update failed - section not found')
+                  console.warn('Available headers:', result.availableHeaders)
+                  console.warn('This should not happen - AI should verify section exists before providing UPDATED_SECTION')
+                }
               }
-
-              // Save updated markdown to database
-              await prisma.contextAnchor.update({
-                where: { id: anchorId },
-                data: { contentMarkdown: updatedMarkdown }
-              })
-
-              // Send markdown update to client (with sectionId for highlighting)
-              const data = JSON.stringify({
-                type: 'markdown_update',
-                content: updatedMarkdown,
-                anchorId: anchorId,
-                version: version,
-                sectionId: sectionId  // Include which section was updated
-              })
-              controller.enqueue(encoder.encode(`data: ${data}\n\n`))
             }
           } else if (fullResponse.includes('UPDATED_DOCUMENT:')) {
             // Fallback: Legacy full document update (backwards compatibility)
