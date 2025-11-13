@@ -227,8 +227,10 @@ Does this sound good? I can make this change for you.
 **Step 2 - After User Confirms (UPDATE ONLY):**
 UPDATED_SECTION: <section_identifier>
 \`\`\`markdown
-[ONLY the updated section content]
+[ONLY the updated section content - DO NOT include the section header (##) itself, just the content beneath it]
 \`\`\`
+
+**CRITICAL:** Do NOT include the section header (e.g., ## Experience, ## Skills) in your UPDATED_SECTION content. The system will handle the header automatically. Only provide the content UNDER that header.
 
 **Section Identifiers:**
 - \`header\` - Name, contact info, title/headline at top of document

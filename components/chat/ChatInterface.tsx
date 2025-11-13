@@ -420,11 +420,15 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             )}
           </div>
 
-          {/* Context Anchors */}
-          <ContextAnchors communityId={communityId} branding={fullBranding} />
+          {/* Context Anchors (Full Voyager mode only) */}
+          {!(communityId === 'careersy' && abTestMode === 'basic') && (
+            <ContextAnchors communityId={communityId} branding={fullBranding} />
+          )}
 
-          {/* Output Artifacts */}
-          <OutputArtifacts communityId={communityId} branding={fullBranding} />
+          {/* Output Artifacts (Full Voyager mode only) */}
+          {!(communityId === 'careersy' && abTestMode === 'basic') && (
+            <OutputArtifacts communityId={communityId} branding={fullBranding} />
+          )}
 
           {/* User Info & Logout - Centered */}
           <div className="px-3 py-4 border-t border-gray-100">
@@ -473,44 +477,6 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
             </button>
           </div>
 
-          {/* Center: Mode Switcher (Expert Only, Full Voyager Mode) */}
-          {isExpert && !(communityId === 'careersy' && abTestMode === 'basic') && (
-            <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center gap-2">
-              <button
-                onClick={() => {
-                  if (currentMode !== 'navigator') {
-                    setPreviousMode(currentMode)
-                    setCurrentMode('navigator')
-                  }
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  currentMode === 'navigator'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                title="Navigator mode - Private coaching"
-              >
-                🧭 Navigator
-              </button>
-              <button
-                onClick={() => {
-                  if (currentMode !== 'cartographer') {
-                    setPreviousMode(currentMode)
-                    setCurrentMode('cartographer')
-                  }
-                }}
-                className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                  currentMode === 'cartographer'
-                    ? 'bg-gray-900 text-white'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                }`}
-                title="Cartographer mode - Share knowledge"
-              >
-                🗺️ Cartographer
-              </button>
-            </div>
-          )}
-
           {/* Right: New Chat Button */}
           <button
             onClick={startNewChat}
@@ -535,8 +501,8 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                 abTestMode === 'basic' ? 'text-blue-700' : 'text-purple-700'
               }`}>
                 {abTestMode === 'basic'
-                  ? '🔵 A/B TEST: Basic Mode (GPT + Domain)'
-                  : '🟣 A/B TEST: Full Voyager (Claude + Constitutional + Cartographer)'}
+                  ? '🔵 A/B TEST: Basic Mode (Chatbot + Domain Expertise)'
+                  : '🟣 A/B TEST: Full Voyager (Claude + Constitutional + Shipwright + Context Anchors + Outputs)'}
               </span>
               <button
                 onClick={() => setAbTestMode(abTestMode === 'basic' ? 'full' : 'basic')}
