@@ -40,8 +40,8 @@ Pilot Launch → Max Tier → Multi-Community → 100K Users
 ## RECENTLY SHIPPED: CONTEXT ANCHORS + SHIPWRIGHT (DOCUMENTS) ✅
 
 **What:** Context Anchors v1.0 (Document Upload & Shipwright Editing)
-**Status:** SHIPPED - Document editing live, manual mode with CodeMirror working!
-**Milestone:** Users can upload docs, edit with AI, export polished artifacts
+**Status:** ✅ **SHIPPED - PRODUCTION READY** - Clean architecture refactor complete!
+**Milestone:** Users can upload docs, edit with AI conversation, save to outputs
 
 ### What We Shipped
 
@@ -51,18 +51,43 @@ Pilot Launch → Max Tier → Multi-Community → 100K Users
 - ✅ Display in sidebar with preview
 - ✅ Persist across conversations
 
-**Shipwright Integration (Process):**
-- ✅ Collaborative editing of Context Anchors
-- ✅ Live markdown preview
-- ✅ Conversational refinement with AI
+**Shipwright Integration - Clean Separation Pattern (Process):**
+- ✅ Conversational editing workflow (chat + preview split pane)
+- ✅ AI proposes changes and explains WHY they help
+- ✅ `/update` command triggers document regeneration (like mode switching)
+- ✅ Progress bar with real-time status (0% → 100%)
+- ✅ Full document regeneration (reliable, no surgical updates)
 - ✅ Manual editing mode with CodeMirror
 - ✅ Version tracking with undo
-- ✅ Two-pane interface (chat + preview/editor)
+- ✅ Autocomplete for commands
 
 **Output Artifacts (Exports):**
-- ✅ Export edited docs as PDF
-- ✅ Save artifact history
-- ✅ Link to Shipwright sessions
+- ✅ Save to Outputs (database storage)
+- ✅ Green success feedback message
+- ✅ Auto-dismiss notifications
+- 📋 Export as PDF (future - needs Vercel Blob token)
+
+### Architecture: Clean Separation Pattern
+
+**Before:** Complex surgical updates, streaming coordination issues, brittle section matching
+**After:** Simple conversation + command-based updates
+
+**Flow:**
+```
+1. User: "Add metrics to my work experience"
+2. AI: Proposes changes + explains impact
+3. AI: "Type /update to apply these changes"
+4. User: /update
+5. Progress bar (Analyzing → Generating → Finalizing)
+6. Document updated
+7. "✅ Document updated! Check the preview pane."
+```
+
+**Benefits:**
+- **Reliable:** Full document regeneration always works
+- **Simple:** Clear separation of concerns (chat vs updates)
+- **Maintainable:** Each API has single responsibility
+- **Extensible:** Easy to add diff highlighting later
 
 ### Why This Matters
 
@@ -70,19 +95,24 @@ Pilot Launch → Max Tier → Multi-Community → 100K Users
 - Makes AI conversations deeply personalized
 - Creates tangible outputs (polished resume, cover letter, LinkedIn posts)
 - Foundation for Shipwright mode value
+- **Commands as UI:** Reduces button clutter, feels like mode switching
 
 ### Success Metrics
 
 - ✅ Users can upload documents via drag-and-drop
 - ✅ Documents parse and display correctly (95%+ accuracy)
 - ✅ Shipwright can edit with AI guidance
+- ✅ `/update` command workflow tested and working
+- ✅ Progress bar provides real-time feedback
+- ✅ Save to Outputs working
 - ✅ Manual editing with CodeMirror works beautifully
-- ⬜ Export as PDF (coming next)
-- ⬜ User feedback: "This actually helped me ship something"
+- ⏳ User feedback: "This actually helped me ship something"
 
 ### Coming Soon: Shipwright for More
 - 📋 **Shipwright for Collab Spaces** - AI-guided question/response crafting
 - 📋 **Shipwright for Whiteboards** - Visual collaboration with AI guidance
+- 📋 **Diff Highlighting** - Show what changed in green (30 min effort)
+- 📋 **Export to PDF** - Re-enable with Vercel Blob (15 min effort)
 
 ### Team
 

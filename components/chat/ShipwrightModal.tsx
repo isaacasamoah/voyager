@@ -44,10 +44,16 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
   const [draftMarkdown, setDraftMarkdown] = useState('')
   const [isSavingEdit, setIsSavingEdit] = useState(false)
 
-  // Export state
-  const [isExporting, setIsExporting] = useState(false)
+  // Save to Outputs state
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
   const [filename, setFilename] = useState<string>('')
   const [communityId] = useState('careersy') // TODO: Pass from props
+
+  // Update progress state (NEW - for /update command)
+  const [isUpdating, setIsUpdating] = useState(false)
+  const [updateProgress, setUpdateProgress] = useState(0)
+  const [updateStatus, setUpdateStatus] = useState('')
 
   // Fetch the context anchor content on mount
   useEffect(() => {
@@ -84,6 +90,14 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     if (!input.trim() || sending) return
 
     const userMessage = input.trim()
+
+    // Check for /update command
+    if (userMessage === '/update') {
+      setInput('')
+      handleUpdate()
+      return
+    }
+
     setInput('')
     setSending(true)
 
@@ -93,13 +107,6 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     // Track if we've added an assistant message yet
     let assistantMessageAdded = false
     let assistantMessageIndex = messages.length + 1
-    let hasMarkdownUpdate = false
-
-    // Track streaming preview
-    let streamingMarkdown = ''
-    let inMarkdownBlock = false
-    let sectionStarted = false
-    let savedPreviousMarkdown = false
 
     try {
       // Call streaming API with full conversation history
@@ -162,64 +169,8 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                 })
               }
 
-              // Stream preview updates
-              // Look for UPDATED_SECTION: marker and subsequent markdown block
-              streamingMarkdown += event.content
-
-              // Check if we've entered a markdown block
-              if (!sectionStarted && streamingMarkdown.includes('UPDATED_SECTION:')) {
-                sectionStarted = true
-              }
-
-              if (sectionStarted) {
-                // Check if we've started the markdown code block
-                if (!inMarkdownBlock && streamingMarkdown.includes('```markdown')) {
-                  inMarkdownBlock = true
-                  setIsEditing(true)
-                }
-
-                // If we're in the markdown block, extract and show it in preview
-                if (inMarkdownBlock) {
-                  const markdownMatch = streamingMarkdown.match(/```markdown\n([\s\S]*?)(?:```|$)/)
-                  if (markdownMatch) {
-                    const partialMarkdown = markdownMatch[1]
-
-                    // Save previous markdown for undo (only once, before streaming starts)
-                    if (!savedPreviousMarkdown) {
-                      setMarkdownContent(prev => {
-                        setPreviousMarkdown(prev)
-                        return prev // Don't change it yet
-                      })
-                      savedPreviousMarkdown = true
-                    }
-
-                    // Stream this into the preview pane
-                    setMarkdownContent(partialMarkdown)
-                  }
-                }
-              }
-            } else if (event.type === 'markdown_update') {
-              hasMarkdownUpdate = true
-              // Final update from backend (with surgical merge applied)
-              // Don't overwrite previousMarkdown - we already saved it during streaming
-              setMarkdownContent(event.content)
-
-              setIsEditing(true)
-              setCurrentVersion(event.version)
-
-              // Show update notification if we have a sectionId
-              if (event.sectionId && event.sectionId !== 'full_document') {
-                setLastUpdate({
-                  section: formatSectionName(event.sectionId),
-                  timestamp: Date.now()
-                })
-
-                // Auto-dismiss notification after 4 seconds
-                setTimeout(() => setLastUpdate(null), 4000)
-              }
-
-              // Clear editing indicator after short delay
-              setTimeout(() => setIsEditing(false), 1000)
+              // Chat only - no preview updates during chat
+              // Document updates happen via /update command only
             } else if (event.type === 'error') {
               console.error('Stream error:', event.message)
               if (!assistantMessageAdded) {
@@ -239,33 +190,7 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                 })
               }
             } else if (event.type === 'done') {
-              // Stream complete - add completion message if we had a markdown update
-              console.log('Stream done. hasMarkdownUpdate:', hasMarkdownUpdate, 'assistantMessageAdded:', assistantMessageAdded)
-
-              if (hasMarkdownUpdate) {
-                const completionMessage = "Finished - check the preview, what do you think?"
-                if (!assistantMessageAdded) {
-                  console.log('Adding new completion message')
-                  setMessages(prev => [...prev, {
-                    role: 'assistant',
-                    content: completionMessage
-                  }])
-                } else {
-                  console.log('Appending completion to existing message at index:', assistantMessageIndex)
-                  // Append to existing message if there was chat content
-                  setMessages(prev => {
-                    const newMessages = [...prev]
-                    const currentContent = newMessages[assistantMessageIndex]?.content || ''
-                    newMessages[assistantMessageIndex] = {
-                      role: 'assistant',
-                      content: currentContent ? `${currentContent}\n\n${completionMessage}` : completionMessage
-                    }
-                    return newMessages
-                  })
-                }
-              } else {
-                console.log('No markdown update, skipping completion message')
-              }
+              // Stream complete - chat only, no document updates
               break
             }
           } catch (e) {
@@ -306,6 +231,100 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
   // Format section ID for display (e.g., "experience" -> "Experience")
   function formatSectionName(sectionId: string): string {
     return sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
+  }
+
+  // Handle /update command - trigger document regeneration
+  async function handleUpdate() {
+    if (isUpdating) return // Prevent spam
+
+    setIsUpdating(true)
+    setUpdateProgress(0)
+    setUpdateStatus('Starting update...')
+
+    // Save previous version for undo
+    setPreviousMarkdown(markdownContent)
+
+    try {
+      // Call update API with conversation history
+      const validMessages = messages.filter(msg => msg.content.trim().length > 0)
+
+      const response = await fetch('/api/shipwright/update', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          anchorId,
+          conversationHistory: validMessages
+        })
+      })
+
+      if (!response.ok) {
+        throw new Error('Failed to update document')
+      }
+
+      // Parse SSE stream for progress
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+
+      if (!reader) {
+        throw new Error('No response body')
+      }
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = line.slice(6)
+            try {
+              const event = JSON.parse(data)
+
+              if (event.type === 'progress') {
+                setUpdateProgress(event.percent)
+                setUpdateStatus(event.status)
+                console.log(`📊 Update progress: ${Math.round(event.percent * 100)}% - ${event.status}`)
+              } else if (event.type === 'complete') {
+                // Document is ready!
+                setUpdateProgress(1.0)
+                setUpdateStatus('Update complete!')
+                setMarkdownContent(event.document)
+                setIsEditing(false)
+                setCurrentVersion(prev => prev + 1)
+
+                // Add completion message to chat
+                setMessages(prev => [...prev, {
+                  role: 'assistant',
+                  content: '✅ Document updated! Check the preview pane.'
+                }])
+
+                console.log('✅ Document update complete')
+              } else if (event.type === 'error') {
+                throw new Error(event.message)
+              }
+            } catch (e) {
+              // Skip malformed JSON
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Update error:', error)
+      setUpdateStatus('Update failed')
+      setMessages(prev => [...prev, {
+        role: 'assistant',
+        content: '❌ Update failed. Please try again.'
+      }])
+    } finally {
+      // Reset progress after 2 seconds
+      setTimeout(() => {
+        setIsUpdating(false)
+        setUpdateProgress(0)
+        setUpdateStatus('')
+      }, 2000)
+    }
   }
 
   // Handle undo - revert to previous markdown version
@@ -383,50 +402,44 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     setEditMode('ai')
   }
 
-  // Handle export as markdown
-  async function handleExport() {
+  // Handle save to outputs (database only, no Blob upload)
+  async function handleSaveToOutputs() {
     // Get filename from user
     const userFilename = prompt('Enter filename (without extension):', filename || 'document')
     if (!userFilename) return // User cancelled
 
     setFilename(userFilename)
-    setIsExporting(true)
+    setIsSaving(true)
+    setSaveSuccess(false)
 
     try {
-      const response = await fetch('/api/output-artifacts/export', {
+      // Save to database via OutputArtifacts API
+      const response = await fetch('/api/output-artifacts', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           contentMarkdown: markdownContent,
-          filename: userFilename,
+          filename: userFilename.endsWith('.md') ? userFilename : `${userFilename}.md`,
           artifactType: 'document',
           communityId,
-          conversationId: null, // TODO: Track conversation ID
+          conversationId: null,
         }),
       })
 
       if (!response.ok) {
-        throw new Error('Failed to export')
+        throw new Error('Failed to save')
       }
 
-      const { artifact } = await response.json()
+      // Show success feedback
+      setSaveSuccess(true)
 
-      // Download the file
-      if (artifact.outputUrl) {
-        const link = document.createElement('a')
-        link.href = artifact.outputUrl
-        link.download = artifact.filename
-        document.body.appendChild(link)
-        link.click()
-        document.body.removeChild(link)
-      }
-
-      alert('Document exported successfully!')
+      // Auto-hide success message after 3 seconds
+      setTimeout(() => setSaveSuccess(false), 3000)
     } catch (error) {
-      console.error('Export error:', error)
-      alert('Failed to export document. Please try again.')
+      console.error('Save error:', error)
+      alert('Failed to save document. Please try again.')
     } finally {
-      setIsExporting(false)
+      setIsSaving(false)
     }
   }
 
@@ -440,20 +453,30 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
             Edit with Shipwright
           </h2>
           <div className="flex items-center gap-2">
-            {/* Export Button */}
+            {/* Save Success Feedback */}
+            {saveSuccess && (
+              <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 border border-green-200 rounded-lg text-sm text-green-700 animate-fade-in">
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                Saved to Outputs!
+              </div>
+            )}
+
+            {/* Save to Outputs Button */}
             <button
-              onClick={handleExport}
-              disabled={isExporting}
+              onClick={handleSaveToOutputs}
+              disabled={isSaving}
               className="flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               style={{
                 backgroundColor: colors.primary,
               }}
-              title="Export as markdown"
+              title="Save to Outputs"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
               </svg>
-              {isExporting ? 'Exporting...' : 'Export'}
+              {isSaving ? 'Saving...' : 'Save to Outputs'}
             </button>
 
             {/* Undo Button */}
@@ -559,14 +582,27 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
             </div>
 
             {/* Input */}
-            <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+            <div className="p-4 border-t border-gray-200 bg-white flex-shrink-0 relative">
+              {/* Command autocomplete */}
+              {input.startsWith('/') && input.length < 8 && input !== '/update' && (
+                <div className="absolute bottom-full left-4 mb-1 bg-white border border-gray-200 rounded-lg shadow-lg py-1 z-10">
+                  <button
+                    onClick={() => setInput('/update')}
+                    className="w-full px-4 py-2 text-left text-sm hover:bg-gray-50 flex items-center gap-2"
+                  >
+                    <span className="font-mono text-blue-600">/update</span>
+                    <span className="text-gray-500">Apply changes to document</span>
+                  </button>
+                </div>
+              )}
+
               <div className="flex gap-2">
                 <textarea
                   ref={inputRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Type a message..."
+                  placeholder="Type a message... (or / for commands)"
                   disabled={sending}
                   className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 disabled:bg-gray-50 disabled:text-gray-400"
                   style={{ '--tw-ring-color': colors.primary } as any}
@@ -634,6 +670,30 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                   </div>
                 )}
               </div>
+
+              {/* Progress Bar - NEW for /update command */}
+              {isUpdating && (
+                <div className="bg-blue-50 border border-blue-200 rounded px-4 py-3">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-sm font-medium text-gray-700">
+                      {updateStatus}
+                    </span>
+                    <span className="text-xs text-gray-600">
+                      {Math.round(updateProgress * 100)}%
+                    </span>
+                  </div>
+                  {/* Progress bar */}
+                  <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                    <div
+                      className="h-full rounded-full transition-all duration-300 ease-out"
+                      style={{
+                        width: `${updateProgress * 100}%`,
+                        backgroundColor: colors.primary
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* Update Notification Banner */}
               {lastUpdate && (
