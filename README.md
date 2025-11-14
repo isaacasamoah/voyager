@@ -46,10 +46,12 @@ Testing hypothesis: *"Career coaches will use Voyager to extract their tacit kno
 - Automatically enhances Navigator with expert knowledge
 - Builds compounding community intelligence
 
-**Shipwright** - Craft quality community posts
-- AI helps draft well-structured questions
-- Ensures posts are answerable and specific
-- Preserves genuine curiosity and vulnerability
+**Shipwright** - AI-powered document editing with conversation-based workflow
+- Chat with AI about document improvements (resume, cover letter, etc.)
+- AI proposes changes and explains WHY they help
+- Type `/update` to apply changes (like mode switching in Navigator)
+- Progress bar shows real-time generation status
+- Save finished documents to Outputs
 
 ### Constitutional AI Framework
 
