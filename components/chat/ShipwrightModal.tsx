@@ -54,6 +54,7 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
   const [isUpdating, setIsUpdating] = useState(false)
   const [updateProgress, setUpdateProgress] = useState(0)
   const [updateStatus, setUpdateStatus] = useState('')
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null)
 
   // Fetch the context anchor content on mount
   useEffect(() => {
@@ -233,6 +234,18 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
     return sectionId.charAt(0).toUpperCase() + sectionId.slice(1)
   }
 
+  function formatTimeAgo(date: Date): string {
+    const seconds = Math.floor((new Date().getTime() - date.getTime()) / 1000)
+
+    if (seconds < 60) return 'just now'
+    const minutes = Math.floor(seconds / 60)
+    if (minutes < 60) return `${minutes}m ago`
+    const hours = Math.floor(minutes / 60)
+    if (hours < 24) return `${hours}h ago`
+    const days = Math.floor(hours / 24)
+    return `${days}d ago`
+  }
+
   // Handle /update command - trigger document regeneration
   async function handleUpdate() {
     if (isUpdating) return // Prevent spam
@@ -293,11 +306,12 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                 setMarkdownContent(event.document)
                 setIsEditing(false)
                 setCurrentVersion(prev => prev + 1)
+                setLastSavedAt(new Date())
 
                 // Add completion message to chat
                 setMessages(prev => [...prev, {
                   role: 'assistant',
-                  content: '✅ Document updated! Check the preview pane.'
+                  content: '✅ **Working document saved!** Your changes are now in the preview pane.\n\n💡 This is your source document - it will show these updates next time you open Shipwright.'
                 }])
 
                 console.log('✅ Document update complete')
@@ -628,9 +642,16 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
             <div className="px-4 md:px-6 py-3 border-b border-gray-200 bg-white flex-shrink-0 flex flex-col gap-2">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
-                  <h3 className="text-sm font-semibold text-gray-700">
-                    {editMode === 'manual' ? 'Edit Document' : 'Preview'}
-                  </h3>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-sm font-semibold text-gray-700">
+                      {editMode === 'manual' ? 'Edit Document' : 'Working Document'}
+                    </h3>
+                    {lastSavedAt && (
+                      <span className="text-xs text-gray-500">
+                        • Saved {formatTimeAgo(lastSavedAt)}
+                      </span>
+                    )}
+                  </div>
                   {/* Mode Toggle - uses community colors */}
                   <div className="flex items-center rounded-lg border border-gray-300 overflow-hidden">
                     <button
