@@ -301,25 +301,33 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                 console.log(`📊 Update progress: ${Math.round(event.percent * 100)}% - ${event.status}`)
               } else if (event.type === 'complete') {
                 // Document is ready!
+                console.log('✅ Received complete event:', event)
                 setUpdateProgress(1.0)
                 setUpdateStatus('Update complete!')
-                setMarkdownContent(event.document)
-                setIsEditing(false)
-                setCurrentVersion(prev => prev + 1)
-                setLastSavedAt(new Date())
 
-                // Add completion message to chat
-                setMessages(prev => [...prev, {
-                  role: 'assistant',
-                  content: '✅ **Working document saved!** Your changes are now in the preview pane.\n\n💡 This is your source document - it will show these updates next time you open Shipwright.'
-                }])
+                if (event.document) {
+                  console.log('✅ Updating markdown content with new document')
+                  setMarkdownContent(event.document)
+                  setIsEditing(false)
+                  setCurrentVersion(prev => prev + 1)
+                  setLastSavedAt(new Date())
 
-                console.log('✅ Document update complete')
+                  // Add completion message to chat
+                  setMessages(prev => [...prev, {
+                    role: 'assistant',
+                    content: '✅ **Working document saved!** Your changes are now in the preview pane.\n\n💡 This is your source document - it will show these updates next time you open Shipwright.'
+                  }])
+
+                  console.log('✅ Document update complete - UI updated')
+                } else {
+                  console.error('❌ Complete event received but no document in payload')
+                }
               } else if (event.type === 'error') {
                 throw new Error(event.message)
               }
             } catch (e) {
-              // Skip malformed JSON
+              // Log parsing errors for debugging
+              console.warn('⚠️ Failed to parse SSE event:', data, e)
             }
           }
         }
