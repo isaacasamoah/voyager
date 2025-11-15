@@ -3,6 +3,8 @@
 import { useState, useEffect, useRef } from 'react'
 import dynamic from 'next/dynamic'
 import { markdown } from '@codemirror/lang-markdown'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 // Dynamically import CodeMirror to avoid SSR issues
 const CodeMirror = dynamic(() => import('@uiw/react-codemirror'), { ssr: false })
@@ -809,11 +811,15 @@ export default function ShipwrightModal({ anchorId, onClose, branding }: Shipwri
                   </div>
                 </div>
               ) : (
-                /* AI Mode - Preview */
-                <div className="prose prose-sm max-w-none">
-                  <pre className="whitespace-pre-wrap font-mono text-xs md:text-sm text-gray-800 bg-white p-3 md:p-4 rounded-lg border border-gray-200">
-                    {markdownContent || '(empty document)'}
-                  </pre>
+                /* AI Mode - Rendered Preview */
+                <div className="prose prose-sm max-w-none p-4">
+                  {markdownContent ? (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {markdownContent}
+                    </ReactMarkdown>
+                  ) : (
+                    <p className="text-gray-400 italic">(empty document)</p>
+                  )}
                 </div>
               )}
             </div>
