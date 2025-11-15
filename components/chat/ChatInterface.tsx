@@ -57,6 +57,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
   const [previousMode, setPreviousMode] = useState<'navigator' | 'cartographer' | null>(null)
   const [isExpert, setIsExpert] = useState(false)
   const [abTestMode, setAbTestMode] = useState<'basic' | 'full'>(FEATURE_FLAGS.CAREERSY_MODE) // A/B test mode for Careersy - defaults from feature flags
+  const [activeCommunityCommand, setActiveCommunityCommand] = useState<string | null>(null) // Active community command prompt (e.g., Jung's prompt)
   const [showCommandAutocomplete, setShowCommandAutocomplete] = useState(false)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const messagesContainerRef = useRef<HTMLDivElement>(null)
@@ -248,6 +249,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           mode: currentMode, // Pass current mode to API
           previousMode: previousMode, // Signal mode switch if it just happened
           abTestMode: communityId === 'careersy' ? abTestMode : undefined, // A/B test mode for Careersy
+          activeCommunityCommand: activeCommunityCommand, // Pass active community command prompt (e.g., Jung's prompt)
         }),
       })
 
@@ -272,7 +274,19 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
           setCurrentMode(data.newMode)
         }
 
-        // Add command response to messages
+        // Handle community command - inject prompt into system
+        if (data.communityCommandPrompt) {
+          // Add command acknowledgment to messages
+          setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
+
+          // Store community command prompt in conversation state
+          // This will be injected into system prompt for subsequent messages
+          setActiveCommunityCommand(data.communityCommandPrompt)
+          setLoading(false)
+          return
+        }
+
+        // Add regular command response to messages
         setMessages(prev => [...prev, { role: 'assistant', content: data.message }])
         setLoading(false)
         return
@@ -528,9 +542,9 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                   <Image
                     src={fullBranding.logo}
                     alt={communityConfig.name}
-                    width={80}
-                    height={80}
-                    className="object-contain mx-auto mb-4 md:mb-6 opacity-90 w-16 h-16 md:w-24 md:h-24 lg:w-30 lg:h-30"
+                    width={40}
+                    height={40}
+                    className="object-contain mx-auto mb-4 md:mb-6 opacity-90 w-8 h-8 md:w-12 md:h-12 lg:w-14 lg:h-14"
                   />
                 )}
                 <h1 className={`${fullBranding.typography.title.font} text-4xl md:text-5xl lg:${fullBranding.typography.title.size} ${fullBranding.typography.title.weight} ${fullBranding.typography.title.tracking} mb-2`} style={{ color: fullBranding.colors.text }}>
@@ -623,7 +637,7 @@ export default function ChatInterface({ communityId, communityConfig, fullBrandi
                       setShowCommandAutocomplete(false)
                     }
                   }}
-                  placeholder="What's your next career move?"
+                  placeholder={communityConfig.inputPlaceholder || "What's your next career move?"}
                   className={`w-full px-4 py-3 md:px-6 md:py-4 pr-12 md:pr-14 ${fullBranding.components.input} transition-colors text-base placeholder:text-gray-400`}
                   disabled={loading}
                 />

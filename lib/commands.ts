@@ -11,12 +11,16 @@ export interface CommandResult {
   command?: string
   mode?: VoyagerMode
   responseMessage?: string
+  communityCommandPrompt?: string  // For community commands (e.g., /jung, /freud)
 }
+
+import type { CommunityConfig } from './communities'
 
 /**
  * Detect and parse slash commands from user input
+ * Supports both platform commands (mode switching) and community commands (domain-specific)
  */
-export function parseCommand(message: string): CommandResult {
+export function parseCommand(message: string, communityConfig?: CommunityConfig): CommandResult {
   const trimmed = message.trim()
 
   // Not a command if doesn't start with /
@@ -59,10 +63,8 @@ export function parseCommand(message: string): CommandResult {
       }
 
     case 'help':
-      return {
-        isCommand: true,
-        command: 'help',
-        responseMessage: `**Available Commands:**
+      // Build help message dynamically
+      let helpMessage = `**Available Commands:**
 
 **/navigator**
 Switch to Navigator mode (1-on-1 coaching)
@@ -74,14 +76,54 @@ Switch to Cartographer mode (knowledge extraction)
 Switch to Shipwright mode (post crafting)
 
 **/help**
-Show this help message
+Show this help message`
+
+      // Add community commands if they exist
+      if (communityConfig?.communityCommands && communityConfig.communityCommands.length > 0) {
+        helpMessage += `
+
+---
+
+**Community Commands:**
+
+`
+        communityConfig.communityCommands.forEach(cmd => {
+          helpMessage += `**/${cmd.command}** - ${cmd.displayName}
+${cmd.description}
+
+`
+        })
+      }
+
+      helpMessage += `
 
 ---
 
 Just type a command to switch modes. Your conversation context carries over.`
+
+      return {
+        isCommand: true,
+        command: 'help',
+        responseMessage: helpMessage
       }
 
     default:
+      // Check if it's a community command
+      if (communityConfig?.communityCommands) {
+        const communityCommand = communityConfig.communityCommands.find(
+          cmd => cmd.command.toLowerCase() === command
+        )
+
+        if (communityCommand) {
+          return {
+            isCommand: true,
+            command,
+            communityCommandPrompt: communityCommand.prompt,
+            responseMessage: `Switching to ${communityCommand.displayName}...`
+          }
+        }
+      }
+
       // Unknown command
       return {
         isCommand: true,
@@ -93,24 +135,38 @@ Just type a command to switch modes. Your conversation context carries over.`
 
 /**
  * Get available commands for autocomplete
+ * Returns both platform commands and community-specific commands
  */
-export function getAvailableCommands() {
-  return [
+export function getAvailableCommands(communityConfig?: CommunityConfig) {
+  const platformCommands = [
     {
       command: '/navigator',
-      description: 'Personal coaching mode'
+      description: 'Personal coaching mode',
+      type: 'platform' as const
     },
     {
       command: '/cartographer',
-      description: 'Knowledge extraction mode'
+      description: 'Knowledge extraction mode',
+      type: 'platform' as const
     },
     {
       command: '/shipwright',
-      description: 'Post crafting mode'
+      description: 'Post crafting mode',
+      type: 'platform' as const
     },
     {
       command: '/help',
-      description: 'Show available commands'
+      description: 'Show available commands',
+      type: 'platform' as const
     }
   ]
+
+  const communityCommands = communityConfig?.communityCommands?.map(cmd => ({
+    command: `/${cmd.command}`,
+    description: cmd.description,
+    displayName: cmd.displayName,
+    type: 'community' as const
+  })) || []
+
+  return [...platformCommands, ...communityCommands]
 }

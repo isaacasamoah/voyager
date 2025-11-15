@@ -24,29 +24,30 @@ export const dynamic = 'force-dynamic'
 
 export async function POST(req: NextRequest) {
   try {
-    const { message, conversationId, communityId = 'careersy', mode = 'navigator', previousMode, incomingHistory, abTestMode } = await req.json()
+    const { message, conversationId, communityId = 'careersy', mode = 'navigator', previousMode, incomingHistory, abTestMode, activeCommunityCommand } = await req.json()
 
     // Validation
     if (!message || typeof message !== 'string' || message.trim().length === 0) {
       return NextResponse.json({ error: 'Invalid message' }, { status: 400 })
     }
 
-    // Check for commands (mode switching, help, etc.)
-    const commandResult = parseCommand(message)
+    // Get community config first (needed for command parsing)
+    const communityConfig = getCommunityConfig(communityId)
+    if (!communityConfig) {
+      return NextResponse.json({ error: 'Community not found' }, { status: 404 })
+    }
+
+    // Check for commands (mode switching, community commands, help, etc.)
+    const commandResult = parseCommand(message, communityConfig)
     if (commandResult.isCommand && commandResult.responseMessage) {
-      // Return command response with mode change metadata
+      // Return command response with metadata
       return NextResponse.json({
         message: commandResult.responseMessage,
         modeChanged: !!commandResult.mode,
         newMode: commandResult.mode,
-        isCommandResponse: true
+        isCommandResponse: true,
+        communityCommandPrompt: commandResult.communityCommandPrompt  // For community commands
       })
-    }
-
-    // Get community config
-    const communityConfig = getCommunityConfig(communityId)
-    if (!communityConfig) {
-      return NextResponse.json({ error: 'Community not found' }, { status: 404 })
     }
 
     // Select model based on community and A/B test mode (runtime toggle)
@@ -58,7 +59,8 @@ export async function POST(req: NextRequest) {
       : anthropic('claude-sonnet-4-20250514')  // Full Voyager mode
 
     // Build system prompt from community config (pass abTestMode for constitutional layer control)
-    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode, communityId, abTestMode: effectiveMode })
+    // Pass activeCommunityCommand to inject persona prompt while preserving constitutional layer
+    let systemPrompt = getCommunitySystemPrompt(communityConfig, { mode, communityId, abTestMode: effectiveMode, communityCommandPrompt: activeCommunityCommand })
 
     // Voyager: No auth required, no conversation history
     if (communityId === 'voyager') {

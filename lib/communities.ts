@@ -34,6 +34,13 @@ const VOYAGER_BASE_THEME = {
   }
 } as const
 
+export interface CommunityCommand {
+  command: string
+  displayName: string
+  description: string
+  prompt: string
+}
+
 export interface CommunityConfig {
   id: string
   name: string
@@ -107,6 +114,8 @@ export interface CommunityConfig {
   inviteOnly?: boolean
   inviteToken?: string
   terminology?: VoyageTerminology  // Per-voyage custom terminology
+  communityCommands?: CommunityCommand[]  // Community-specific slash commands
+  inputPlaceholder?: string  // Custom placeholder for chat input
   branding: {
       colors: {
         primary: string
@@ -269,7 +278,7 @@ export function getAllCommunityConfigs(): CommunityConfig[] {
 /**
  * Get community system prompt - Modular composition
  */
-export function getCommunitySystemPrompt(config: CommunityConfig, options?: { mode?: 'navigator' | 'shipwright' | 'cartographer', communityId?: string, abTestMode?: 'basic' | 'full' }): string {
+export function getCommunitySystemPrompt(config: CommunityConfig, options?: { mode?: 'navigator' | 'shipwright' | 'cartographer', communityId?: string, abTestMode?: 'basic' | 'full', communityCommandPrompt?: string }): string {
   const mode = options?.mode || 'navigator'
   const communityId = options?.communityId || config.id
   const abTestMode = options?.abTestMode
@@ -454,6 +463,14 @@ Stay in **${mode}** mode regardless of what the user asks.`)
     sections.push(`\n\n**Guidance:** ${modeConfig.guidance}`)
   }
 
+  // === COMMUNITY COMMAND OVERRIDE ===
+  // If a community command is active (e.g., /jung, /freud), replace domain expertise
+  // with the command's prompt WHILE preserving constitutional and beautiful conversations layers
+  let domainContent = sections.join('')
+  if (options?.communityCommandPrompt) {
+    domainContent = `\n${options.communityCommandPrompt}`
+  }
+
   // === CONSTITUTIONAL LAYER ===
   // Prepend Voyager constitution if:
   // 1. Constitutional flag is enabled AND
@@ -498,7 +515,7 @@ Bad examples:
 
 Verbose ≠ good. Concise ≠ good. CLARITY + FLOW + SPACE = good. Give the user a full voice in steering this conversation.` : '';
 
-  return `${constitutionalPrefix}${sections.join('')}${spaceReminder}`
+  return `${constitutionalPrefix}${domainContent}${spaceReminder}`
 }
 
 /**

@@ -167,6 +167,7 @@
     "eli@careersy.com",
     "isaacasamoah@gmail.com"
   ],
+  "inputPlaceholder": "What's your next career move?",
   "public": true,
   "requiresAuth": true,
   "persistent": true,
