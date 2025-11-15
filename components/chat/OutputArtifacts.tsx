@@ -7,6 +7,7 @@ interface OutputArtifact {
   filename: string
   artifactType: string
   createdAt: string
+  contentMarkdown?: string
   outputUrl?: string
 }
 
@@ -65,15 +66,46 @@ export default function OutputArtifacts({ communityId, branding }: OutputArtifac
     }
   }
 
-  function handleDownload(artifact: OutputArtifact) {
-    if (!artifact.outputUrl) return
+  async function handleDownload(artifact: OutputArtifact) {
+    try {
+      // Fetch full artifact with contentMarkdown if not already loaded
+      let content = artifact.contentMarkdown
 
-    const link = document.createElement('a')
-    link.href = artifact.outputUrl
-    link.download = artifact.filename
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
+      if (!content) {
+        const response = await fetch(`/api/output-artifacts/${artifact.id}`)
+        if (!response.ok) throw new Error('Failed to fetch artifact content')
+        const data = await response.json()
+        content = data.artifact.contentMarkdown
+      }
+
+      if (!content) {
+        alert('No content available to download')
+        return
+      }
+
+      // Create blob from markdown content
+      const blob = new Blob([content], { type: 'text/markdown' })
+      const url = URL.createObjectURL(blob)
+
+      // Ensure filename has .md extension
+      const filename = artifact.filename.endsWith('.md')
+        ? artifact.filename
+        : `${artifact.filename}.md`
+
+      // Download
+      const link = document.createElement('a')
+      link.href = url
+      link.download = filename
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Cleanup
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error('Download error:', error)
+      alert('Failed to download artifact. Please try again.')
+    }
   }
 
   function getFileIcon(type: string) {

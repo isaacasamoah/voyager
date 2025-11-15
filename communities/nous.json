@@ -86,7 +86,7 @@
     "eli@careersy.com"
   ],
   "public": true,
-  "requiresAuth": true,
+  "requiresAuth": false,
   "persistent": true,
   "allowPublicConversations": false,
   "terminology": {
